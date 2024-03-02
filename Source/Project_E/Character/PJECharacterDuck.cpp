@@ -3,3 +3,11 @@
 
 #include "Character/PJECharacterDuck.h"
 
+APJECharacterDuck::APJECharacterDuck()
+{
+}
+
+void APJECharacterDuck::BeginPlay()
+{
+	Super::BeginPlay();
+}

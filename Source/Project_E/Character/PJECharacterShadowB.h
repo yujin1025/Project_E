@@ -13,5 +13,18 @@ UCLASS()
 class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadowA
 {
 	GENERATED_BODY()
-	
+public:
+	APJECharacterShadowB();
+
+protected:
+	virtual void BeginPlay() override;
+
+// AI Section
+protected:
+	virtual float GetAIPatrolRadius() override;
+	virtual float GetAIDetectRange() override;
+	virtual float GetAIAttackRange() override;
+	virtual float GetAITurnSpeed() override;
+
+	virtual void AttackByAI() override;
 };

@@ -3,3 +3,11 @@
 
 #include "Character/PJECharacterCat.h"
 
+APJECharacterCat::APJECharacterCat()
+{
+}
+
+void APJECharacterCat::BeginPlay()
+{
+	Super::BeginPlay();
+}

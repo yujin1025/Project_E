@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "PJEGameInterface.generated.h"
+#include "PJECharacterItemInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UPJEGameInterface : public UInterface
+class UPJECharacterItemInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,11 +16,11 @@ class UPJEGameInterface : public UInterface
 /**
  * 
  */
-class PROJECT_E_API IPJEGameInterface
+class PROJECT_E_API IPJECharacterItemInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void OnPlayerDead(int PlayerNumber) = 0;
+	virtual void TakeItem() = 0;
 };

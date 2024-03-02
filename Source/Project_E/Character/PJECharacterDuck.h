@@ -13,5 +13,11 @@ UCLASS()
 class PROJECT_E_API APJECharacterDuck : public APJECharacterPlayer
 {
 	GENERATED_BODY()
-	
+public:
+	APJECharacterDuck();
+
+protected:
+	virtual void BeginPlay() override;
+
+// TODO : Attack, Shoot, Swallow, etc...
 };

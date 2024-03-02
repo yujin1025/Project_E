@@ -14,4 +14,13 @@ class PROJECT_E_API APJECharacterCat : public APJECharacterPlayer
 {
 	GENERATED_BODY()
 	
+public:
+	APJECharacterCat();
+
+protected:
+	virtual void BeginPlay() override;
+
+// Action Section
+protected:
+	//TODO : Attack, Jump, Swing, etc...
 };
