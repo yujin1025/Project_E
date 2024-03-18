@@ -9,7 +9,7 @@
 #include "PJECharacterPlayer.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IABCharacterHUDInterface*/, public IPJECharacterItemInterface
@@ -25,7 +25,7 @@ protected:
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-// Camera Section
+	// Camera Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
@@ -33,17 +33,26 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
-// Input Section
+	UPROPERTY(EditAnywhere)
+	float RaycastTargetLength = 100.0f;
+
+public:
+	virtual FVector GetTargetPosition(ECollisionChannel Channel, float RayCastDistance);
+
+	// Input Section
 protected:
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	//TObjectPtr<class UInputAction> MoveAction; etc...
-
+	void ShowPopUI();
 	void Attack();
-// UI Section
+	// UI Section
 protected:
 	//virtual void SetupHUDWidget(class UABHUDWidget* InHUDWidget) override;
 
-//Item Section
+ //Item Section
 protected:
 	virtual void TakeItem() override;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float PopupDistance;
 };

@@ -11,3 +11,20 @@ void APJECharacterDuck::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+void APJECharacterDuck::Attack()
+{
+	Super::Attack();
+}
+
+void APJECharacterDuck::Swallow()
+{
+}
+
+void APJECharacterDuck::Shoot()
+{
+}
+
+void APJECharacterDuck::RapidFire()
+{
+}

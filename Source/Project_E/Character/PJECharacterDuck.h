@@ -7,7 +7,7 @@
 #include "PJECharacterDuck.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class PROJECT_E_API APJECharacterDuck : public APJECharacterPlayer
@@ -19,5 +19,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// TODO : Attack, Shoot, Swallow, etc...
+protected:
+	void Attack(); //¹°±â
+	void Swallow();
+	void Shoot();
+	void RapidFire();
 };
