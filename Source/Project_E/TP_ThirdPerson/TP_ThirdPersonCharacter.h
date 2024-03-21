@@ -8,6 +8,9 @@
 #include "TP_ThirdPersonCharacter.generated.h"
 
 
+class IPJEInteractInterface;
+class UBoxComponent;
+
 UCLASS(config=Game)
 class ATP_ThirdPersonCharacter : public ACharacter
 {
@@ -62,5 +65,16 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UFUNCTION()
+	virtual void VolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
+	UFUNCTION()
+	virtual void VolumeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+protected:
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Volume;
+
+	IPJEInteractInterface* Interface = nullptr;
 };
 

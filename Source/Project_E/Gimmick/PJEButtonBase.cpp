@@ -5,6 +5,7 @@
 
 #include "PJEPlatform.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -23,6 +24,9 @@ APJEButtonBase::APJEButtonBase()
 	ButtonMesh->SetupAttachment(RootComponent);
 	ButtonMesh->SetGenerateOverlapEvents(false);
 
+	Widget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
+	Widget->SetupAttachment(ButtonMesh);
+
 }
 
 // Called when the game starts or when spawned
@@ -31,17 +35,6 @@ void APJEButtonBase::BeginPlay()
 	Super::BeginPlay();
 
 	OriginLocation = ButtonMesh->GetRelativeLocation();
-
-	// 버튼 작동 테스트를 위해 APawn* Character를 생성하여 적용시킴
-	// 실제 게임에서는 Cast를 통해 PlayerDuck & Cat 판별해야 함
-	Character = Cast<APawn>(UGameplayStatics::GetPlayerPawn(this, 0));
-
-	// Event Binding
-	// Warning : 캐릭터에 Generate Overlap Event가 적용된 Component가 여러 개 있다면 해당 수 만큼 실행된다.
-	// 해결법 반드시 찾을 것
-	ButtonTrigger->OnComponentBeginOverlap.AddDynamic(this, &APJEButtonBase::ButtonBeginOverlap);
-	ButtonTrigger->OnComponentEndOverlap.AddDynamic(this, &APJEButtonBase::ButtonEndOverlap);
-
 }
 
 void APJEButtonBase::MoveButton(float DeltaTime)
@@ -83,28 +76,6 @@ void APJEButtonBase::MoveButton(float DeltaTime)
 	}
 }
 
-void APJEButtonBase::ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
-{
-	// 버튼 작동 테스트를 위해 APawn* Character를 생성하여 적용시킴
-	// 실제 게임에서는 Cast를 통해 PlayerDuck & Cat 판별해야 함
-	if(Character) // Nullptr Check
-	{
-		if(OtherActor != Character) return;
-	}
-}
-
-void APJEButtonBase::ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	// 버튼 작동 테스트를 위해 APawn* Character를 생성하여 적용시킴
-	// 실제 게임에서는 Cast를 통해 PlayerDuck & Cat 판별해야 함
-	if(Character) // Nullptr Check
-	{
-		if(OtherActor != Character) return;
-	}
-}
-
 void APJEButtonBase::NotifyActiveToPlatform(bool ButtonActive)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Now Button Active : %d"), ButtonActive);
@@ -116,5 +87,12 @@ void APJEButtonBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APJEButtonBase::InInteracting()
+{
+	IPJEInteractInterface::InInteracting();
+
+	UE_LOG(LogTemp, Warning, TEXT("Interact!"));
 }
 

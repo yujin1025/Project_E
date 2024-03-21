@@ -16,8 +16,7 @@ class PROJECT_E_API APJEPressButton : public APJEButtonBase
 
 protected:
 	virtual void BeginPlay() override;
-	
-	virtual void ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit) override;
-	virtual void ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
-	
+
+public:
+	virtual void Tick(float DeltaSeconds) override;
 };

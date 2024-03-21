@@ -3,14 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PJEInteractInterface.h"
 #include "GameFramework/Actor.h"
 #include "PJEButtonBase.generated.h"
 
+class UWidgetComponent;
 class APJEPlatform;
 class UBoxComponent;
 
 UCLASS()
-class PROJECT_E_API APJEButtonBase : public AActor
+class PROJECT_E_API APJEButtonBase : public AActor, public IPJEInteractInterface
 {
 	GENERATED_BODY()
 	
@@ -22,12 +24,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void MoveButton(float DeltaTime);
-
-	UFUNCTION()
-	virtual void ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
-	UFUNCTION()
-	virtual void ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+	
 	void NotifyActiveToPlatform(bool ButtonActive);
 
 public:	
@@ -35,7 +32,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	bool bButtonActive = false;
-	
+
+	virtual void InInteracting() override;
+
 protected:
 	// Button Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -57,8 +56,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<APJEPlatform>> Platforms;
-	
-	// To be removed later
-	APawn* Character;
+
+	UPROPERTY(EditAnywhere)
+	UWidgetComponent* Widget;
 
 };

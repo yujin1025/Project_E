@@ -9,6 +9,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/BoxComponent.h"
+#include "Gimmick/PJEInteractInterface.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,6 +49,10 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Create a Interaction Volume
+	Volume = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionVolume"));
+	Volume->SetupAttachment(RootComponent);
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -64,6 +70,25 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	Volume->OnComponentBeginOverlap.AddDynamic(this, &ATP_ThirdPersonCharacter::VolumeBeginOverlap);
+	Volume->OnComponentEndOverlap.AddDynamic(this, &ATP_ThirdPersonCharacter::VolumeEndOverlap);
+}
+
+void ATP_ThirdPersonCharacter::VolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+{
+	Interface = Cast<IPJEInteractInterface>(OtherActor);
+
+	if(Interface)
+	{
+		Interface->InInteracting();
+	}
+}
+
+void ATP_ThirdPersonCharacter::VolumeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
 
 //////////////////////////////////////////////////////////////////////////

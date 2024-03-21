@@ -12,3 +12,8 @@ void IPJEInteractInterface::HideInteractWidget()
 {
 	
 }
+
+void IPJEInteractInterface::InInteracting()
+{
+	
+}

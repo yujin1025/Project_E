@@ -3,25 +3,24 @@
 
 #include "Gimmick/PJEPressButton.h"
 
+#include "Components/BoxComponent.h"
+
 void APJEPressButton::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
 
-void APJEPressButton::ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+void APJEPressButton::Tick(float DeltaSeconds)
 {
-	Super::ButtonBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, Hit);
-	
-	bButtonInteract = true;
-}
+	Super::Tick(DeltaSeconds);
 
-void APJEPressButton::ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	Super::ButtonEndOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
+	// Get overlapped actors every tick
+	TArray<AActor*> OverlappedActors;
+	ButtonTrigger->GetOverlappingActors(OverlappedActors);
 
-	bButtonInteract = false;
+	// Find most appropriate Actor
+	for(auto OverlappedActor:OverlappedActors)
+	{
+		
+	}
 }

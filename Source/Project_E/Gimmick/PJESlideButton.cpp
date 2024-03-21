@@ -3,24 +3,6 @@
 
 #include "Gimmick/PJESlideButton.h"
 
-void APJESlideButton::ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
-{
-	Super::ButtonBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, Hit);
-
-	// a. Show Interaction UI
-	// b. Enable Interaction
-}
-
-void APJESlideButton::ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	Super::ButtonEndOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
-
-	// a. Show Interaction UI
-	// b. Enable Interaction
-}
-
 // TODO: Make Interact
 // Interaction Key is [E] (can be changed)
 // Interaction Type is [Hold]

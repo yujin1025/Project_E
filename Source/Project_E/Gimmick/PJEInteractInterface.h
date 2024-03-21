@@ -19,4 +19,6 @@ class PROJECT_E_API IPJEInteractInterface
 public:
 	virtual void ShowInteractWidget();
 	virtual void HideInteractWidget();
+
+	virtual void InInteracting();
 };
