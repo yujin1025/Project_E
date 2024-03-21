@@ -4,6 +4,8 @@
 #include "PJECharacterPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "InputActionValue.h"
+#include "EnhancedInputComponent.h"
 //#include "InputMappingContext.h"
 #include <Interface/PJEGameInterface.h>
 #include "Game/PJEGameModeBase.h"
@@ -11,9 +13,13 @@
 APJECharacterPlayer::APJECharacterPlayer()
 {
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-    CameraBoom->SetupAttachment(RootComponent);
+    CameraBoom->SetupAttachment(GetMesh());
+    CameraBoom->TargetArmLength = 600.0f;
+    CameraBoom->bUsePawnControlRotation = true;
+
     FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
     FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+    FollowCamera->bUsePawnControlRotation = false;
 }
 
 void APJECharacterPlayer::BeginPlay()
@@ -27,9 +33,23 @@ void APJECharacterPlayer::BeginPlay()
     }
 }
 
+void APJECharacterPlayer::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+}
+
 void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    PlayerInputComponent->BindAxis(FName("MoveForward"), this, &APJECharacterPlayer::MoveForward);
+    PlayerInputComponent->BindAxis("MoveRight", this, &APJECharacterPlayer::MoveRight);
+    PlayerInputComponent->BindAxis("Turn", this, &APJECharacterPlayer::Turn);
+    PlayerInputComponent->BindAxis("LookUp", this, &APJECharacterPlayer::LookUp);
+
+    //if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+        //EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
+    //}
 }
 
 
@@ -64,6 +84,36 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
     }
 
     return End;
+}
+
+void APJECharacterPlayer::MoveForward(float Value)
+{
+    if (Controller != nullptr && Value != 0.f)
+    {
+        const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+        const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
+        AddMovementInput(Direction, Value);
+    }
+}
+
+void APJECharacterPlayer::MoveRight(float Value)
+{
+    if (Controller != nullptr && Value != 0.f)
+    {
+        const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+        const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
+        AddMovementInput(Direction, Value);
+    }
+}
+
+void APJECharacterPlayer::Turn(float Value)
+{
+    AddControllerYawInput(Value);
+}
+
+void APJECharacterPlayer::LookUp(float Value)
+{
+    AddControllerPitchInput(Value);
 }
 
 void APJECharacterPlayer::SetDead()

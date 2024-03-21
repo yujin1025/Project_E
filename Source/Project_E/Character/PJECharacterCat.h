@@ -28,12 +28,15 @@ protected:
 	bool bFirstJump = true;
 
 	UPROPERTY(EditAnywhere)
-	bool bIsWalking = false;
+	bool bIsWalking = true;
+
+	int32 JumpCount = 0;
 
 	// Action Section
 protected:
 	void DoubleJump();
 	void Dash();
+	void StopDash();
 	void Attack(); //¿‚±‚
 	void Swing();
 };

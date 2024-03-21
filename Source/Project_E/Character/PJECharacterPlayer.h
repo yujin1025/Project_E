@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "PJECharacterBase.h"
-//#include "InputActionValue.h"
 #include "Interface/PJECharacterItemInterface.h"
 #include "PJECharacterPlayer.generated.h"
 
+class UInputAction;
 /**
  *
  */
@@ -23,6 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetDead() override;
 public:
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Camera Section
@@ -41,13 +42,20 @@ public:
 
 	// Input Section
 protected:
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	//TObjectPtr<class UInputAction> MoveAction; etc...
-	void ShowPopUI();
-	void Attack();
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	//UInputAction* MoveAction;
+
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void Turn(float Value);
+	void LookUp(float Value);
+
 	// UI Section
 protected:
 	//virtual void SetupHUDWidget(class UABHUDWidget* InHUDWidget) override;
+
+	void ShowPopUI();
+	void Attack();
 
  //Item Section
 protected:
