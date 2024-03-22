@@ -33,7 +33,8 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	bool bButtonActive = false;
 
-	virtual void InInteracting() override;
+	virtual void ShowInteractWidget() override;
+	virtual void HideInteractWidget() override;
 
 protected:
 	// Button Components
@@ -59,5 +60,4 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UWidgetComponent* Widget;
-
 };

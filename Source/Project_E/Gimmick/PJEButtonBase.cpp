@@ -35,6 +35,7 @@ void APJEButtonBase::BeginPlay()
 	Super::BeginPlay();
 
 	OriginLocation = ButtonMesh->GetRelativeLocation();
+	Widget->SetVisibility(false);
 }
 
 void APJEButtonBase::MoveButton(float DeltaTime)
@@ -89,10 +90,16 @@ void APJEButtonBase::Tick(float DeltaTime)
 
 }
 
-void APJEButtonBase::InInteracting()
+void APJEButtonBase::ShowInteractWidget()
 {
-	IPJEInteractInterface::InInteracting();
+	IPJEInteractInterface::ShowInteractWidget();
 
-	UE_LOG(LogTemp, Warning, TEXT("Interact!"));
+	Widget->SetVisibility(true);
 }
 
+void APJEButtonBase::HideInteractWidget()
+{
+	IPJEInteractInterface::HideInteractWidget();
+
+	Widget->SetVisibility(false);
+}

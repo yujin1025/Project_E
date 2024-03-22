@@ -20,5 +20,10 @@ public:
 	virtual void ShowInteractWidget();
 	virtual void HideInteractWidget();
 
-	virtual void InInteracting();
+	virtual void BeginInteracting();
+	virtual void EndInteracting();
+
+protected:
+	bool bIsInArea = false;
+	bool bIsInteracting = false;
 };

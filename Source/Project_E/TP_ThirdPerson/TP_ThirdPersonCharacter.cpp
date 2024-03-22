@@ -82,13 +82,20 @@ void ATP_ThirdPersonCharacter::VolumeBeginOverlap(UPrimitiveComponent* Overlappe
 
 	if(Interface)
 	{
-		Interface->InInteracting();
+		Interface->ShowInteractWidget();
 	}
 }
 
 void ATP_ThirdPersonCharacter::VolumeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	Interface = Cast<IPJEInteractInterface>(OtherActor);
+
+	if(Interface)
+	{
+		Interface->HideInteractWidget();
+	}
+	
 }
 
 //////////////////////////////////////////////////////////////////////////

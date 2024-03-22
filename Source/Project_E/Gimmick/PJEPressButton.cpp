@@ -14,13 +14,5 @@ void APJEPressButton::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Get overlapped actors every tick
-	TArray<AActor*> OverlappedActors;
-	ButtonTrigger->GetOverlappingActors(OverlappedActors);
-
-	// Find most appropriate Actor
-	for(auto OverlappedActor:OverlappedActors)
-	{
-		
-	}
+	
 }
