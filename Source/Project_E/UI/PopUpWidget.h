@@ -13,5 +13,12 @@ UCLASS()
 class PROJECT_E_API UPopUpWidget : public UBaseWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* HealthBar;
 	
+protected:
+	virtual void NativeConstruct() override;
+
 };
