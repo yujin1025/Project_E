@@ -33,6 +33,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	bool bButtonActive = false;
 
+protected:
 	virtual void ShowInteractWidget() override;
 	virtual void HideInteractWidget() override;
 
