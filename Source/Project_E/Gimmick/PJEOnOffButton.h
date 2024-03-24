@@ -18,10 +18,10 @@ class PROJECT_E_API APJEOnOffButton : public APJEButtonBase
 public:
 	APJEOnOffButton();
 
-	/** Button Interface */
-	virtual void ShowInteractWidget() override;
-	virtual void HideInteractWidget() override;
-	/** end Button Interface */
+	/** Interaction */
+	virtual void BeginInteracting() override;
+	virtual void EndInteracting() override;
+	/** end Interaction */
 
 public:
 	virtual void Tick(float DeltaTime) override;

@@ -24,6 +24,5 @@ public:
 	virtual void EndInteracting();
 
 protected:
-	bool bIsInArea = false;
 	bool bIsInteracting = false;
 };

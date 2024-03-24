@@ -8,15 +8,26 @@ APJEOnOffButton::APJEOnOffButton()
 	// Add Interaction Widget
 }
 
-void APJEOnOffButton::ShowInteractWidget()
+/** Interact: Can Interact when the previous action end */
+void APJEOnOffButton::BeginInteracting()
 {
-	// Enable Interaction
+	Super::BeginInteracting();
 }
 
-void APJEOnOffButton::HideInteractWidget()
+void APJEOnOffButton::EndInteracting()
 {
-	// Disable Interaction
+	Super::EndInteracting();
+
+	if(bIsInteracting)
+	{
+		bIsInteracting = false;
+	}
+	else
+	{
+		bIsInteracting = true;
+	}
 }
+
 
 void APJEOnOffButton::Tick(float DeltaTime)
 {
@@ -24,9 +35,3 @@ void APJEOnOffButton::Tick(float DeltaTime)
 
 	
 }
-
-// TODO: Make Interact
-// Interaction Key is [E] (can be changed)
-// if Interact..
-// a. When bButtonInteract is false -> set bButtonInteract true
-// b. When bButtonInteract is true -> set bButtonInteract false

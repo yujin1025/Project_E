@@ -71,32 +71,61 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 		}
 	}
 
-	Volume->OnComponentBeginOverlap.AddDynamic(this, &ATP_ThirdPersonCharacter::VolumeBeginOverlap);
-	Volume->OnComponentEndOverlap.AddDynamic(this, &ATP_ThirdPersonCharacter::VolumeEndOverlap);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &ATP_ThirdPersonCharacter::OnInteractBegin);
+	InputComponent->BindAction("Interact", IE_Released, this, &ATP_ThirdPersonCharacter::OnInteractEnd);
+
+	UE_LOG(LogTemp, Warning, TEXT("Heello"));
 }
 
-void ATP_ThirdPersonCharacter::VolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+AActor* ATP_ThirdPersonCharacter::GetClosestActor()
 {
-	Interface = Cast<IPJEInteractInterface>(OtherActor);
+	TArray<AActor*> OverlappingActors;
 
-	if(Interface)
+	Volume->GetOverlappingActors(OverlappingActors);
+
+	if(OverlappingActors.IsEmpty())
 	{
-		Interface->ShowInteractWidget();
-	}
-}
-
-void ATP_ThirdPersonCharacter::VolumeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	Interface = Cast<IPJEInteractInterface>(OtherActor);
-
-	if(Interface)
-	{
-		Interface->HideInteractWidget();
+		if(Interface)
+		{
+			Interface->HideInteractWidget();
+		}
+		return nullptr;
 	}
 	
+	AActor* ClosestActor = OverlappingActors[0];
+
+	for(auto CurrentActor:OverlappingActors)
+	{
+		if(GetDistanceTo(CurrentActor) < GetDistanceTo(ClosestActor))
+		{
+			ClosestActor = CurrentActor;
+		}
+	}
+	return ClosestActor;
 }
+
+
+void ATP_ThirdPersonCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if(AActor* ClosestActor = GetClosestActor())
+	{
+		if(Interface)
+		{
+			Interface->HideInteractWidget();
+		}
+
+		Interface = Cast<IPJEInteractInterface>(ClosestActor);
+
+		if(Interface)
+		{
+			Interface->ShowInteractWidget();
+		}
+	}
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -153,6 +182,22 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ATP_ThirdPersonCharacter::OnInteractBegin()
+{
+	if(Interface)
+	{
+		Interface->BeginInteracting();
+	}
+}
+
+void ATP_ThirdPersonCharacter::OnInteractEnd()
+{
+	if(Interface)
+	{
+		Interface->EndInteracting();
 	}
 }
 

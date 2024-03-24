@@ -13,4 +13,14 @@ UCLASS()
 class PROJECT_E_API APJESlideButton : public APJEButtonBase
 {
 	GENERATED_BODY()
+
+public:
+	APJESlideButton();
+
+	/** Interaction */
+	virtual void BeginInteracting() override;
+	virtual void EndInteracting() override;
+	/** end Interaction */
+
+	
 };

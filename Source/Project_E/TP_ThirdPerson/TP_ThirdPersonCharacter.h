@@ -51,7 +51,9 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+
+	void OnInteractBegin();
+	void OnInteractEnd();
 
 protected:
 	// APawn interface
@@ -60,16 +62,16 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	AActor* GetClosestActor();
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	
-	UFUNCTION()
-	virtual void VolumeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
-	UFUNCTION()
-	virtual void VolumeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	virtual void Tick(float DeltaSeconds) override;
 
 protected:
 	UPROPERTY(EditAnywhere)

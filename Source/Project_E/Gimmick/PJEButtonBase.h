@@ -36,6 +36,9 @@ public:
 	virtual void ShowInteractWidget() override;
 	virtual void HideInteractWidget() override;
 
+	virtual void BeginInteracting() override;
+	virtual void EndInteracting() override;
+
 protected:
 	// Button Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -44,9 +47,8 @@ protected:
 	TObjectPtr<UStaticMeshComponent> ButtonBorderMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> ButtonMesh;
-
-	UPROPERTY(VisibleAnywhere)
-	bool bButtonInteract = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UBoxComponent> WidgetTrigger;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	FVector OriginLocation;

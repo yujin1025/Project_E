@@ -25,7 +25,10 @@ APJEButtonBase::APJEButtonBase()
 	ButtonMesh->SetGenerateOverlapEvents(false);
 
 	Widget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
-	Widget->SetupAttachment(ButtonMesh);
+	Widget->SetupAttachment(RootComponent);
+
+	WidgetTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
+	WidgetTrigger->SetupAttachment(RootComponent);
 
 }
 
@@ -45,7 +48,7 @@ void APJEButtonBase::MoveButton(float DeltaTime)
 	float Speed = FVector::Distance(OriginLocation, TargetLocation) / MoveTime;
 
 	// Interactive 여부에 따라 버튼을 임계점이나 원 위치로 움직이게 한다
-	if(bButtonInteract)
+	if(bIsInteracting)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Button Active"));
 		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
@@ -80,7 +83,10 @@ void APJEButtonBase::MoveButton(float DeltaTime)
 void APJEButtonBase::NotifyActiveToPlatform(bool ButtonActive)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Now Button Active : %d"), ButtonActive);
-	Platforms[0]->SetbPlatformActive(ButtonActive);
+	if(!Platforms.IsEmpty())
+	{
+		Platforms[0]->SetbPlatformActive(ButtonActive);
+	}
 }
 
 // Called every frame
@@ -88,6 +94,7 @@ void APJEButtonBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	MoveButton(DeltaTime);
 }
 
 void APJEButtonBase::ShowInteractWidget()
@@ -102,4 +109,15 @@ void APJEButtonBase::HideInteractWidget()
 	IPJEInteractInterface::HideInteractWidget();
 
 	Widget->SetVisibility(false);
+}
+
+void APJEButtonBase::BeginInteracting()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Overlap"));
+	IPJEInteractInterface::BeginInteracting();
+}
+
+void APJEButtonBase::EndInteracting()
+{
+	IPJEInteractInterface::EndInteracting();
 }
