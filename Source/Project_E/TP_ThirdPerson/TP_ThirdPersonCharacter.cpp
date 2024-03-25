@@ -73,8 +73,6 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 
 	InputComponent->BindAction("Interact", IE_Pressed, this, &ATP_ThirdPersonCharacter::OnInteractBegin);
 	InputComponent->BindAction("Interact", IE_Released, this, &ATP_ThirdPersonCharacter::OnInteractEnd);
-
-	UE_LOG(LogTemp, Warning, TEXT("Heello"));
 }
 
 AActor* ATP_ThirdPersonCharacter::GetClosestActor()
@@ -88,6 +86,8 @@ AActor* ATP_ThirdPersonCharacter::GetClosestActor()
 		if(Interface)
 		{
 			Interface->HideInteractWidget();
+			Interface->BreakInteracting();
+			Interface = nullptr;
 		}
 		return nullptr;
 	}

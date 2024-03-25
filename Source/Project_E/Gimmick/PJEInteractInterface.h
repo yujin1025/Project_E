@@ -22,6 +22,7 @@ public:
 
 	virtual void BeginInteracting();
 	virtual void EndInteracting();
+	virtual void BreakInteracting();
 
 protected:
 	bool bIsInteracting = false;

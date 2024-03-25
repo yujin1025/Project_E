@@ -85,7 +85,10 @@ void APJEButtonBase::NotifyActiveToPlatform(bool ButtonActive)
 	UE_LOG(LogTemp, Warning, TEXT("Now Button Active : %d"), ButtonActive);
 	if(!Platforms.IsEmpty())
 	{
-		Platforms[0]->SetbPlatformActive(ButtonActive);
+		for(auto CurrentPlatform:Platforms)
+		{
+			CurrentPlatform->SetbPlatformActive(ButtonActive);
+		}
 	}
 }
 

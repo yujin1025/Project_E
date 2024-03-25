@@ -22,3 +22,8 @@ void IPJEInteractInterface::EndInteracting()
 {
 	
 }
+
+void IPJEInteractInterface::BreakInteracting()
+{
+	bIsInteracting = false;
+}
