@@ -55,6 +55,8 @@ protected:
 	void OnInteractBegin();
 	void OnInteractEnd();
 
+	bool GetItem(int32 ItemCode);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

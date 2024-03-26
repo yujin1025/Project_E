@@ -20,8 +20,8 @@ public:
 	virtual void ShowInteractWidget();
 	virtual void HideInteractWidget();
 
-	virtual void BeginInteracting();
-	virtual void EndInteracting();
+	virtual void BeginInteracting(const AActor* InteractActor);
+	virtual void EndInteracting(const AActor* InteractActor);
 	virtual void BreakInteracting();
 
 protected:

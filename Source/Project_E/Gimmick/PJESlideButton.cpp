@@ -8,16 +8,16 @@ APJESlideButton::APJESlideButton()
 	
 }
 
-void APJESlideButton::BeginInteracting()
+void APJESlideButton::BeginInteracting(const AActor* InteractActor)
 {
-	Super::BeginInteracting();
+	Super::BeginInteracting(InteractActor);
 
 	bIsInteracting = true;
 }
 
-void APJESlideButton::EndInteracting()
+void APJESlideButton::EndInteracting(const AActor* InteractActor)
 {
-	Super::EndInteracting();
+	Super::EndInteracting(InteractActor);
 
 	bIsInteracting = false;
 }

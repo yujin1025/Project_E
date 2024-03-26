@@ -13,12 +13,12 @@ void IPJEInteractInterface::HideInteractWidget()
 	
 }
 
-void IPJEInteractInterface::BeginInteracting()
+void IPJEInteractInterface::BeginInteracting(const AActor* InteractActor)
 {
 	
 }
 
-void IPJEInteractInterface::EndInteracting()
+void IPJEInteractInterface::EndInteracting(const AActor* InteractActor)
 {
 	
 }

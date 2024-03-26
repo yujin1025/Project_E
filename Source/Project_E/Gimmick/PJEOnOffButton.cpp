@@ -9,14 +9,14 @@ APJEOnOffButton::APJEOnOffButton()
 }
 
 /** Interact: Can Interact when the previous action end */
-void APJEOnOffButton::BeginInteracting()
+void APJEOnOffButton::BeginInteracting(const AActor* InteractActor)
 {
-	Super::BeginInteracting();
+	Super::BeginInteracting(InteractActor);
 }
 
-void APJEOnOffButton::EndInteracting()
+void APJEOnOffButton::EndInteracting(const AActor* InteractActor)
 {
-	Super::EndInteracting();
+	Super::EndInteracting(InteractActor);
 
 	if(bIsInteracting)
 	{

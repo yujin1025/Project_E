@@ -189,7 +189,7 @@ void ATP_ThirdPersonCharacter::OnInteractBegin()
 {
 	if(Interface)
 	{
-		Interface->BeginInteracting();
+		Interface->BeginInteracting(Cast<AActor>(this));
 	}
 }
 
@@ -197,8 +197,20 @@ void ATP_ThirdPersonCharacter::OnInteractEnd()
 {
 	if(Interface)
 	{
-		Interface->EndInteracting();
+		Interface->EndInteracting(Cast<AActor>(this));
 	}
+}
+
+bool ATP_ThirdPersonCharacter::GetItem(int32 ItemCode)
+{
+	// 구현해주세요 ^~^
+	
+	// a. ItemCode는 아이템 별로 각각 할당된 코드
+	// b. DropedItem에서 Player의 GetItem코드를 실행하면 해당 Item의 Code를 넘겨준다
+	// c. 아이템 습득이 불가능한 상황 (ex 인벤토리가 꽉 참) 이라면 false 반환
+	// d. 아이템 습득이 가능하면 true 반환
+
+	return false;
 }
 
 

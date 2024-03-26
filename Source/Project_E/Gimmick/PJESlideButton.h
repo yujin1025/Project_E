@@ -18,8 +18,8 @@ public:
 	APJESlideButton();
 
 	/** Interaction */
-	virtual void BeginInteracting() override;
-	virtual void EndInteracting() override;
+	virtual void BeginInteracting(const AActor* InteractActor) override;
+	virtual void EndInteracting(const AActor* InteractActor) override;
 	/** end Interaction */
 
 	

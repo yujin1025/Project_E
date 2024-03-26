@@ -114,13 +114,13 @@ void APJEButtonBase::HideInteractWidget()
 	Widget->SetVisibility(false);
 }
 
-void APJEButtonBase::BeginInteracting()
+void APJEButtonBase::BeginInteracting(const AActor* InteractActor)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Overlap"));
-	IPJEInteractInterface::BeginInteracting();
+	IPJEInteractInterface::BeginInteracting(InteractActor);
 }
 
-void APJEButtonBase::EndInteracting()
+void APJEButtonBase::EndInteracting(const AActor* InteractActor)
 {
-	IPJEInteractInterface::EndInteracting();
+	IPJEInteractInterface::EndInteracting(InteractActor);
 }
