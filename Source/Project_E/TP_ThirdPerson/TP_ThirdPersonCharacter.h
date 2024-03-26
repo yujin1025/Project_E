@@ -8,6 +8,9 @@
 #include "TP_ThirdPersonCharacter.generated.h"
 
 
+class IPJEInteractInterface;
+class UBoxComponent;
+
 UCLASS(config=Game)
 class ATP_ThirdPersonCharacter : public ACharacter
 {
@@ -48,7 +51,11 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+
+	void OnInteractBegin();
+	void OnInteractEnd();
+
+	bool GetItem(int32 ItemCode);
 
 protected:
 	// APawn interface
@@ -57,10 +64,21 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	AActor* GetClosestActor();
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	
+
+	virtual void Tick(float DeltaSeconds) override;
+
+protected:
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Volume;
+
+	IPJEInteractInterface* Interface = nullptr;
 };
 

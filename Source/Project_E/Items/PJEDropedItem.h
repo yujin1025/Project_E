@@ -3,27 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PJEInteractInterface.h"
-#include "Gimmick/PJEButtonBase.h"
-#include "PJEOnOffButton.generated.h"
+#include "Items/ItemBase.h"
+#include "PJEDropedItem.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJEOnOffButton : public APJEButtonBase
+class PROJECT_E_API APJEDropedItem : public AItemBase
 {
 	GENERATED_BODY()
 
 public:
-	APJEOnOffButton();
+	APJEDropedItem();
 
-	/** Interaction */
+protected:
 	virtual void BeginInteracting(const AActor* InteractActor) override;
 	virtual void EndInteracting(const AActor* InteractActor) override;
-	/** end Interaction */
 
-public:
-	virtual void Tick(float DeltaTime) override;
-	
+	void GetItem(const AActor* InteractActor);
+
+protected:
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	int32 ItemCode;
 };

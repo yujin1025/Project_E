@@ -4,26 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Gimmick/PJEInteractInterface.h"
-#include "ItemBase.generated.h"
-
-class UBoxComponent;
+#include "PJELockedDoor.generated.h"
 
 UCLASS()
-class PROJECT_E_API AItemBase : public AActor, public IPJEInteractInterface
+class PROJECT_E_API APJELockedDoor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AItemBase();
-
-protected:
-	UPROPERTY(VisibleAnywhere, Category = Box)
-	TObjectPtr<UBoxComponent> WidgetTrigger;
-
-	UPROPERTY(VisibleAnywhere, Category = Box)
-	TObjectPtr<UStaticMeshComponent> ItemMesh;
+	APJELockedDoor();
 
 protected:
 	// Called when the game starts or when spawned

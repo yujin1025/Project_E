@@ -12,16 +12,13 @@ AItemBase::AItemBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Item Mesh"));
+	SetRootComponent(ItemMesh);
+	ItemMesh->SetGenerateOverlapEvents(false);
+	
+	WidgetTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
+	WidgetTrigger->SetupAttachment(ItemMesh);
 }
-
-void AItemBase::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	// Bind to the overlap event
-	Trigger->OnComponentBeginOverlap.AddDynamic(this, &AItemBase::OnOverlapBegin);
-}
-
 
 
 // Called when the game starts or when spawned
@@ -36,14 +33,4 @@ void AItemBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void AItemBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
-{
-	//Cast to CharacterItemInterface
-	IPJECharacterItemInterface* OverlappingPawn = Cast<IPJECharacterItemInterface>(OtherActor);
-	if (OverlappingPawn)
-	{
-		//OverlappingPawn->TakeItem(Item);
-	}
 }

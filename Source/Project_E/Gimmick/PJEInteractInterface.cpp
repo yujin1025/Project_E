@@ -12,3 +12,18 @@ void IPJEInteractInterface::HideInteractWidget()
 {
 	
 }
+
+void IPJEInteractInterface::BeginInteracting(const AActor* InteractActor)
+{
+	
+}
+
+void IPJEInteractInterface::EndInteracting(const AActor* InteractActor)
+{
+	
+}
+
+void IPJEInteractInterface::BreakInteracting()
+{
+	bIsInteracting = false;
+}

@@ -8,35 +8,26 @@ APJEOnOffButton::APJEOnOffButton()
 	// Add Interaction Widget
 }
 
-void APJEOnOffButton::ShowInteractWidget()
+/** Interact: Can Interact when the previous action end */
+void APJEOnOffButton::BeginInteracting(const AActor* InteractActor)
 {
-	// Enable Interaction
+	Super::BeginInteracting(InteractActor);
 }
 
-void APJEOnOffButton::HideInteractWidget()
+void APJEOnOffButton::EndInteracting(const AActor* InteractActor)
 {
-	// Disable Interaction
+	Super::EndInteracting(InteractActor);
+
+	if(bIsInteracting)
+	{
+		bIsInteracting = false;
+	}
+	else
+	{
+		bIsInteracting = true;
+	}
 }
 
-void APJEOnOffButton::ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-										UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
-{
-	Super::ButtonBeginOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, Hit);
-
-	// a. Show Interaction UI
-	// b. Enable Interaction
-	ShowInteractWidget();
-}
-
-void APJEOnOffButton::ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	Super::ButtonEndOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
-
-	// a. Hide Interaction UI
-	// b. Disable Interaction
-	HideInteractWidget();
-}
 
 void APJEOnOffButton::Tick(float DeltaTime)
 {
@@ -44,9 +35,3 @@ void APJEOnOffButton::Tick(float DeltaTime)
 
 	
 }
-
-// TODO: Make Interact
-// Interaction Key is [E] (can be changed)
-// if Interact..
-// a. When bButtonInteract is false -> set bButtonInteract true
-// b. When bButtonInteract is true -> set bButtonInteract false

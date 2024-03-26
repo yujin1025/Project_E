@@ -9,6 +9,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/BoxComponent.h"
+#include "Gimmick/PJEInteractInterface.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,6 +49,10 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Create a Interaction Volume
+	Volume = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionVolume"));
+	Volume->SetupAttachment(RootComponent);
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -64,7 +70,62 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	InputComponent->BindAction("Interact", IE_Pressed, this, &ATP_ThirdPersonCharacter::OnInteractBegin);
+	InputComponent->BindAction("Interact", IE_Released, this, &ATP_ThirdPersonCharacter::OnInteractEnd);
 }
+
+AActor* ATP_ThirdPersonCharacter::GetClosestActor()
+{
+	TArray<AActor*> OverlappingActors;
+
+	Volume->GetOverlappingActors(OverlappingActors);
+
+	if(OverlappingActors.IsEmpty())
+	{
+		if(Interface)
+		{
+			Interface->HideInteractWidget();
+			Interface->BreakInteracting();
+			Interface = nullptr;
+		}
+		return nullptr;
+	}
+	
+	AActor* ClosestActor = OverlappingActors[0];
+
+	for(auto CurrentActor:OverlappingActors)
+	{
+		if(GetDistanceTo(CurrentActor) < GetDistanceTo(ClosestActor))
+		{
+			ClosestActor = CurrentActor;
+		}
+	}
+	return ClosestActor;
+}
+
+
+void ATP_ThirdPersonCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if(AActor* ClosestActor = GetClosestActor())
+	{
+		if(Interface)
+		{
+			Interface->HideInteractWidget();
+		}
+
+		Interface = Cast<IPJEInteractInterface>(ClosestActor);
+
+		if(Interface)
+		{
+			Interface->ShowInteractWidget();
+		}
+	}
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -122,6 +183,34 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ATP_ThirdPersonCharacter::OnInteractBegin()
+{
+	if(Interface)
+	{
+		Interface->BeginInteracting(Cast<AActor>(this));
+	}
+}
+
+void ATP_ThirdPersonCharacter::OnInteractEnd()
+{
+	if(Interface)
+	{
+		Interface->EndInteracting(Cast<AActor>(this));
+	}
+}
+
+bool ATP_ThirdPersonCharacter::GetItem(int32 ItemCode)
+{
+	// 구현해주세요 ^~^
+	
+	// a. ItemCode는 아이템 별로 각각 할당된 코드
+	// b. DropedItem에서 Player의 GetItem코드를 실행하면 해당 Item의 Code를 넘겨준다
+	// c. 아이템 습득이 불가능한 상황 (ex 인벤토리가 꽉 참) 이라면 false 반환
+	// d. 아이템 습득이 가능하면 true 반환
+
+	return false;
 }
 
 
