@@ -43,7 +43,10 @@ class ATP_ThirdPersonCharacter : public ACharacter
 public:
 	ATP_ThirdPersonCharacter();
 	
+	bool GetItem(int32 ItemCode);
 
+	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
+	
 protected:
 
 	/** Called for movement input */
@@ -55,7 +58,7 @@ protected:
 	void OnInteractBegin();
 	void OnInteractEnd();
 
-	bool GetItem(int32 ItemCode);
+	
 
 protected:
 	// APawn interface
@@ -79,6 +82,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* Volume;
 
+	// Interaction Interface
 	IPJEInteractInterface* Interface = nullptr;
+
+	// Item code that character currently holding
+	UPROPERTY(EditAnywhere)
+	int32 HandItemCode;
 };
 

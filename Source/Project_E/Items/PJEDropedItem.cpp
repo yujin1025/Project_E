@@ -3,6 +3,9 @@
 
 #include "Items/PJEDropedItem.h"
 
+// Delete later
+#include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+
 APJEDropedItem::APJEDropedItem()
 {
 	
@@ -18,6 +21,11 @@ void APJEDropedItem::EndInteracting(const AActor* InteractActor)
 {
 	Super::EndInteracting(InteractActor);
 
-	
+	// To be modified later
+	AActor* NCInteractActor = const_cast<AActor*>(InteractActor);
+	if(ATP_ThirdPersonCharacter* InteractCharacter = Cast<ATP_ThirdPersonCharacter>(NCInteractActor))
+	{
+		InteractCharacter->GetItem(ItemCode);
+	}
 	Destroy();
 }
