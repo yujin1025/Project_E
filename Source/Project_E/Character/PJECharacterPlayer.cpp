@@ -55,7 +55,8 @@ void APJECharacterPlayer::BeginPlay()
 void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
+    
+    
     if(IPJEInteractInterface* ClosestInterface = GetClosestInterface())
     {
         if(Interface)
