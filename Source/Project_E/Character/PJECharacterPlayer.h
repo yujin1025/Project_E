@@ -7,17 +7,22 @@
 #include "Interface/PJECharacterItemInterface.h"
 #include "PJECharacterPlayer.generated.h"
 
+class IPJEInteractInterface;
+class UBoxComponent;
 class UInputAction;
-/**
- *
- */
+
+
+
 UCLASS()
 class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IABCharacterHUDInterface*/, public IPJECharacterItemInterface
 {
 	GENERATED_BODY()
 public:
 	APJECharacterPlayer();
-
+	
+	void GetItem(int32 ItemCode);
+	FORCEINLINE int32 GetHandItemCode() const {return HandItemCode;}
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,6 +31,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void OnInteractBegin();
+	void OnInteractEnd();
+
+	IPJEInteractInterface* GetClosestInterface();
+	
 	// Camera Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
@@ -63,4 +73,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float PopupDistance;
+
+	UPROPERTY(EditAnywhere)
+	int32 HandItemCode;
+
+//Interact Section
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Volume;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<IPJEInteractInterface> Interface = nullptr;
 };

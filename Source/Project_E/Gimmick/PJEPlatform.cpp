@@ -33,7 +33,9 @@ void APJEPlatform::MovePlatform(float DeltaTime)
 	else
 	{
 		AfterDisactive += DeltaTime;
-		// 캐릭터가 버튼을 떠나고 일정 시간이 지나면 플랫폼 원위치로 복귀
+		
+		// Return the platform to its original location after
+		// a period of time has passed since the player stopped interacting with button
 		if(AfterDisactive > PlatformDelayTime)
 		{
 			FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, OriginLocation, DeltaTime, Speed);

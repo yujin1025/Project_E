@@ -8,7 +8,10 @@
 #include "EnhancedInputComponent.h"
 //#include "InputMappingContext.h"
 #include <Interface/PJEGameInterface.h>
+
+#include "Components/BoxComponent.h"
 #include "Game/PJEGameModeBase.h"
+#include "Gimmick/PJEInteractInterface.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -20,6 +23,19 @@ APJECharacterPlayer::APJECharacterPlayer()
     FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
     FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
     FollowCamera->bUsePawnControlRotation = false;
+
+    Volume = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
+    Volume->SetupAttachment(RootComponent);
+}
+
+void APJECharacterPlayer::GetItem(int32 ItemCode)
+{
+    // Please implement ^~^
+	
+    // a. ItemCode is the code assigned to each item.
+    // b. When the player's GetItem() is executed on class DroppedItem, the ItemCode is passed by argument.
+    // c. Return false if it is impossible to get the item ( ex) inventory is full )
+    // d. Return true if the item can be picked up
 }
 
 void APJECharacterPlayer::BeginPlay()
@@ -31,11 +47,29 @@ void APJECharacterPlayer::BeginPlay()
     {
         EnableInput(PlayerController);
     }
+
+    InputComponent->BindAction("Interact", IE_Pressed, this, &APJECharacterPlayer::OnInteractBegin);
+    InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
 }
 
 void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    if(IPJEInteractInterface* ClosestInterface = GetClosestInterface())
+    {
+        if(Interface)
+        {
+            Interface->HideInteractWidget();
+        }
+
+        Interface = ClosestInterface;
+        
+        if(Interface)
+        {
+            Interface->ShowInteractWidget();
+        }
+    }
 }
 
 void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -50,6 +84,63 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     //if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
         //EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
     //}
+}
+
+void APJECharacterPlayer::OnInteractBegin()
+{
+    if(Interface)
+    {
+        Interface->BeginInteracting(Cast<AActor>(this));
+    }
+}
+
+void APJECharacterPlayer::OnInteractEnd()
+{
+    if(Interface)
+    {
+        Interface->EndInteracting(Cast<AActor>(this));
+    }
+}
+
+IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
+{
+    TArray<AActor*> OverlappingActors;
+    TArray<IPJEInteractInterface*> OverlappingInterfaces;
+    IPJEInteractInterface* ClosestInterface = nullptr;
+    
+    Volume->GetOverlappingActors(OverlappingActors);
+    
+    for(auto CurrentActor:OverlappingActors)
+    {
+        if(IPJEInteractInterface* CInterface = Cast<IPJEInteractInterface>(CurrentActor))
+        {
+            OverlappingInterfaces.Add(CInterface);
+        }
+    }
+    
+    if(OverlappingInterfaces.IsEmpty())
+    {
+        if(Interface)
+        {
+            Interface->HideInteractWidget();
+            Interface->BreakInteracting();
+            Interface = nullptr;
+        }
+        return nullptr;
+    }
+    
+    ClosestInterface = OverlappingInterfaces[0];
+    
+    for(auto CurrentInterface:OverlappingInterfaces)
+    {
+        if(GetDistanceTo(Cast<AActor>(CurrentInterface)) <
+            GetDistanceTo(Cast<AActor>(ClosestInterface)))
+        {
+            ClosestInterface = CurrentInterface;
+        }
+    }
+    
+    return ClosestInterface;
 }
 
 
@@ -70,7 +161,7 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
     FCollisionQueryParams CollisionParams;
     CollisionParams.AddIgnoredActor(this);
 
-    // ·¹ÀÌ¸¦ ½ò ¶§ ÇÃ·¹ÀÌ¾î Ä³¸¯ÅÍ´Â ¹«½Ã, isTarget¸¸ µÇµµ·Ï
+    // ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Ä³ï¿½ï¿½ï¿½Í´ï¿½ ï¿½ï¿½ï¿½ï¿½, isTargetï¿½ï¿½ ï¿½Çµï¿½ï¿½ï¿½
     if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, Channel, CollisionParams))
     {
         if (HitResult.GetActor() && HitResult.GetActor()->IsA<APJECharacterBase>())
@@ -138,7 +229,7 @@ void APJECharacterPlayer::ShowPopUI()
 {
     FVector TargetPosition = GetTargetPosition(ECollisionChannel::ECC_GameTraceChannel1, 100.0f);
 
-    //È°¼ºÈ­ ÆË¾÷ Àç»ý 
+    //È°ï¿½ï¿½È­ ï¿½Ë¾ï¿½ ï¿½ï¿½ï¿½ 
     if (TargetPosition != FVector::ZeroVector)
     {
         APlayerController* PlayerController = Cast<APlayerController>(GetController());

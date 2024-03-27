@@ -58,8 +58,6 @@ protected:
 	void OnInteractBegin();
 	void OnInteractEnd();
 
-	
-
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -81,7 +79,8 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* Volume;
-
+	
+	
 	// Interaction Interface
 	IPJEInteractInterface* Interface = nullptr;
 
