@@ -4,6 +4,7 @@
 #include "Items/PJEDropedItem.h"
 
 // Delete later
+#include "Character/PJECharacterPlayer.h"
 #include "TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 
 APJEDropedItem::APJEDropedItem()
@@ -23,7 +24,7 @@ void APJEDropedItem::EndInteracting(const AActor* InteractActor)
 
 	// To be modified later
 	AActor* NCInteractActor = const_cast<AActor*>(InteractActor);
-	if(ATP_ThirdPersonCharacter* InteractCharacter = Cast<ATP_ThirdPersonCharacter>(NCInteractActor))
+	if(APJECharacterPlayer* InteractCharacter = Cast<APJECharacterPlayer>(NCInteractActor))
 	{
 		InteractCharacter->GetItem(ItemCode);
 	}

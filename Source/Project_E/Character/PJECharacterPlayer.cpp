@@ -123,8 +123,9 @@ IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
     {
         if(Interface)
         {
+            // 차후 코드 수정 매우 필요.. 지금은 하기 싫다
             Interface->HideInteractWidget();
-            Interface->BreakInteracting();
+            //Interface->BreakInteracting();
             Interface = nullptr;
         }
         return nullptr;
