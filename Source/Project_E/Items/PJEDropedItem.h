@@ -27,4 +27,3 @@ protected:
 	UPROPERTY(EditInstanceOnly)
 	int32 ItemCode;
 };
-ddddd

@@ -59,14 +59,14 @@ void APJECharacterPlayer::Tick(float DeltaTime)
     
     if(IPJEInteractInterface* ClosestInterface = GetClosestInterface())
     {
-        if(Interface != nullptr)
+        if(Interface)
         {
             Interface->HideInteractWidget();
         }
 
         Interface = ClosestInterface;
         
-        if(Interface != nullptr)
+        if(Interface)
         {
             Interface->ShowInteractWidget();
         }
@@ -130,8 +130,11 @@ IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
         }
         return nullptr;
     }
-    
-    ClosestInterface = OverlappingInterfaces[0];
+
+    if(OverlappingInterfaces.IsValidIndex(0))
+    {
+        ClosestInterface = OverlappingInterfaces[0];
+    }
     
     for(auto CurrentInterface:OverlappingInterfaces)
     {
