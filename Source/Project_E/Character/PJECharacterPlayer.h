@@ -21,7 +21,9 @@ public:
 	APJECharacterPlayer();
 	
 	void GetItem(int32 ItemCode);
-	FORCEINLINE int32 GetHandItemCode() const {return HandItemCode;}
+	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
+	// INLINE Function for test.. to be Deleted
+	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
 	
 protected:
 	// Called when the game starts or when spawned
@@ -75,7 +77,7 @@ protected:
 	float PopupDistance;
 
 	UPROPERTY(EditAnywhere)
-	int32 HandItemCode;
+	int32 HandItemCode = 0;
 
 //Interact Section
 protected:

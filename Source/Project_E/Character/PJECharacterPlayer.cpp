@@ -59,14 +59,14 @@ void APJECharacterPlayer::Tick(float DeltaTime)
     
     if(IPJEInteractInterface* ClosestInterface = GetClosestInterface())
     {
-        if(Interface)
+        if(Interface != nullptr)
         {
             Interface->HideInteractWidget();
         }
 
         Interface = ClosestInterface;
         
-        if(Interface)
+        if(Interface != nullptr)
         {
             Interface->ShowInteractWidget();
         }
@@ -110,7 +110,7 @@ IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
     IPJEInteractInterface* ClosestInterface = nullptr;
     
     Volume->GetOverlappingActors(OverlappingActors);
-    
+
     for(auto CurrentActor:OverlappingActors)
     {
         if(IPJEInteractInterface* CInterface = Cast<IPJEInteractInterface>(CurrentActor))

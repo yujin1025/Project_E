@@ -24,6 +24,7 @@ protected:
 	void GetItem(const AActor* InteractActor);
 
 protected:
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(EditInstanceOnly)
 	int32 ItemCode;
 };
+ddddd
