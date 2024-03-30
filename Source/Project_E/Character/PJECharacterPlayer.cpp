@@ -56,21 +56,17 @@ void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     
-    
-    if(IPJEInteractInterface* ClosestInterface = GetClosestInterface())
+    if(Interface != nullptr)
     {
-        if(Interface)
-        {
-            Interface->HideInteractWidget();
-        }
-
-        Interface = ClosestInterface;
-        
-        if(Interface)
-        {
-            Interface->ShowInteractWidget();
-        }
+        Interface->HideInteractWidget();
     }
+
+    // Crash Maker..
+    if(Interface = GetClosestInterface())
+    {
+        Interface->ShowInteractWidget();
+    }
+    // End Crash Maker..
 }
 
 void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -89,7 +85,7 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 void APJECharacterPlayer::OnInteractBegin()
 {
-    if(Interface)
+    if(Interface != nullptr)
     {
         Interface->BeginInteracting(Cast<AActor>(this));
     }
@@ -97,7 +93,7 @@ void APJECharacterPlayer::OnInteractBegin()
 
 void APJECharacterPlayer::OnInteractEnd()
 {
-    if(Interface)
+    if(Interface != nullptr)
     {
         Interface->EndInteracting(Cast<AActor>(this));
     }
@@ -121,7 +117,7 @@ IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
     
     if(OverlappingInterfaces.IsEmpty())
     {
-        if(Interface)
+        if(Interface != nullptr)
         {
             // 차후 코드 수정 매우 필요.. 지금은 하기 싫다
             Interface->HideInteractWidget();
@@ -134,18 +130,18 @@ IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
     if(OverlappingInterfaces.IsValidIndex(0))
     {
         ClosestInterface = OverlappingInterfaces[0];
-    }
-    
-    for(auto CurrentInterface:OverlappingInterfaces)
-    {
-        if(GetDistanceTo(Cast<AActor>(CurrentInterface)) <
-            GetDistanceTo(Cast<AActor>(ClosestInterface)))
+
+        for(auto CurrentInterface:OverlappingInterfaces)
         {
-            ClosestInterface = CurrentInterface;
+            if(GetDistanceTo(Cast<AActor>(CurrentInterface)) <
+                GetDistanceTo(Cast<AActor>(ClosestInterface)))
+            {
+                ClosestInterface = CurrentInterface;
+            }
         }
+        return ClosestInterface;
     }
-    
-    return ClosestInterface;
+    return nullptr;
 }
 
 
