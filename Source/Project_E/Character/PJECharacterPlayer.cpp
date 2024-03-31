@@ -50,23 +50,26 @@ void APJECharacterPlayer::BeginPlay()
 
     InputComponent->BindAction("Interact", IE_Pressed, this, &APJECharacterPlayer::OnInteractBegin);
     InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
+
+    Volume->OnComponentBeginOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapBegin);
+    Volume->OnComponentEndOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapEnd);
+
+    
 }
 
 void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    
-    if(Interface != nullptr)
-    {
-        Interface->HideInteractWidget();
-    }
 
-    // Crash Maker..
-    if(Interface = GetClosestInterface())
+    if(Interface)
     {
-        Interface->ShowInteractWidget();
+        Interface->HideInteracPointWidget();
     }
-    // End Crash Maker..
+    Interface = GetClosestInterface();
+    if(Interface)
+    {
+        Interface->ShowInteractPointWidget();    
+    }
 }
 
 void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -99,6 +102,26 @@ void APJECharacterPlayer::OnInteractEnd()
     }
 }
 
+void APJECharacterPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if(IPJEInteractInterface* OtherActorInterface = Cast<IPJEInteractInterface>(OtherActor))
+    {
+        // If Cast Succeed
+        OtherActorInterface->ShowInteractWidget();
+    }
+}
+
+void APJECharacterPlayer::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    if(IPJEInteractInterface* OtherActorInterface = Cast<IPJEInteractInterface>(OtherActor))
+    {
+        // If Cast Succeed
+        OtherActorInterface->HideInteractWidget();
+    }
+}
+
 IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
 {
     TArray<AActor*> OverlappingActors;
@@ -115,18 +138,6 @@ IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
         }
     }
     
-    if(OverlappingInterfaces.IsEmpty())
-    {
-        if(Interface != nullptr)
-        {
-            // 차후 코드 수정 매우 필요.. 지금은 하기 싫다
-            Interface->HideInteractWidget();
-            //Interface->BreakInteracting();
-            Interface = nullptr;
-        }
-        return nullptr;
-    }
-
     if(OverlappingInterfaces.IsValidIndex(0))
     {
         ClosestInterface = OverlappingInterfaces[0];

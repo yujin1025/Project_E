@@ -24,6 +24,9 @@ public:
 	virtual void EndInteracting(const AActor* InteractActor);
 	virtual void BreakInteracting();
 
+	virtual void ShowInteractPointWidget();
+	virtual void HideInteracPointWidget();
+
 protected:
 	bool bIsInteracting = false;
 };
