@@ -40,4 +40,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pawn)
 	bool IsTarget = false;
+
+	void Move(const FVector2D Value);
+	virtual void Look(const FVector2D Value);
 };

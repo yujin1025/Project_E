@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "../Items/Item.h"
 #include "PJECharacterItemInterface.generated.h"
 
 // This class does not need to be modified.
@@ -22,5 +23,5 @@ class PROJECT_E_API IPJECharacterItemInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void TakeItem() = 0;
+	virtual void TakeItem(UItem* Item) = 0;
 };

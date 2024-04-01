@@ -9,9 +9,11 @@
 
 class IPJEInteractInterface;
 class UBoxComponent;
+class UInputMappingContext;
 class UInputAction;
+class UItem;
 
-
+struct FInputActionValue;
 
 UCLASS()
 class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IABCharacterHUDInterface*/, public IPJECharacterItemInterface
@@ -30,11 +32,6 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	void OnInteractBegin();
-	void OnInteractEnd();
-
-	IPJEInteractInterface* GetClosestInterface();
 	
 	// Camera Section
 protected:
@@ -52,13 +49,18 @@ public:
 
 	// Input Section
 protected:
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//UInputAction* MoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* DefaultContext;
 
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void Turn(float Value);
-	void LookUp(float Value);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* LookAction;
+
+private:
+	void OnMove(const FInputActionValue& Value);	
+	void OnLook(const FInputActionValue& Value);
 
 	// UI Section
 protected:
@@ -69,7 +71,10 @@ protected:
 
  //Item Section
 protected:
-	virtual void TakeItem() override;
+	virtual void TakeItem(UItem* Item) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	UInventory* Inventory;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float PopupDistance;
@@ -84,4 +89,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<IPJEInteractInterface> Interface = nullptr;
+
+public:
+	void OnInteractBegin();
+	void OnInteractEnd();
+
+	IPJEInteractInterface* GetClosestInterface();
 };

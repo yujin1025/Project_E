@@ -82,3 +82,27 @@ void APJECharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 }
 
+void APJECharacterBase::Move(const FVector2D Value)
+{
+	if (Controller != nullptr)
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		AddMovementInput(ForwardDirection, Value.Y);
+		AddMovementInput(RightDirection, Value.X);
+	}
+}
+
+void APJECharacterBase::Look(const FVector2D Value)
+{
+	if (Controller != nullptr)
+	{
+		AddControllerYawInput(Value.X);
+		AddControllerPitchInput(Value.Y);
+	}
+}
+

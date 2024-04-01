@@ -3,12 +3,15 @@
 
 #include "PJECharacterPlayer.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/Controller.h"
 #include "InputActionValue.h"
 #include "EnhancedInputComponent.h"
-//#include "InputMappingContext.h"
+#include "EnhancedInputSubsystems.h"
+#include "../Items/Inventory.h"
+#include "InputMappingContext.h"
 #include <Interface/PJEGameInterface.h>
-
 #include "Components/BoxComponent.h"
 #include "Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractInterface.h"
@@ -28,7 +31,7 @@ APJECharacterPlayer::APJECharacterPlayer()
     Volume->SetupAttachment(RootComponent);
 }
 
-void APJECharacterPlayer::GetItem(int32 ItemCode)
+void APJECharacterPlayer::GetItem(int32 ItemCode) //bool
 {
     // Please implement ^~^
 	
@@ -41,6 +44,8 @@ void APJECharacterPlayer::GetItem(int32 ItemCode)
 void APJECharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();
+
+    Inventory = NewObject<UInventory>(this);
 
     APlayerController* PlayerController = Cast<APlayerController>(GetController());
     if (PlayerController)
@@ -77,72 +82,18 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    PlayerInputComponent->BindAxis(FName("MoveForward"), this, &APJECharacterPlayer::MoveForward);
-    PlayerInputComponent->BindAxis("MoveRight", this, &APJECharacterPlayer::MoveRight);
-    PlayerInputComponent->BindAxis("Turn", this, &APJECharacterPlayer::Turn);
-    PlayerInputComponent->BindAxis("LookUp", this, &APJECharacterPlayer::LookUp);
-
-    //if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-        //EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
-    //}
-}
-
-void APJECharacterPlayer::OnInteractBegin()
-{
-    if(Interface)
+    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
     {
-        Interface->BeginInteracting(Cast<AActor>(this));
-    }
-}
-
-void APJECharacterPlayer::OnInteractEnd()
-{
-    if(Interface)
-    {
-        Interface->EndInteracting(Cast<AActor>(this));
-    }
-}
-
-IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
-{
-    TArray<AActor*> OverlappingActors;
-    TArray<IPJEInteractInterface*> OverlappingInterfaces;
-    IPJEInteractInterface* ClosestInterface = nullptr;
-    
-    Volume->GetOverlappingActors(OverlappingActors);
-    
-    for(auto CurrentActor:OverlappingActors)
-    {
-        if(IPJEInteractInterface* CInterface = Cast<IPJEInteractInterface>(CurrentActor))
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
-            OverlappingInterfaces.Add(CInterface);
+            Subsystem->AddMappingContext(DefaultContext, 0);
         }
     }
-    
-    if(OverlappingInterfaces.IsEmpty())
-    {
-        if(Interface)
-        {
-            // 차후 코드 수정 매우 필요.. 지금은 하기 싫다
-            Interface->HideInteractWidget();
-            //Interface->BreakInteracting();
-            Interface = nullptr;
-        }
-        return nullptr;
+
+    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+        EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
+        EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
     }
-    
-    ClosestInterface = OverlappingInterfaces[0];
-    
-    for(auto CurrentInterface:OverlappingInterfaces)
-    {
-        if(GetDistanceTo(Cast<AActor>(CurrentInterface)) <
-            GetDistanceTo(Cast<AActor>(ClosestInterface)))
-        {
-            ClosestInterface = CurrentInterface;
-        }
-    }
-    
-    return ClosestInterface;
 }
 
 
@@ -163,7 +114,6 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
     FCollisionQueryParams CollisionParams;
     CollisionParams.AddIgnoredActor(this);
 
-    // ���̸� �� �� �÷��̾� ĳ���ʹ� ����, isTarget�� �ǵ���
     if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, Channel, CollisionParams))
     {
         if (HitResult.GetActor() && HitResult.GetActor()->IsA<APJECharacterBase>())
@@ -179,39 +129,12 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
     return End;
 }
 
-void APJECharacterPlayer::MoveForward(float Value)
-{
-    if (Controller != nullptr && Value != 0.f)
-    {
-        const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
-        const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
-        AddMovementInput(Direction, Value);
-    }
-}
 
-void APJECharacterPlayer::MoveRight(float Value)
-{
-    if (Controller != nullptr && Value != 0.f)
-    {
-        const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
-        const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
-        AddMovementInput(Direction, Value);
-    }
-}
-
-void APJECharacterPlayer::Turn(float Value)
-{
-    AddControllerYawInput(Value);
-}
-
-void APJECharacterPlayer::LookUp(float Value)
-{
-    AddControllerPitchInput(Value);
-}
 
 void APJECharacterPlayer::SetDead()
 {
     Super::SetDead();
+
     APlayerController* PlayerController = Cast<APlayerController>(GetController());
     if (PlayerController)
     {
@@ -227,11 +150,23 @@ void APJECharacterPlayer::SetDead()
 
 
 
+void APJECharacterPlayer::OnMove(const FInputActionValue& Value)
+{
+    FVector2D MovementVector = Value.Get<FVector2D>();
+    Move(MovementVector);
+}
+
+void APJECharacterPlayer::OnLook(const FInputActionValue& Value)
+{
+    FVector2D LookAxisVector = Value.Get<FVector2D>();
+    Look(LookAxisVector);
+}
+
+
 void APJECharacterPlayer::ShowPopUI()
 {
     FVector TargetPosition = GetTargetPosition(ECollisionChannel::ECC_GameTraceChannel1, 100.0f);
 
-    //Ȱ��ȭ �˾� ��� 
     if (TargetPosition != FVector::ZeroVector)
     {
         APlayerController* PlayerController = Cast<APlayerController>(GetController());
@@ -251,8 +186,69 @@ void APJECharacterPlayer::Attack()
 
 }
 
-
-void APJECharacterPlayer::TakeItem()
+void APJECharacterPlayer::TakeItem(UItem* Item)
 {
-    //TODO : TakeItem
+    if (Inventory)
+    {
+        Inventory->AddItem(Item);
+    }
+}
+
+void APJECharacterPlayer::OnInteractBegin()
+{
+    if (Interface)
+    {
+        Interface->BeginInteracting(Cast<AActor>(this));
+    }
+}
+
+void APJECharacterPlayer::OnInteractEnd()
+{
+    if (Interface)
+    {
+        Interface->EndInteracting(Cast<AActor>(this));
+    }
+}
+
+
+IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
+{
+    TArray<AActor*> OverlappingActors;
+    TArray<IPJEInteractInterface*> OverlappingInterfaces;
+    IPJEInteractInterface* ClosestInterface = nullptr;
+
+    Volume->GetOverlappingActors(OverlappingActors);
+
+    for (auto CurrentActor : OverlappingActors)
+    {
+        if (IPJEInteractInterface* CInterface = Cast<IPJEInteractInterface>(CurrentActor))
+        {
+            OverlappingInterfaces.Add(CInterface);
+        }
+    }
+
+    if (OverlappingInterfaces.IsEmpty())
+    {
+        if (Interface)
+        {
+            // 차후 코드 수정 매우 필요.. 지금은 하기 싫다
+            Interface->HideInteractWidget();
+            //Interface->BreakInteracting();
+            Interface = nullptr;
+        }
+        return nullptr;
+    }
+
+    ClosestInterface = OverlappingInterfaces[0];
+
+    for (auto CurrentInterface : OverlappingInterfaces)
+    {
+        if (GetDistanceTo(Cast<AActor>(CurrentInterface)) <
+            GetDistanceTo(Cast<AActor>(ClosestInterface)))
+        {
+            ClosestInterface = CurrentInterface;
+        }
+    }
+
+    return ClosestInterface;
 }
