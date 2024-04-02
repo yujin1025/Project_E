@@ -27,3 +27,11 @@ void IPJEInteractInterface::BreakInteracting()
 {
 	bIsInteracting = false;
 }
+
+void IPJEInteractInterface::ShowInteractPointWidget()
+{
+}
+
+void IPJEInteractInterface::HideInteracPointWidget()
+{
+}

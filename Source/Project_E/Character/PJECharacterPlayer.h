@@ -23,8 +23,10 @@ class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IAB
 public:
 	APJECharacterPlayer();
 	
-	bool GetItem(int32 ItemCode);
-	FORCEINLINE int32 GetHandItemCode() const {return HandItemCode;}
+	void GetItem(int32 ItemCode);
+	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
+	// INLINE Function for test.. to be Deleted
+	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
 	
 protected:
 	// Called when the game starts or when spawned
@@ -33,6 +35,16 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void OnInteractBegin();
+	void OnInteractEnd();
+
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	IPJEInteractInterface* GetClosestInterface();
 	
 	// Camera Section
 protected:
@@ -84,19 +96,13 @@ protected:
 	float PopupDistance;
 
 	UPROPERTY(EditAnywhere)
-	int32 HandItemCode;
+	int32 HandItemCode = 0;
 
 //Interact Section
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> Volume;
 
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<IPJEInteractInterface> Interface = nullptr;
-
-public:
-	void OnInteractBegin();
-	void OnInteractEnd();
-
-	IPJEInteractInterface* GetClosestInterface();
+	// Crash occurs when UPROPERTY added (reason unknown)
+	TObjectPtr<IPJEInteractInterface> Interface;
 };

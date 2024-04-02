@@ -6,6 +6,7 @@
 #include "Items/ItemBase.h"
 #include "PJEDropedItem.generated.h"
 
+class UWidgetComponent;
 /**
  * 
  */
@@ -21,12 +22,23 @@ public:
 	void SetItemCode(int32 NewItemCode);
 
 protected:
+	virtual void BeginPlay() override;
+	
 	virtual void BeginInteracting(const AActor* InteractActor) override;
 	virtual void EndInteracting(const AActor* InteractActor) override;
 
-	//void GetItem(const AActor* InteractActor);
+	virtual void ShowInteractWidget() override;
+	virtual void HideInteractWidget() override;
+	virtual void ShowInteractPointWidget() override;
+	virtual void HideInteracPointWidget() override;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 ItemCode;
+
+	UPROPERTY(EditAnywhere)
+	UWidgetComponent* Widget;
+
+	UPROPERTY(EditAnywhere)
+	UWidgetComponent* PointWidget;
 };
