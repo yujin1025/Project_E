@@ -75,23 +75,6 @@ void APJECharacterPlayer::BeginPlay()
 
     Volume->OnComponentBeginOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapBegin);
     Volume->OnComponentEndOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapEnd);
-
-    
-}
-
-void APJECharacterPlayer::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-
-    if(Interface)
-    {
-        Interface->HideInteracPointWidget();
-    }
-    Interface = GetClosestInterface();
-    if(Interface)
-    {
-        Interface->ShowInteractPointWidget();    
-    }
 }
 
 void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -106,30 +89,30 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
         }
     }
 
-    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+    {
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
         //EnhancedInputComponent->BindAction(TakeAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::TakeItem);
-        
     }
-    
-    if(OverlappingInterfaces.IsValidIndex(0))
-    {
-        ClosestInterface = OverlappingInterfaces[0];
-
-        for(auto CurrentInterface:OverlappingInterfaces)
-        {
-            if(GetDistanceTo(Cast<AActor>(CurrentInterface)) <
-                GetDistanceTo(Cast<AActor>(ClosestInterface)))
-            {
-                ClosestInterface = CurrentInterface;
-            }
-        }
-        return ClosestInterface;
-    }
-    return nullptr;
 }
 
+void APJECharacterPlayer::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if(Interface)
+    {
+        Interface->HideInteracPointWidget();
+    }
+    
+    Interface = GetClosestInterface();
+    
+    if(Interface)
+    {
+        Interface->ShowInteractPointWidget();    
+    }
+}
 
 FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance)
 {
@@ -284,13 +267,6 @@ IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
 
     if (OverlappingInterfaces.IsEmpty())
     {
-        if (Interface)
-        {
-            // 차후 코드 수정 매우 필요.. 지금은 하기 싫다
-            Interface->HideInteractWidget();
-            //Interface->BreakInteracting();
-            Interface = nullptr;
-        }
         return nullptr;
     }
 

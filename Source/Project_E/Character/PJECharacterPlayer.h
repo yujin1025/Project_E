@@ -23,7 +23,7 @@ class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IAB
 public:
 	APJECharacterPlayer();
 	
-	void GetItem(int32 ItemCode);
+	bool GetItem(int32 ItemCode);
 	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
 	// INLINE Function for test.. to be Deleted
 	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
