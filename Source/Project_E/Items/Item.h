@@ -26,6 +26,9 @@ public:
     UItem();
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+    int32 ItemCode;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
     FString Name;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
@@ -38,12 +41,17 @@ public:
     float Damage;
 
     FString GetItemName() const { return Name; }
+
+    static UItem* SetItem(const UDataTable* ItemDataTable, int32 Code);
 };
 
 USTRUCT()
 struct FItemData : public FTableRowBase
 {
     GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    int32 ItemCode; 
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     FString Name;

@@ -17,9 +17,9 @@ void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-        PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &APJECharacterCat::DoubleJump);
-        PlayerInputComponent->BindAction(FName("Dash"), IE_Pressed, this, &APJECharacterCat::Dash);
-        PlayerInputComponent->BindAction(FName("Dash"), IE_Released, this, &APJECharacterCat::StopDash);
+        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterCat::DoubleJump);
+        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterCat::Dash);
+        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterCat::StopDash);
     }
 }
 
@@ -42,7 +42,9 @@ void APJECharacterCat::DoubleJump()
         bFirstJump = false;
         JumpCount++;
         Jump();
+        return;
     }
+
     else if (!bFirstJump && JumpCount < 2)
     {
         UCharacterMovementComponent* PlayerMovement = GetCharacterMovement();
@@ -54,13 +56,12 @@ void APJECharacterCat::DoubleJump()
             LaunchCharacter(End - GetActorLocation(), false, true);
             JumpCount++;
         }
+        return;
     }
 }
 
 void APJECharacterCat::Dash()
 {
-    //const FVector Direction = GetActorRotation().Vector();
-    //LaunchCharacter(Direction * DashDistance, true, true);
     if (bIsWalking)
     {
         GetCharacterMovement()->MaxWalkSpeed *= 2.0f;

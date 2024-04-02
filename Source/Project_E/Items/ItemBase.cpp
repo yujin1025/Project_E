@@ -21,7 +21,7 @@ AItemBase::AItemBase()
 	WidgetTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
 	WidgetTrigger->SetupAttachment(ItemMesh);
 
-	Item = NewObject<UItem>(this, TEXT("Item"));
+	//Item = NewObject<UItem>(this, TEXT("Item"));
 }
 
 
@@ -38,6 +38,7 @@ void AItemBase::Tick(float DeltaTime)
 
 }
 
+/*
 void AItemBase::SetItem(const FString& ItemName)
 {
     UDataTable* ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
@@ -58,4 +59,4 @@ void AItemBase::SetItem(const FString& ItemName)
             //UE_LOG(LogTemp, Warning, TEXT("Item Damage: %f"), Item->Damage);
         }
     }
-}
+}*/

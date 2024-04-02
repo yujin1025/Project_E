@@ -9,8 +9,8 @@
 #include "InputActionValue.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "../Items/Inventory.h"
 #include "InputMappingContext.h"
+#include "../Items/Inventory.h"
 #include <Interface/PJEGameInterface.h>
 #include "Components/BoxComponent.h"
 #include "Game/PJEGameModeBase.h"
@@ -31,14 +31,31 @@ APJECharacterPlayer::APJECharacterPlayer()
     Volume->SetupAttachment(RootComponent);
 }
 
-void APJECharacterPlayer::GetItem(int32 ItemCode) //bool
+bool APJECharacterPlayer::GetItem(int32 ItemCode)
 {
+    if (Inventory && !Inventory->IsFull())
+    {
+        UDataTable* ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
+
+        UItem* NewItem = UItem::SetItem(ItemDatabase, ItemCode); 
+        if (NewItem)
+        {
+            Inventory->AddItem(NewItem);
+            return true;
+        }
+    }
+
+    return false;
+
     // Please implement ^~^
-	
     // a. ItemCode is the code assigned to each item.
     // b. When the player's GetItem() is executed on class DroppedItem, the ItemCode is passed by argument.
     // c. Return false if it is impossible to get the item ( ex) inventory is full )
     // d. Return true if the item can be picked up
+    //ItemCode는 각 아이템에 할당된 코드입니다.
+    //    해당 함수는 DroppedItem 클래스에서 실행될 때 ItemCode가 인수로 전달됩니다.
+    //    인벤토리가 가득 차있어서 아이템을 획득할 수 없는 경우 false를 반환합니다.
+    //    아이템을 집을 수 있는 경우 true를 반환합니다.
 }
 
 void APJECharacterPlayer::BeginPlay()
@@ -93,6 +110,8 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
+        //EnhancedInputComponent->BindAction(TakeAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::TakeItem);
+        
     }
 }
 
@@ -191,6 +210,8 @@ void APJECharacterPlayer::TakeItem(UItem* Item)
     if (Inventory)
     {
         Inventory->AddItem(Item);
+
+        Item->ConditionalBeginDestroy();
     }
 }
 

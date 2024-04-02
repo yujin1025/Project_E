@@ -23,4 +23,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Inventory")
     void RemoveItem(UItem* Item);
+
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    bool IsFull() const;
 };

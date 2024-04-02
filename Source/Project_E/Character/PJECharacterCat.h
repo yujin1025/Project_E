@@ -24,6 +24,12 @@ protected:
 
 	virtual void Landed(const FHitResult& Hit) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DashAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	bool bFirstJump = true;
 

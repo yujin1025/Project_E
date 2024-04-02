@@ -12,6 +12,7 @@ class UBoxComponent;
 class UInputMappingContext;
 class UInputAction;
 class UItem;
+class UInventory;
 
 struct FInputActionValue;
 
@@ -22,7 +23,7 @@ class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IAB
 public:
 	APJECharacterPlayer();
 	
-	void GetItem(int32 ItemCode);
+	bool GetItem(int32 ItemCode);
 	FORCEINLINE int32 GetHandItemCode() const {return HandItemCode;}
 	
 protected:
@@ -57,6 +58,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* TakeAction;
 
 private:
 	void OnMove(const FInputActionValue& Value);	

@@ -18,11 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	AItemBase();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	UItem* Item;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	//UItem* Item;
 
-	UFUNCTION(BlueprintCallable, Category = "Item")
-	void SetItem(const FString& ItemName);
+	//UFUNCTION(BlueprintCallable, Category = "Item")
+	//void SetItem(const FString& ItemName);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Box)

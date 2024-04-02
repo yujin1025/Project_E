@@ -12,6 +12,11 @@ APJEDropedItem::APJEDropedItem()
 	
 }
 
+void APJEDropedItem::SetItemCode(int32 NewItemCode)
+{
+	ItemCode = NewItemCode;
+}
+
 void APJEDropedItem::BeginInteracting(const AActor* InteractActor)
 {
 	Super::BeginInteracting(InteractActor);

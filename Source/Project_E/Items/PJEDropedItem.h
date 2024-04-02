@@ -17,13 +17,16 @@ class PROJECT_E_API APJEDropedItem : public AItemBase
 public:
 	APJEDropedItem();
 
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void SetItemCode(int32 NewItemCode);
+
 protected:
 	virtual void BeginInteracting(const AActor* InteractActor) override;
 	virtual void EndInteracting(const AActor* InteractActor) override;
 
-	void GetItem(const AActor* InteractActor);
+	//void GetItem(const AActor* InteractActor);
 
 protected:
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 ItemCode;
 };
