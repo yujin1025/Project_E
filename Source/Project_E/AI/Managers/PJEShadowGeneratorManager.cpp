@@ -8,15 +8,31 @@
 #include "Kismet/GameplayStatics.h"
 
 
-TObjectPtr<UPJEShadowGeneratorManager> UPJEShadowGeneratorManager::Instance = nullptr;
+UPJEShadowGeneratorManager* UPJEShadowGeneratorManager::Instance = nullptr;
 
 UPJEShadowGeneratorManager* UPJEShadowGeneratorManager::GetInstance()
 {
     if (!Instance)
     {
-        Instance = NewObject<UPJEShadowGeneratorManager>();
+        Instance = NewObject<UPJEShadowGeneratorManager>(GetTransientPackage(), UPJEShadowGeneratorManager::StaticClass());
+        Instance->AddToRoot();
+        FWorldDelegates::LevelRemovedFromWorld.AddLambda([](ULevel* Level, UWorld* World)
+            {
+                UPJEShadowGeneratorManager::GetInstance()->ShutdownInstance();
+            });
+
+        Instance->FindAllShadowGenerators();
     }
     return Instance;
+}
+
+void UPJEShadowGeneratorManager::ShutdownInstance()
+{
+    if (Instance)
+    {
+        Instance->RemoveFromRoot();
+        Instance = nullptr;
+    }
 }
 
 void UPJEShadowGeneratorManager::FindAllShadowGenerators()
@@ -25,10 +41,9 @@ void UPJEShadowGeneratorManager::FindAllShadowGenerators()
 
     if (GEngine)
     {
-        UWorld* World = GEngine->GetWorldFromContextObject(this, EGetWorldErrorMode::LogAndReturnNull);
-        if (World)
+        if (GWorld)
         {
-            for (TActorIterator<APJEShadowGenerator> It(World); It; ++It)
+            for (TActorIterator<APJEShadowGenerator> It(GWorld); It; ++It)
             {
                 APJEShadowGenerator* ShadowGenerator = *It;
                 if (ShadowGenerator)
@@ -48,8 +63,11 @@ void UPJEShadowGeneratorManager::AddShadowGenerator(APJEShadowGenerator* NewGene
 
 void UPJEShadowGeneratorManager::RemoveShadowGenerator(APJEShadowGenerator* GeneratorToRemove)
 {
-    ShadowGenerators.RemoveSingle(GeneratorToRemove);
-    UpdateShadowGeneratorsCount();
+    if (GeneratorToRemove)
+    {
+        ShadowGenerators.RemoveSingle(GeneratorToRemove);
+        UpdateShadowGeneratorsCount();
+    }
 }
 
 void UPJEShadowGeneratorManager::UpdateShadowGeneratorsCount()
@@ -77,4 +95,9 @@ void UPJEShadowGeneratorManager::RemoveSpawnedMonster(APJECharacterShadowA* Spaw
     {
         SpawnedShadowA.RemoveSingle(SpawnedMonsterToRemove);
     }
+}
+
+int32 UPJEShadowGeneratorManager::GetShadowGeneratorsCount()
+{
+    return ShadowGenerators.Num();
 }

@@ -2,13 +2,16 @@
 
 
 #include "Character/PJECharacterShadowA.h"
+#include "AI/Managers/PJEShadowGeneratorManager.h"
 
 APJECharacterShadowA::APJECharacterShadowA()
 {
+	ShadowGeneratorsCount = 0;
 }
 
 void APJECharacterShadowA::BeginPlay()
 {
+	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 }
 
 float APJECharacterShadowA::GetAIPatrolRadius()

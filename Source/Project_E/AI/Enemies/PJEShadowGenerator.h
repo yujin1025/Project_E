@@ -13,18 +13,28 @@ class PROJECT_E_API APJEShadowGenerator : public AActor
 
 public:
     APJEShadowGenerator();
-
+    virtual void BeginPlay() override;
     virtual void Destroyed() override;
+
+// Mesh Section
+protected:
+    UPROPERTY(VisibleAnywhere)
+    UStaticMeshComponent* CubeMesh;
 
 // Spawn Section
 public:
+    
     void SpawnMonsterAtRandomLocation();
 
 protected:
+    FTimerHandle SpawnTimerHandle;
+
     UPROPERTY(EditAnywhere, Category = "Spawn")
     TSubclassOf<class APJECharacterShadowA> MonsterClass;
 
     UPROPERTY(EditAnywhere, Category = "Spawn")
     float SpawnRadius = 1000.0f;
 
+    void StartSpawnTimer();
+    void SpawnMonsterWithTimer();
 };

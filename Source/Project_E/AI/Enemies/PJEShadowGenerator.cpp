@@ -11,14 +11,22 @@ APJEShadowGenerator::APJEShadowGenerator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+    CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CubeMesh"));
+    RootComponent = CubeMesh;
 }
+
+void APJEShadowGenerator::BeginPlay()
+{
+    Super::BeginPlay();
+    StartSpawnTimer();
+}
+
 
 void APJEShadowGenerator::SpawnMonsterAtRandomLocation()
 {
     if (MonsterClass)
     {
-        FVector SpawnLocation = GetActorLocation() + UKismetMathLibrary::RandomUnitVector() * SpawnRadius;
+        FVector SpawnLocation = GetActorLocation() + UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(-SpawnRadius, SpawnRadius);
         SpawnLocation.Z += 500.0f;
 
         FHitResult HitResult;
@@ -41,8 +49,17 @@ void APJEShadowGenerator::SpawnMonsterAtRandomLocation()
 
 void APJEShadowGenerator::Destroyed()
 {
-    Super::Destroyed();
-
     UPJEShadowGeneratorManager::GetInstance()->RemoveShadowGenerator(this);
+    Super::Destroyed();
 }
 
+
+void APJEShadowGenerator::StartSpawnTimer()
+{
+    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnMonsterWithTimer, 5.0f, true);
+}
+
+void APJEShadowGenerator::SpawnMonsterWithTimer()
+{
+    for (int i = 0; i < 3; i++) SpawnMonsterAtRandomLocation();
+}

@@ -16,9 +16,10 @@ class PROJECT_E_API UPJEShadowGeneratorManager : public UObject
 
 public:
     static UPJEShadowGeneratorManager* GetInstance();
+    void ShutdownInstance();
 
 private:
-    static TObjectPtr<UPJEShadowGeneratorManager> Instance;
+    static UPJEShadowGeneratorManager* Instance;
 
 // Init Section
 public:
@@ -32,11 +33,13 @@ public:
     void AddSpawnedMonster(class APJECharacterShadowA* SpawnedMonster);
     void RemoveSpawnedMonster(class APJECharacterShadowA* SpawnedMonsterToRemove);
 
+    int32 GetShadowGeneratorsCount();
+
 protected:
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere)
     TArray<TObjectPtr<class APJEShadowGenerator>> ShadowGenerators;
 
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere)
     TArray<TObjectPtr<class APJECharacterShadowA>> SpawnedShadowA;
 
     void UpdateShadowGeneratorsCount();
