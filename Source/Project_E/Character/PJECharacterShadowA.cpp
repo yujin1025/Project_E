@@ -39,3 +39,8 @@ void APJECharacterShadowA::AttackByAI()
 {
 	return;
 }
+
+void APJECharacterShadowA::SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount)
+{
+	ShadowGeneratorsCount = NewShadowGeneratorsCount;
+}

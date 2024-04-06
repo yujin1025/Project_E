@@ -28,4 +28,13 @@ protected:
 
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 	virtual void AttackByAI() override;
+
+
+public:
+	void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shadow Generator")
+	int32 ShadowGeneratorsCount;
+	
 };
