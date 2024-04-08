@@ -13,5 +13,5 @@ UCLASS()
 class PROJECT_E_API UBaseWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 };

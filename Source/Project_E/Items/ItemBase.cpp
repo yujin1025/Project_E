@@ -20,8 +20,6 @@ AItemBase::AItemBase()
 	
 	WidgetTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
 	WidgetTrigger->SetupAttachment(ItemMesh);
-
-	//Item = NewObject<UItem>(this, TEXT("Item"));
 }
 
 
@@ -37,26 +35,3 @@ void AItemBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-/*
-void AItemBase::SetItem(const FString& ItemName)
-{
-    UDataTable* ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
-    if (ItemDatabase)
-    {
-        FItemData* ItemData = ItemDatabase->FindRow<FItemData>(*ItemName, TEXT(""));
-
-        if (ItemData)
-        {
-            //Item->Name = ItemData->Name;
-            //Item->Type = ItemData->Type;
-            //Item->Weight = ItemData->Weight;
-            //Item->Damage = ItemData->Damage;
-
-            //UE_LOG(LogTemp, Warning, TEXT("Item Name: %s"), *Item->Name);
-            //UE_LOG(LogTemp, Warning, TEXT("Item Type: %d"), static_cast<int32>(Item->Type));
-            //UE_LOG(LogTemp, Warning, TEXT("Item Weight: %f"), Item->Weight);
-            //UE_LOG(LogTemp, Warning, TEXT("Item Damage: %f"), Item->Damage);
-        }
-    }
-}*/
