@@ -33,6 +33,7 @@ APJECharacterPlayer::APJECharacterPlayer()
 
 bool APJECharacterPlayer::GetItem(int32 ItemCode)
 {
+    //주석확인용
     if (Inventory && !Inventory->IsFull())
     {
         UDataTable* ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
@@ -52,10 +53,6 @@ bool APJECharacterPlayer::GetItem(int32 ItemCode)
     // b. When the player's GetItem() is executed on class DroppedItem, the ItemCode is passed by argument.
     // c. Return false if it is impossible to get the item ( ex) inventory is full )
     // d. Return true if the item can be picked up
-    //ItemCode는 각 아이템에 할당된 코드입니다.
-    //    해당 함수는 DroppedItem 클래스에서 실행될 때 ItemCode가 인수로 전달됩니다.
-    //    인벤토리가 가득 차있어서 아이템을 획득할 수 없는 경우 false를 반환합니다.
-    //    아이템을 집을 수 있는 경우 true를 반환합니다.
 }
 
 void APJECharacterPlayer::BeginPlay()
