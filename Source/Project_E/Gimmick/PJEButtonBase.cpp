@@ -30,6 +30,7 @@ APJEButtonBase::APJEButtonBase()
 	WidgetTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
 	WidgetTrigger->SetupAttachment(RootComponent);
 
+
 }
 
 // Called when the game starts or when spawned
