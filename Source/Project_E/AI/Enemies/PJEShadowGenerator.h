@@ -23,18 +23,18 @@ protected:
 
 // Spawn Section
 public:
-    
-    void SpawnMonsterAtRandomLocation();
+    template <typename ShadowType>
+    void SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass);
 
 protected:
     FTimerHandle SpawnTimerHandle;
 
     UPROPERTY(EditAnywhere, Category = "Spawn")
-    TSubclassOf<class APJECharacterShadowA> MonsterClass;
+    TSubclassOf<class APJECharacterShadowA> ShadowAClass;
 
     UPROPERTY(EditAnywhere, Category = "Spawn")
-    float SpawnRadius = 1000.0f;
+    TSubclassOf<class APJECharacterShadowB> ShadowBClass;
 
     void StartSpawnTimer();
-    void SpawnMonsterWithTimer();
+    void SpawnShadowAWithTimer();
 };

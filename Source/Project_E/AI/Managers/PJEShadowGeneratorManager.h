@@ -30,8 +30,8 @@ public:
     void RemoveShadowGenerator(class APJEShadowGenerator* GeneratorToRemove);
     void AddShadowGenerator(class APJEShadowGenerator* NewGenerator);
 
-    void AddSpawnedMonster(class APJECharacterShadowA* SpawnedMonster);
-    void RemoveSpawnedMonster(class APJECharacterShadowA* SpawnedMonsterToRemove);
+    void AddSpawnedMonster(class APJECharacterShadow* SpawnedMonster);
+    void RemoveSpawnedMonster(class APJECharacterShadow* SpawnedMonsterToRemove);
 
     int32 GetShadowGeneratorsCount();
 
@@ -40,7 +40,10 @@ protected:
     TArray<TObjectPtr<class APJEShadowGenerator>> ShadowGenerators;
 
     UPROPERTY(VisibleAnywhere)
-    TArray<TObjectPtr<class APJECharacterShadowA>> SpawnedShadowA;
+    TArray<TObjectPtr<class APJECharacterShadowA>> SpawnedShadowAArr;
+
+    UPROPERTY(VisibleAnywhere)
+    TArray<TObjectPtr<class APJECharacterShadowB>> SpawnedShadowBArr;
 
     void UpdateShadowGeneratorsCount();
 };

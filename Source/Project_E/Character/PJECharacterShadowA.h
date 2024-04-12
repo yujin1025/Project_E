@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/PJECharacterNonPlayer.h"
+#include "Character/PJECharacterShadow.h"
 #include "PJECharacterShadowA.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowA : public APJECharacterNonPlayer
+class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow
 {
 	GENERATED_BODY()
 public:
@@ -30,11 +30,4 @@ protected:
 	virtual void AttackByAI() override;
 
 
-public:
-	void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shadow Generator")
-	int32 ShadowGeneratorsCount;
-	
 };

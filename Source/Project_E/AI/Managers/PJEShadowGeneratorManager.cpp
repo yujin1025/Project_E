@@ -4,6 +4,7 @@
 #include "AI/Managers/PJEShadowGeneratorManager.h"
 #include "AI/Enemies/PJEShadowGenerator.h"
 #include "Character/PJECharacterShadowA.h"
+#include "Character/PJECharacterShadowB.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -72,7 +73,7 @@ void UPJEShadowGeneratorManager::RemoveShadowGenerator(APJEShadowGenerator* Gene
 
 void UPJEShadowGeneratorManager::UpdateShadowGeneratorsCount()
 {
-    for (APJECharacterShadowA* Character : SpawnedShadowA)
+    for (APJECharacterShadowA* Character : SpawnedShadowAArr)
     {
         if (Character)
         {
@@ -81,19 +82,43 @@ void UPJEShadowGeneratorManager::UpdateShadowGeneratorsCount()
     }
 }
 
-void UPJEShadowGeneratorManager::AddSpawnedMonster(APJECharacterShadowA* SpawnedMonster)
+void UPJEShadowGeneratorManager::AddSpawnedMonster(APJECharacterShadow* SpawnedMonster)
 {
     if (SpawnedMonster)
     {
-        SpawnedShadowA.Add(SpawnedMonster);
+        APJECharacterShadowA* SpawnedShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
+        if (SpawnedShadowA != nullptr)
+        {
+            SpawnedShadowAArr.Add(SpawnedShadowA);
+        }
+        else
+        {
+            APJECharacterShadowB* SpawnedShadowB = Cast<APJECharacterShadowB>(SpawnedMonster);
+            if (SpawnedShadowB != nullptr)
+            {
+                SpawnedShadowBArr.Add(SpawnedShadowB);
+            }
+        }
     }
 }
 
-void UPJEShadowGeneratorManager::RemoveSpawnedMonster(APJECharacterShadowA* SpawnedMonsterToRemove)
+void UPJEShadowGeneratorManager::RemoveSpawnedMonster(APJECharacterShadow* SpawnedMonsterToRemove)
 {
     if (SpawnedMonsterToRemove)
     {
-        SpawnedShadowA.RemoveSingle(SpawnedMonsterToRemove);
+        APJECharacterShadowA* SpawnedShadowA = Cast<APJECharacterShadowA>(SpawnedMonsterToRemove);
+        if (SpawnedShadowA != nullptr)
+        {
+            SpawnedShadowAArr.RemoveSingle(SpawnedShadowA);
+        }
+        else
+        {
+            APJECharacterShadowB* SpawnedShadowB = Cast<APJECharacterShadowB>(SpawnedMonsterToRemove);
+            if (SpawnedShadowB != nullptr)
+            {
+                SpawnedShadowBArr.RemoveSingle(SpawnedShadowB);
+            }
+        }
     }
 }
 

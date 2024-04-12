@@ -11,6 +11,8 @@ APJECharacterShadowA::APJECharacterShadowA()
 
 void APJECharacterShadowA::BeginPlay()
 {
+	Super::BeginPlay();
+	//
 	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 }
 
@@ -41,9 +43,4 @@ void APJECharacterShadowA::SetAIAttackDelegate(const FAICharacterAttackFinished&
 void APJECharacterShadowA::AttackByAI()
 {
 	return;
-}
-
-void APJECharacterShadowA::SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount)
-{
-	ShadowGeneratorsCount = NewShadowGeneratorsCount;
 }
