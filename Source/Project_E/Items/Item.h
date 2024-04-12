@@ -40,9 +40,6 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
     float Damage;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-    UTexture2D* ItemImage;
-
     FString GetItemName() const { return Name; }
 
     static UItem* SetItem(const UDataTable* ItemDataTable, int32 Code);
@@ -67,7 +64,4 @@ struct FItemData : public FTableRowBase
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     float Damage;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-    UTexture2D* ItemImage;
 };

@@ -7,8 +7,6 @@
 #include "Interface/PJEGameInterface.h"
 #include "PJEGameModeBase.generated.h"
 
-class UBaseWidget;
-
 /**
  * 
  */
@@ -16,7 +14,6 @@ UCLASS()
 class PROJECT_E_API APJEGameModeBase : public AGameModeBase, public IPJEGameInterface
 {
 	GENERATED_BODY()
-
 public:
 	APJEGameModeBase();
 
@@ -24,15 +21,4 @@ public:
 	
 	virtual void OnPlayerDead(int PlayerNumber) override;
 	
-private:
-	void OpenWidget();
-
-
-public:
-	UPROPERTY()
-	UBaseWidget* InGameWindowWidget;
-
-private:
-	UPROPERTY(EditAnywhere, Category = UI)
-	TSubclassOf<UBaseWidget> InGameWindowWidgetClass;
 };
