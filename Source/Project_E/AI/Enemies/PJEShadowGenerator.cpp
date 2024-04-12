@@ -56,7 +56,7 @@ void APJEShadowGenerator::Destroyed()
 
 void APJEShadowGenerator::StartSpawnTimer()
 {
-    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnMonsterWithTimer, 5.0f, true);
+    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnMonsterWithTimer, 3.0f, true);
 }
 
 void APJEShadowGenerator::SpawnMonsterWithTimer()
