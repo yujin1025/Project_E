@@ -19,8 +19,8 @@ public:
 
 // Spawn Section
 public:
-	void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
-	float GetShadowSpawnRadius();
+	FORCEINLINE void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
+	FORCEINLINE float GetShadowSpawnRadius() const;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shadow Generator")

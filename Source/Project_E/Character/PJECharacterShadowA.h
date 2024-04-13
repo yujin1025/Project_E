@@ -18,6 +18,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	float PlayerDetectionRange;
+	float KeepMovingDuration;
+	float BlinkDuration;
+	float TeleportRange;
 
 // AI Section
 protected:

@@ -122,7 +122,7 @@ void UPJEShadowGeneratorManager::RemoveSpawnedMonster(APJECharacterShadow* Spawn
     }
 }
 
-int32 UPJEShadowGeneratorManager::GetShadowGeneratorsCount()
+int32 UPJEShadowGeneratorManager::GetShadowGeneratorsCount() const
 {
     return ShadowGenerators.Num();
 }

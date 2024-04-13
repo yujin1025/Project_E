@@ -13,7 +13,7 @@ void APJECharacterShadow::SetShadowGeneratorsCount(int32 NewShadowGeneratorsCoun
 	ShadowGeneratorsCount = NewShadowGeneratorsCount;
 }
 
-float APJECharacterShadow::GetShadowSpawnRadius()
+float APJECharacterShadow::GetShadowSpawnRadius() const
 {
 	return ShadowSpawnRadius;
 }

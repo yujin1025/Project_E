@@ -7,12 +7,20 @@
 APJECharacterShadowA::APJECharacterShadowA()
 {
 	ShadowGeneratorsCount = 0;
+
+	MonsterRank = EMonsterRank::Normal;
+	MaxHp = 50;
+	SetCurrentHP(MaxHp);
+	MoveSpeed = 2.0f;
+	PlayerDetectionRange = 1.0f;
+	KeepMovingDuration = 10.0f;
+	BlinkDuration = 0.2f;
+	TeleportRange = 2.0f;
 }
 
 void APJECharacterShadowA::BeginPlay()
 {
 	Super::BeginPlay();
-	//
 	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 }
 
