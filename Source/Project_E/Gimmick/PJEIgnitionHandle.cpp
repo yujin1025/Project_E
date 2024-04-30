@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "PJEIgnitionHandle.h"
 #include "Gimmick/PJEIgnitionHandle.h"
 
-#include "PJERotationPlatform.h"
+#include "PJERotateComponent.h"
 
 // Sets default values
 APJEIgnitionHandle::APJEIgnitionHandle()
@@ -17,14 +18,14 @@ APJEIgnitionHandle::APJEIgnitionHandle()
 void APJEIgnitionHandle::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	OperateClockwiseTurn();
 }
 
 // Called every frame
 void APJEIgnitionHandle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void APJEIgnitionHandle::BindInput()
@@ -41,11 +42,18 @@ void APJEIgnitionHandle::OperateClockwiseTurn()
 {
 	if(!RotationPlatforms.IsEmpty())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Not Empty"));
 		for(auto CurrentPlatform:RotationPlatforms)
 		{
-			if(TObjectPtr<UPJERotationPlatform> RotationPlatform = Cast<UPJERotationPlatform>(CurrentPlatform))
+			if(TObjectPtr<UPJERotateComponent> RotationPlatform = Cast<UPJERotateComponent>(CurrentPlatform))
 			{
-				RotationPlatform->SetRotationOffset(1);
+				UE_LOG(LogTemp, Warning, TEXT("Cast Succeed"));
+				RotationPlatform->SetRotationSpeed(1);
+				RotationPlatform->SetIsRotating(true);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Cast Faild"));
 			}
 		}
 	}
@@ -53,27 +61,30 @@ void APJEIgnitionHandle::OperateClockwiseTurn()
 
 void APJEIgnitionHandle::OperateCounterClockwiseTurn()
 {
-	if(!RotationPlatforms.IsEmpty())
+	if(RotationPlatforms.IsEmpty())
 	{
-		for(auto CurrentPlatform:RotationPlatforms)
+		return;
+	}
+	for(auto CurrentPlatform:RotationPlatforms)
+	{
+		if(TObjectPtr<UPJERotateComponent> RotationPlatform = Cast<UPJERotateComponent>(CurrentPlatform))
 		{
-			if(TObjectPtr<UPJERotationPlatform> RotationPlatform = Cast<UPJERotationPlatform>(CurrentPlatform))
-			{
-				RotationPlatform->SetRotationOffset(-1);
-			}
+			RotationPlatform->SetRotationSpeed(-1);
+			RotationPlatform->SetIsRotating(true);
 		}
 	}
 }
 
-void APJEIgnitionHandle::IntteruptRotation()
+void APJEIgnitionHandle::InterruptRotation()
 {
 	if(!RotationPlatforms.IsEmpty())
 	{
 		for(auto CurrentPlatform:RotationPlatforms)
 		{
-			if(TObjectPtr<UPJERotationPlatform> RotationPlatform = Cast<UPJERotationPlatform>(CurrentPlatform))
+			if(TObjectPtr<UPJERotateComponent> RotationPlatform = Cast<UPJERotateComponent>(CurrentPlatform))
 			{
-				RotationPlatform->SetRotationOffset(0);
+				RotationPlatform->SetRotationSpeed(0);
+				RotationPlatform->SetIsRotating(false);
 			}
 		}
 	}

@@ -30,7 +30,7 @@ public:
 	
 	void OperateClockwiseTurn();
 	void OperateCounterClockwiseTurn();
-	void IntteruptRotation();
+	void InterruptRotation();
 
 	void SetCharacter(APJECharacterPlayer* PlayerCharacter);
 	
@@ -40,4 +40,8 @@ protected:
 	TArray<TObjectPtr<AActor>> RotationPlatforms;
 
 	TObjectPtr<APJECharacterPlayer> Character = nullptr;
+
+	//For test
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	int HandleInt = 0;
 };
