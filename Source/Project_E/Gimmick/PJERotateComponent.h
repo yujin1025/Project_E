@@ -31,7 +31,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
-	FORCEINLINE void SetRotationOffset(const FRotator rotationVector) { RotationOffset = rotationVector; }
+	FORCEINLINE void SetRotator(const FRotator rotationVector) { RotationOffset = rotationVector; }
 	FORCEINLINE void SetRotationSpeed(const float rotationSpeed) { RotationSpeed = rotationSpeed; }
 	FORCEINLINE void SetIsRotating(const bool isRotating) { bIsRotating = isRotating; }
+
+	FORCEINLINE FRotator GetRotator() const { return RotationOffset; }
 };

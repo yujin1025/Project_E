@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "PJEIgnitionHandle.generated.h"
 
+class APJERotatingPlatform;
 class APJECharacterPlayer;
 class UPJERotationPlatform;
 
@@ -22,26 +23,23 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void SetPlatformOptions(float Speed, bool bRotate);
+
+	void ResetRotation();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	void BindInput();
-	
-	void OperateClockwiseTurn();
-	void OperateCounterClockwiseTurn();
-	void InterruptRotation();
-
-	void SetCharacter(APJECharacterPlayer* PlayerCharacter);
 	
 	
 protected:
-	UPROPERTY(EditAnywhere, Category="Platform")
-	TArray<TObjectPtr<AActor>> RotationPlatforms;
-
-	TObjectPtr<APJECharacterPlayer> Character = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "Platform")
+	TArray<TObjectPtr<APJERotatingPlatform>> RotationPlatforms;
+	
 	//For test
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	int HandleInt = 0;
+	int LastHandleInt = 5;
+
+	float PostInputTime = 0;
 };
