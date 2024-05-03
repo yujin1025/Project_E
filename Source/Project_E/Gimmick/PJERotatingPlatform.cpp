@@ -17,7 +17,6 @@ void APJERotatingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OriginRotation = GetActorRotation();
 }
 
 // Called every frame
@@ -25,10 +24,4 @@ void APJERotatingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void APJERotatingPlatform::SetRotationComponent(float Speed, bool bRotate)
-{
-	RotationComponent->SetRotationSpeed(Speed);
-	RotationComponent->SetIsRotating(bRotate);
 }

@@ -18,7 +18,7 @@ void APJEIgnitionHandle::SetPlatformOptions(float Speed, bool bRotate)
 {
 	for(auto Platform:RotationPlatforms)
 	{
-		Platform->SetRotationComponent(Speed, bRotate);
+		
 	}
 }
 

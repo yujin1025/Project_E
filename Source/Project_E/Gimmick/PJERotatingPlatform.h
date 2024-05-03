@@ -20,8 +20,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void RotationObject(bool bClockwise);
-
 public:	
 	virtual void Tick(float DeltaTime) override;
 	
@@ -31,8 +29,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UPJERotateComponent> RotationComponent;
 
-	FRotator OriginRotation;
 public:
-	void SetRotationComponent(float Speed, bool bRotate);
 	
 };
