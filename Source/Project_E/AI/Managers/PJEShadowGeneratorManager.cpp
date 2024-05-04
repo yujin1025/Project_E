@@ -126,3 +126,8 @@ int32 UPJEShadowGeneratorManager::GetShadowGeneratorsCount() const
 {
     return ShadowGenerators.Num();
 }
+
+int32 UPJEShadowGeneratorManager::GetShadowACount() const
+{
+    return SpawnedShadowAArr.Num();
+}

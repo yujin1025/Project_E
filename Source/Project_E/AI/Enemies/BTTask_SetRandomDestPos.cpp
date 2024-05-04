@@ -30,7 +30,7 @@ EBTNodeResult::Type UBTTask_SetRandomDestPos::ExecuteTask(UBehaviorTreeComponent
 	FVector OriPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_ORIPOS);
 	FNavLocation NextPatrolPos;
 
-	if (NavSystem->GetRandomPointInNavigableRadius(OriPos, 500.0f, NextPatrolPos))
+	if (NavSystem->GetRandomPointInNavigableRadius(OriPos, 1000.0f, NextPatrolPos))
 	{
 
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_DESTPOS, NextPatrolPos.Location);

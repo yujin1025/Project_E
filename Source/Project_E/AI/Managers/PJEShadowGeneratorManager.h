@@ -34,6 +34,7 @@ public:
     void RemoveSpawnedMonster(class APJECharacterShadow* SpawnedMonsterToRemove);
 
     FORCEINLINE int32 GetShadowGeneratorsCount() const;
+    FORCEINLINE int32 GetShadowACount() const;
 
 protected:
     UPROPERTY(VisibleAnywhere)

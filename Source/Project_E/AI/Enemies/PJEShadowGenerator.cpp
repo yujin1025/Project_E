@@ -77,5 +77,8 @@ void APJEShadowGenerator::StartSpawnTimer()
 
 void APJEShadowGenerator::SpawnShadowAWithTimer()
 {
-    for (int32 i = 0; i < 3; i++) SpawnMonsterAtRandomLocation(ShadowAClass);
+    if (UPJEShadowGeneratorManager::GetInstance()->GetShadowACount() <= 5)
+    {
+        for (int32 i = 0; i < 3; i++) SpawnMonsterAtRandomLocation(ShadowAClass);
+    }
 }

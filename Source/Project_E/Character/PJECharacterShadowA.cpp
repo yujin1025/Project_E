@@ -3,6 +3,10 @@
 
 #include "Character/PJECharacterShadowA.h"
 #include "AI/Managers/PJEShadowGeneratorManager.h"
+#include "AI/Enemies/PJEShadowAAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 APJECharacterShadowA::APJECharacterShadowA()
 {
@@ -16,6 +20,11 @@ APJECharacterShadowA::APJECharacterShadowA()
 	KeepMovingDuration = 10.0f;
 	BlinkDuration = 0.2f;
 	TeleportRange = 2.0f;
+}
+
+float APJECharacterShadowA::GetKeepMovingDuration()
+{
+	return KeepMovingDuration;
 }
 
 void APJECharacterShadowA::BeginPlay()

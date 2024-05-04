@@ -14,15 +14,19 @@ class PROJECT_E_API APJEAIController : public AAIController
 {
 	GENERATED_BODY()
 public:
-	APJEAIController();
-
 	void RunAI();
 	void StopAI();
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void InitBB();
 
-private:
+public:
+	TObjectPtr<class UBlackboardData> GetBB();
+	
+	TObjectPtr<class UBehaviorTree> GetBT();
+
+protected:
 	UPROPERTY()
 	TObjectPtr<class UBlackboardData> BBAsset;
 
