@@ -1,0 +1,3 @@
+APJERotatingPlatform
+
+SetRotating
