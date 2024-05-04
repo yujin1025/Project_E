@@ -5,24 +5,25 @@
 
 APJEPlayerController::APJEPlayerController()
 {
+	
 }
 
-void APJEPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
 
-	FInputModeGameOnly GameOnlyInputMode;
-	SetInputMode(GameOnlyInputMode);
+void APJEPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
 }
 
-void APJEPlayerController::GameClear()
+void APJEPlayerController::SwitchInputToIgnitionHandle()
 {
-	//TODO: GameClear
+	
+}
+
+void APJEPlayerController::SwitchInputToPlayer()
+{
+	
 }
 
 void APJEPlayerController::GameOver()
 {
-	//TODO: GameOver
 }
-
-

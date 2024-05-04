@@ -6,47 +6,32 @@
 APJEIgnitionHandle::APJEIgnitionHandle()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void APJEIgnitionHandle::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LastRotateState = ERotateState::Interrupt;
+	CurrentRotateState = ERotateState::Interrupt;
 }
 
-void APJEIgnitionHandle::SetPlatformOptions(float Speed, bool bRotate)
+void APJEIgnitionHandle::NotifyState(ERotateState RotateState)
 {
-	for(auto Platform:RotationPlatforms)
+	for(auto RotationPlatform: RotationPlatforms)
 	{
-		
+		UPJERotateComponent* RotateComponent = RotationPlatform->GetRotationComponent();
+		RotateComponent->SetRotateState(RotateState);
 	}
-}
-
-void APJEIgnitionHandle::ResetRotation()
-{
 }
 
 void APJEIgnitionHandle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(LastHandleInt != HandleInt)
+	if(CurrentRotateState != LastRotateState)
 	{
-		switch(HandleInt)
-		{
-		case -1:
-			SetPlatformOptions(-1, true);
-			break;
-		case 0:
-			SetPlatformOptions(0, false);
-			break;
-		case 1:
-			SetPlatformOptions(1, true);
-			break;
-		default:
-			break;
-		}
+		NotifyState(CurrentRotateState);
 	}
-
-	LastHandleInt = HandleInt;
+	LastRotateState = CurrentRotateState;
 }

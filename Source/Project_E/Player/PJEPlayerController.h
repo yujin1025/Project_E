@@ -13,11 +13,17 @@ UCLASS()
 class PROJECT_E_API APJEPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
 public:
 	APJEPlayerController();
-	void GameClear();
-	void GameOver();
-protected:
-	virtual void BeginPlay() override;
 	
+	void SetupInputComponent() override;
+	
+	void GameOver();
+
+protected:
+	void SwitchInputToIgnitionHandle();
+	void SwitchInputToPlayer();
+
+
 };

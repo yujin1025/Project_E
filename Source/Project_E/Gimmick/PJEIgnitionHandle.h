@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "PJEIgnitionHandle.generated.h"
 
+enum class ERotateState : uint8;
 class APJERotatingPlatform;
 class APJECharacterPlayer;
 class UPJERotationPlatform;
@@ -16,19 +17,14 @@ class PROJECT_E_API APJEIgnitionHandle : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	APJEIgnitionHandle();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void SetPlatformOptions(float Speed, bool bRotate);
-
-	void ResetRotation();
+	void NotifyState(ERotateState RotateState);
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
 	
@@ -36,10 +32,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Platform")
 	TArray<TObjectPtr<APJERotatingPlatform>> RotationPlatforms;
 	
-	//For test
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	int HandleInt = 0;
-	int LastHandleInt = 5;
-
-	float PostInputTime = 0;
+	ERotateState CurrentRotateState;
+	ERotateState LastRotateState;
+	
+	float TimeAfterInput;
+	float DelayTime;
 };

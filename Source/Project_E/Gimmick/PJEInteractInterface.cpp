@@ -30,8 +30,10 @@ void IPJEInteractInterface::BreakInteracting()
 
 void IPJEInteractInterface::ShowInteractPointWidget()
 {
+	
 }
 
 void IPJEInteractInterface::HideInteracPointWidget()
 {
+	
 }
