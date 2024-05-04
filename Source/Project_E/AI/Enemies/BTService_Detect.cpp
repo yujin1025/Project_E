@@ -23,7 +23,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     {
         UWorld* World = AIControllerPawn->GetWorld();
         TArray<AActor*> OverlappedActors;
-        float DetectionRadius = 800.0f;
+        float DetectionRadius = 300.0f;
         FVector AIControllerLocation = AIControllerPawn->GetActorLocation();
 
         UKismetSystemLibrary::SphereOverlapActors(

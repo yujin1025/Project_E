@@ -4,14 +4,12 @@
 #include "AI/Enemies/BTTask_KeepMoving.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "NavigationSystem.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
-UBTTask_KeepMoving::UBTTask_KeepMoving(const FObjectInitializer& ObjectInitializer)
-    : Super(ObjectInitializer)
+UBTTask_KeepMoving::UBTTask_KeepMoving()
 {
     NodeName = "Move In Direction";
     bNotifyTick = true;
@@ -20,8 +18,7 @@ UBTTask_KeepMoving::UBTTask_KeepMoving(const FObjectInitializer& ObjectInitializ
 EBTNodeResult::Type UBTTask_KeepMoving::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
-
-    StartTime = GetWorld()->TimeSeconds;
+    OwnerComp.GetBlackboardComponent()->SetValueAsFloat("KeepMovingTime", GetWorld()->TimeSeconds);
     return EBTNodeResult::InProgress;
 }
 
@@ -44,13 +41,13 @@ void UBTTask_KeepMoving::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
         return;
     }
 
-    FVector Direction = ControlledPawn->GetActorForwardVector();
-    FVector NewLocation = ControlledPawn->GetActorLocation() + Direction * ControlledPawn->GetCharacterMovement()->MaxWalkSpeed * DeltaSeconds * 100;
-    AICon->MoveToLocation(NewLocation, 0.0001f, true, false, false, false, nullptr, true);
-    
-    if (GetWorld()->TimeSeconds - StartTime >= 2.0f)
+    if (GetWorld()->TimeSeconds - OwnerComp.GetBlackboardComponent()->GetValueAsFloat("KeepMovingTime") >= 2.0f)
     {
         AICon->StopMovement();
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
+
+    FVector Direction = ControlledPawn->GetActorForwardVector();
+    FVector NewLocation = ControlledPawn->GetActorLocation() + Direction * ControlledPawn->GetCharacterMovement()->MaxWalkSpeed * DeltaSeconds * 100;
+    AICon->MoveToLocation(NewLocation, 0.0001f, true, false, false, false, nullptr, true);
 }

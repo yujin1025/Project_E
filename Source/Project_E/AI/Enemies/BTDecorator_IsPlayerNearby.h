@@ -17,8 +17,4 @@ class PROJECT_E_API UBTDecorator_IsPlayerNearby : public UBTDecorator
 public:
 	UBTDecorator_IsPlayerNearby();
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
-
-protected:
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector IsPlayerNearbyKey;
 };

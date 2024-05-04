@@ -27,7 +27,7 @@ void APJEShadowAAIController::InitBB()
 {
 	Super::InitBB();
 	APJECharacterShadowA* OwnCharacter = Cast<APJECharacterShadowA>(GetPawn());
-	Blackboard->SetValueAsFloat("MaxKeepDirTime", OwnCharacter->GetKeepMovingDuration());
+	Blackboard->SetValueAsFloat("MaxKeepMovingTime", OwnCharacter->GetKeepMovingDuration());
 }
 
 

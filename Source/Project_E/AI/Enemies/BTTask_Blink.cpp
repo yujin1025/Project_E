@@ -8,21 +8,22 @@
 UBTTask_Blink::UBTTask_Blink()
 {
 	bNotifyTick = true;
-	FlashCount = 0;
     StartTime = 0;
+    AccumulatedTime = 0.0f;
 }
 
 EBTNodeResult::Type UBTTask_Blink::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	StartTime = GetWorld()->GetTimeSeconds();
-	FlashCount = 0;
     AccumulatedTime = 0.0f;
 	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+    Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
     AAIController* AICon = OwnerComp.GetAIOwner();
     if (!AICon)
     {
@@ -39,22 +40,19 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
     USkeletalMeshComponent* Mesh = ControlledPawn->GetMesh();
 
-    const float FlashDuration = 0.2/4.0;  
-
     AccumulatedTime += DeltaSeconds;
 
     if (AccumulatedTime >= FlashDuration)
     {
-        FlashCount++;
-        Mesh->SetVisibility(!Mesh->IsVisible());
 
-        if (FlashCount >= 4)
+        if (GetWorld()->TimeSeconds - StartTime >= 0.2f)
         {
             Mesh->SetVisibility(true);
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
             return;
         }
 
+        Mesh->SetVisibility(!Mesh->IsVisible());
         AccumulatedTime -= FlashDuration;
     }
 }

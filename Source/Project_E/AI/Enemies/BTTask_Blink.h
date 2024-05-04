@@ -23,6 +23,6 @@ protected:
 
 private:
     float StartTime;
-    int32 FlashCount;
     float AccumulatedTime;
+    const float FlashDuration = 0.2 / 6.0;
 };

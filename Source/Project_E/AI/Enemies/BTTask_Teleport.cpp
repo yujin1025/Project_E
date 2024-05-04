@@ -30,10 +30,30 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
     FVector CurrentLocation = Pawn->GetActorLocation();
     FNavLocation RandomNavLocation;
-    float Radius = 800.0f;
+    float Radius = 400.0f;
 
     UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
-    if (!NavSys || !NavSys->GetRandomPointInNavigableRadius(CurrentLocation, Radius, RandomNavLocation))
+    if (!NavSys)
+    {
+        return EBTNodeResult::Failed;
+    }
+
+    const int32 MaxAttempts = 10;  // 시도 횟수 제한
+    int32 Attempts = 0;
+    bool bLocationFound = false;
+
+    while (Attempts < MaxAttempts)
+    {
+        if (NavSys->GetRandomPointInNavigableRadius(CurrentLocation, Radius, RandomNavLocation))
+        {
+            bLocationFound = true;
+            break;
+        }
+
+        Attempts++;
+    }
+
+    if (!bLocationFound)
     {
         return EBTNodeResult::Failed;
     }
@@ -42,3 +62,4 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
     OwnerComp.GetBlackboardComponent()->SetValueAsBool("bIsPlayerNearby", false);
     return EBTNodeResult::Succeeded;
 }
+
