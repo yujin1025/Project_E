@@ -24,19 +24,19 @@ public:
 	UPJERotateComponent();
 
 protected:
-	void OperateRotation();
+	void OperateRotation(float DeltaTime);
 	void StopRotation();
-	void ResetRotation();
-
-	FRotator RNewInterpConstantTo(const FRotator& Current, const FRotator& Target, float DeltaTime, float InterpSpeed);
+	void ResetRotation(float DeltaTime);
 	
 protected:
 	virtual void BeginPlay() override;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	FRotator OriginRotation;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	FRotator RotationAngle;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	FRotator RotationOffset;
+	float MaxRotateDegree;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float RotationSpeed = 0.f;
 	UPROPERTY(EditAnywhere, Category = "Movement")
@@ -46,12 +46,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	FORCEINLINE void SetRotationAngle(FRotator NewRotationAngle) { RotationAngle = NewRotationAngle; }
-	FORCEINLINE void SetRotationOffset(FRotator NewRotationOffset) { RotationAngle = NewRotationOffset; }
+	FORCEINLINE void SetRotationOffset(float NewMaxRotateDegree) { MaxRotateDegree = NewMaxRotateDegree; }
 	FORCEINLINE void SetRotationSpeed(float NewRotationSpeed) { RotationSpeed = NewRotationSpeed; }
 	FORCEINLINE void SetRotateState(ERotateState NewRotateState) { RotateState = NewRotateState; }
 
 	FORCEINLINE FRotator GetRotationAngle() const { return RotationAngle; }
-	FORCEINLINE FRotator GetRotationOffset() const { return RotationOffset; }
+	FORCEINLINE float GetMaxRotateDegree() const { return MaxRotateDegree; }
 	FORCEINLINE float GetRotationSpeed() const { return RotationSpeed; }
 	FORCEINLINE ERotateState GetRotateState() const { return RotateState; }
 
