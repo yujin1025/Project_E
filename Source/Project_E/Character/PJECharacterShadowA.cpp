@@ -3,14 +3,33 @@
 
 #include "Character/PJECharacterShadowA.h"
 #include "AI/Managers/PJEShadowGeneratorManager.h"
+#include "AI/Enemies/PJEShadowAAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 APJECharacterShadowA::APJECharacterShadowA()
 {
 	ShadowGeneratorsCount = 0;
+
+	MonsterRank = EMonsterRank::Normal;
+	MaxHp = 50;
+	SetCurrentHP(MaxHp);
+	MoveSpeed = 2.0f;
+	PlayerDetectionRange = 1.0f;
+	KeepMovingDuration = 10.0f;
+	BlinkDuration = 0.2f;
+	TeleportRange = 2.0f;
+}
+
+float APJECharacterShadowA::GetKeepMovingDuration()
+{
+	return KeepMovingDuration;
 }
 
 void APJECharacterShadowA::BeginPlay()
 {
+	Super::BeginPlay();
 	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 }
 
@@ -41,9 +60,4 @@ void APJECharacterShadowA::SetAIAttackDelegate(const FAICharacterAttackFinished&
 void APJECharacterShadowA::AttackByAI()
 {
 	return;
-}
-
-void APJECharacterShadowA::SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount)
-{
-	ShadowGeneratorsCount = NewShadowGeneratorsCount;
 }

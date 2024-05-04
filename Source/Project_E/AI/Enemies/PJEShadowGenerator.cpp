@@ -3,7 +3,9 @@
 
 #include "AI/Enemies/PJEShadowGenerator.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Character/PJECharacterShadow.h"
 #include "Character/PJECharacterShadowA.h"
+#include "Character/PJECharacterShadowB.h"
 #include "AI/Managers/PJEShadowGeneratorManager.h"
 
 // Sets default values
@@ -21,31 +23,45 @@ void APJEShadowGenerator::BeginPlay()
     StartSpawnTimer();
 }
 
-
-void APJEShadowGenerator::SpawnMonsterAtRandomLocation()
+template <typename ShadowType>
+void APJEShadowGenerator::SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass)
 {
     if (MonsterClass)
     {
-        FVector SpawnLocation = GetActorLocation() + UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(-SpawnRadius, SpawnRadius);
-        SpawnLocation.Z += 500.0f;
+        FVector InitialSpawnLocation = FVector::ZeroVector;
+        FRotator SpawnRotation = FRotator::ZeroRotator;
+        ShadowType* SpawnedMonster = GetWorld()->SpawnActor<ShadowType>(MonsterClass, InitialSpawnLocation, SpawnRotation);
 
-        FHitResult HitResult;
-        FVector StartLocation = SpawnLocation;
-        FVector EndLocation = StartLocation;
-        EndLocation.Z -= 1000.0f;
-        FCollisionQueryParams Params;
-        Params.AddIgnoredActor(this);
-        if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params))
+        if (SpawnedMonster)
         {
-            SpawnLocation = HitResult.Location;
-            APJECharacterShadowA* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadowA>(MonsterClass, SpawnLocation, FRotator::ZeroRotator);
-            if (SpawnedMonster)
+            FVector RandomOffset = UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(-SpawnedMonster->GetShadowSpawnRadius(), SpawnedMonster->GetShadowSpawnRadius());
+            RandomOffset.Z = 0.0f;
+            FVector SpawnLocation = GetActorLocation() + RandomOffset;
+            SpawnLocation.Z += 500.0f;
+
+            FHitResult HitResult;
+            FVector StartLocation = SpawnLocation;
+            FVector EndLocation = StartLocation;
+            EndLocation.Z -= 1000.0f;
+            FCollisionQueryParams Params;
+            Params.AddIgnoredActor(this);
+
+            if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params))
             {
+                SpawnLocation = HitResult.Location;
+                FVector BoundsExtent = SpawnedMonster->GetComponentsBoundingBox().GetExtent();
+                SpawnLocation.Z += BoundsExtent.Z;
+                SpawnedMonster->SetActorLocation(SpawnLocation);
                 UPJEShadowGeneratorManager::GetInstance()->AddSpawnedMonster(SpawnedMonster);
+            }
+            else
+            {
+                SpawnedMonster->Destroy();
             }
         }
     }
 }
+
 
 void APJEShadowGenerator::Destroyed()
 {
@@ -56,10 +72,13 @@ void APJEShadowGenerator::Destroyed()
 
 void APJEShadowGenerator::StartSpawnTimer()
 {
-    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnMonsterWithTimer, 3.0f, true);
+    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnShadowAWithTimer, 3.0f, true);
 }
 
-void APJEShadowGenerator::SpawnMonsterWithTimer()
+void APJEShadowGenerator::SpawnShadowAWithTimer()
 {
-    for (int i = 0; i < 3; i++) SpawnMonsterAtRandomLocation();
+    if (UPJEShadowGeneratorManager::GetInstance()->GetShadowACount() <= 5)
+    {
+        for (int32 i = 0; i < 3; i++) SpawnMonsterAtRandomLocation(ShadowAClass);
+    }
 }

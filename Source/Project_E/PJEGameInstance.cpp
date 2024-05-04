@@ -8,6 +8,5 @@ void UPJEGameInstance::Shutdown()
 {
     UPJEShadowGeneratorManager::GetInstance()->ShutdownInstance();
 
-    // 기본 Shutdown 처리 호출
     Super::Shutdown();
 }

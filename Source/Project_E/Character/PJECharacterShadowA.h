@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/PJECharacterNonPlayer.h"
+#include "Character/PJECharacterShadow.h"
 #include "PJECharacterShadowA.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowA : public APJECharacterNonPlayer
+class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow
 {
 	GENERATED_BODY()
 public:
@@ -18,6 +18,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	float PlayerDetectionRange;
+	float KeepMovingDuration;
+	float BlinkDuration;
+	float TeleportRange;
 
 // AI Section
 protected:
@@ -29,12 +33,8 @@ protected:
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 	virtual void AttackByAI() override;
 
-
 public:
-	void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
+	float GetKeepMovingDuration();
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shadow Generator")
-	int32 ShadowGeneratorsCount;
-	
+
 };

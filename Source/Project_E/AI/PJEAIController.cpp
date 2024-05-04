@@ -5,32 +5,14 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#define BBKEY_HOMEPOS TEXT("HomePos")
-#define BBKEY_PATROLPOS TEXT("PatrolPos")
-#define BBKEY_TARGET TEXT("Target")
-
-APJEAIController::APJEAIController()
-{
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(TEXT(""));
-	if (nullptr != BBAssetRef.Object)
-	{
-		BBAsset = BBAssetRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(TEXT(""));
-	if (nullptr != BTAssetRef.Object)
-	{
-		BTAsset = BTAssetRef.Object;
-	}
-}
+#include "PJEAI.h"
 
 void APJEAIController::RunAI()
 {
 	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardPtr))
 	{
-		Blackboard->SetValueAsVector(BBKEY_HOMEPOS, GetPawn()->GetActorLocation());
-
+		InitBB();
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);
 	}
@@ -50,3 +32,19 @@ void APJEAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 	RunAI();
 }
+
+void APJEAIController::InitBB()
+{
+	Blackboard->SetValueAsVector(BBKEY_ORIPOS, GetPawn()->GetActorLocation());
+}
+
+TObjectPtr<class UBlackboardData> APJEAIController::GetBB()
+{
+	return BBAsset;
+}
+
+TObjectPtr<class UBehaviorTree> APJEAIController::GetBT()
+{
+	return BTAsset;
+}
+
