@@ -143,7 +143,7 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
 
 void APJECharacterPlayer::SetDead()
 {
-    Super::SetDead();
+    //Super::SetDead();
 
     APlayerController* PlayerController = Cast<APlayerController>(GetController());
     if (PlayerController)

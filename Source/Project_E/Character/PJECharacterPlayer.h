@@ -79,10 +79,7 @@ protected:
 private:
 	void OnMove(const FInputActionValue& Value);	
 	void OnLook(const FInputActionValue& Value);
-	void OpenInventory();
-
-	bool bIsInventoryOpen = false; 
-	UInventoryWidget* InventoryWidgetInstance = nullptr;
+	//void OpenInventory();
 
 	bool bIsInventoryOpen = false; 
 	UInventoryWidget* InventoryWidgetInstance = nullptr;
