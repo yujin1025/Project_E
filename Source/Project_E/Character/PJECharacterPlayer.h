@@ -72,13 +72,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* InventoryAction;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	//UInputAction* InventoryAction;
+
 
 private:
 	void OnMove(const FInputActionValue& Value);	
 	void OnLook(const FInputActionValue& Value);
 	void OpenInventory();
+
+	bool bIsInventoryOpen = false; 
+	UInventoryWidget* InventoryWidgetInstance = nullptr;
 
 	bool bIsInventoryOpen = false; 
 	UInventoryWidget* InventoryWidgetInstance = nullptr;
@@ -92,7 +96,7 @@ protected:
 protected:
 	//virtual void TakeItem(UItem* Item) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 	UInventory* Inventory;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
@@ -103,11 +107,9 @@ protected:
 
 	UPROPERTY()
 	UInventoryWidget* InventoryWidget;
-
 private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
-
 //Interact Section
 protected:
 	UPROPERTY(EditAnywhere)

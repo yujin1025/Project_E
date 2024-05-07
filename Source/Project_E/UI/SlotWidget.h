@@ -17,6 +17,15 @@ class PROJECT_E_API USlotWidget : public UBaseWidget
 	GENERATED_BODY()
 
 public:
+    virtual void NativeConstruct() override;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UImage* ItemImage;
+
+    UFUNCTION(BlueprintCallable)
+    void UpdateSlot(class UItem* Item);
+    /*
+public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     UImage* ItemImg; // Image widget to display item image
 
@@ -30,4 +39,5 @@ public:
 
 private:
     UTexture2D* CurrentItemImage;
+    */
 };

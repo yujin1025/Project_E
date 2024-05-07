@@ -15,12 +15,28 @@ UCLASS()
 class PROJECT_E_API UInventoryWidget : public UBaseWidget
 {
 	GENERATED_BODY()
+
+public:
+    virtual void NativeConstruct() override;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UPanelWidget* InventoryPanel;
+
+    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    TSubclassOf<class USlotWidget> SlotWidgetClass;
+
+    UFUNCTION(BlueprintCallable)
+    virtual void UpdateInventory(const TArray<class UItem*>& Items);
+};
+    /*
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     UPanelWidget* SlotsPanel; // Assume SlotsPanel is a panel where slots will be added
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
     TSubclassOf<class USlotWidget> SlotWidgetClass; 
+
+    TArray<class USlotWidget*> Slots; // Array to store SlotWidgets
 
     // Function to add item to slot
     UFUNCTION(BlueprintCallable)
@@ -33,12 +49,10 @@ protected:
     virtual void NativeConstruct() override;
 
 private:
-    TArray<class USlotWidget*> Slots; // Array to store SlotWidgets
-
     // Function to create SlotWidget and add it to SlotsPanel
     USlotWidget* CreateSlotWidget();
 
     // Function to set item image to SlotWidget
     void SetItemImage(USlotWidget* Slot, UTexture2D* ItemImage);
+    */
 
-};

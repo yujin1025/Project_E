@@ -5,16 +5,39 @@
 
 void UInventory::AddItem(UItem* Item)
 {
-	Items.Add(Item);
+    if (!Item)
+		return;
+
+    if (Item->Type == EItemType::Weapon)
+    {
+        WeaponInventory.Add(Item);
+    }
+    else if (Item->Type == EItemType::NonWeapon)
+    {
+        NonWeaponInventory.Add(Item);
+    }
+
 	UE_LOG(LogTemp, Warning, TEXT("Added item: %s"), *Item->Name);
 }
 
 void UInventory::RemoveItem(UItem* Item)
 {
-	Items.Remove(Item);
+    if (!Item)
+        return;
+
+    if (Item->Type == EItemType::Weapon)
+    {
+        WeaponInventory.Remove(Item);
+    }
+    else if (Item->Type == EItemType::NonWeapon)
+    {
+        NonWeaponInventory.Remove(Item);
+    }
+
 	UE_LOG(LogTemp, Warning, TEXT("Removed item: %s"), *Item->Name);
 }
 
+/*
 bool UInventory::IsFull() const
 {
 	const int32 MaxCapacity = 9;
@@ -25,3 +48,4 @@ bool UInventory::IsFull() const
 
 	return false;
 }
+*/
