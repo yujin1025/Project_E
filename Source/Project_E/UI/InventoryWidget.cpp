@@ -9,19 +9,57 @@
 void UInventoryWidget::NativeConstruct()
 {
     Super::NativeConstruct();
+}
 
-    //ÀÎº¥Åä¸®¿¡ Ç¥½ÃµÉ °¢ ½½·ÔÀ» »ý¼º
+void UInventoryWidget::UpdateInventory(const TArray<class UItem*>& Items)
+{
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    InventoryPanel->ClearChildren();
+
+    // ï¿½Ö±Ù¿ï¿½ È¹ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÄµÇµï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¸ï¿½Õ´Ï´ï¿½.
+    for (int32 i = Items.Num() - 1; i >= 0; --i)
+    {
+        UItem* Item = Items[i];
+        USlotWidget* NewSlot = CreateWidget<USlotWidget>(GetWorld(), SlotWidgetClass);
+        if (NewSlot)
+        {
+            NewSlot->UpdateSlot(Item);
+            InventoryPanel->AddChild(NewSlot);
+        }
+    }
+}
+/*
+void UInventoryWidget::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    //ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ Ç¥ï¿½Ãµï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     for (int32 i = 0; i < 9; ++i)
     {
         USlotWidget* NewSlot = CreateSlotWidget();
-        SlotsPanel->AddChild(NewSlot);
-        Slots.Add(NewSlot);
+        if (NewSlot)
+        {
+            SlotsPanel->AddChild(NewSlot);
+            Slots.Add(NewSlot);
+            UE_LOG(LogTemp, Error, TEXT("CreateSlotWidget Add!"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("CreateSlotWidget returned nullptr!"));
+        }
+    }
+
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    UE_LOG(LogTemp, Warning, TEXT("Slots in inventory:"));
+    for (int32 Index = 0; Index < Slots.Num(); ++Index)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Slot %d: %s"), Index, Slots[Index] ? TEXT("Valid") : TEXT("Invalid"));
     }
 }
 
 USlotWidget* UInventoryWidget::CreateSlotWidget()
 {
-    //»õ·Î¿î USlotWidget ÀÎ½ºÅÏ½º¸¦ »ý¼º
+    //ï¿½ï¿½ï¿½Î¿ï¿½ USlotWidget ï¿½Î½ï¿½ï¿½Ï½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     USlotWidget* NewSlot = CreateWidget<USlotWidget>(GetWorld(), SlotWidgetClass);
     UE_LOG(LogTemp, Warning, TEXT("CreateSlotWidget: Creating slot widget"));
     return NewSlot;
@@ -31,12 +69,12 @@ void UInventoryWidget::AddItemToSlot(UItem* Item)
 {
     UE_LOG(LogTemp, Warning, TEXT("AddItemToSlot: Adding item to slot"));
 
-    for (auto& CurrentSlot : Slots)
+    for (int32 Index = 0; Index < Slots.Num(); ++Index)
     {
-        //ÇØ´ç ½½·ÔÀÌ ºñ¾îÀÖÀ¸¸é ÀÌ¹ÌÁö ¼³Á¤
-        if (!CurrentSlot->IsOccupied())
+        //ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if (!Slots[Index]->IsOccupied())
         {
-            SetItemImage(CurrentSlot, Item->ItemImage);
+            SetItemImage(Slots[Index], Item->ItemImage);
             break;
         }
     }
@@ -50,3 +88,4 @@ void UInventoryWidget::SetItemImage(USlotWidget* ItemSlot, UTexture2D* ItemImage
         ItemSlot->SetItemImage(ItemImage);
     }
 }
+*/

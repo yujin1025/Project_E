@@ -16,7 +16,10 @@ class PROJECT_E_API UInventory : public UObject
 	
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-    TArray<UItem*> Items;
+    TArray<UItem*> WeaponInventory;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+    TArray<UItem*> NonWeaponInventory;
 
     UFUNCTION(BlueprintCallable, Category = "Inventory")
     void AddItem(UItem* Item);
@@ -24,6 +27,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Inventory")
     void RemoveItem(UItem* Item);
 
-    UFUNCTION(BlueprintCallable, Category = "Inventory")
-    bool IsFull() const;
+    //UFUNCTION(BlueprintCallable, Category = "Inventory")
+    //bool IsFull() const;
 };

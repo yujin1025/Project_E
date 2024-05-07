@@ -34,7 +34,7 @@ APJECharacterPlayer::APJECharacterPlayer()
 
 bool APJECharacterPlayer::GetItem(int32 ItemCode)
 {
-    //주석확인용
+    /*
     if (Inventory && !Inventory->IsFull())
     {
         UDataTable* ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
@@ -43,10 +43,10 @@ bool APJECharacterPlayer::GetItem(int32 ItemCode)
         if (NewItem)
         {
             Inventory->AddItem(NewItem);
-            InventoryWidget->AddItemToSlot(NewItem);
+            //InventoryWidget->AddItemToSlot(NewItem);
             return true;
         }
-    }
+    }*/
 
     return false;
 }
@@ -86,7 +86,7 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     {
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
-        EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
+        //EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
     }
 }
 
@@ -172,6 +172,7 @@ void APJECharacterPlayer::OnLook(const FInputActionValue& Value)
     Look(LookAxisVector);
 }
 
+/*
 void APJECharacterPlayer::OpenInventory()
 {
     if (InventoryWidgetInstance)
@@ -201,7 +202,7 @@ void APJECharacterPlayer::OpenInventory()
             }
         }
     }
-}
+}*/
 
 
 void APJECharacterPlayer::ShowPopUI()
@@ -226,6 +227,7 @@ void APJECharacterPlayer::Attack()
 {
 
 }
+
 
 
 void APJECharacterPlayer::OnInteractBegin()
