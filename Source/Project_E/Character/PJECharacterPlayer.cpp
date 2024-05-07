@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "../Items/Inventory.h"
+#include "../UI/InventoryWidget.h"
 #include <Interface/PJEGameInterface.h>
 #include "Components/BoxComponent.h"
 #include "Game/PJEGameModeBase.h"
@@ -42,17 +43,12 @@ bool APJECharacterPlayer::GetItem(int32 ItemCode)
         if (NewItem)
         {
             Inventory->AddItem(NewItem);
+            InventoryWidget->AddItemToSlot(NewItem);
             return true;
         }
     }
 
     return false;
-
-    // Please implement ^~^
-    // a. ItemCode is the code assigned to each item.
-    // b. When the player's GetItem() is executed on class DroppedItem, the ItemCode is passed by argument.
-    // c. Return false if it is impossible to get the item ( ex) inventory is full )
-    // d. Return true if the item can be picked up
 }
 
 void APJECharacterPlayer::BeginPlay()
@@ -90,7 +86,7 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     {
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
-        //EnhancedInputComponent->BindAction(TakeAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::TakeItem);
+        EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
     }
 }
 
@@ -176,6 +172,37 @@ void APJECharacterPlayer::OnLook(const FInputActionValue& Value)
     Look(LookAxisVector);
 }
 
+void APJECharacterPlayer::OpenInventory()
+{
+    if (InventoryWidgetInstance)
+    {
+        if (bIsInventoryOpen)
+        {
+            InventoryWidgetInstance->RemoveFromViewport();
+            UE_LOG(LogTemp, Warning, TEXT("Inventory closed"));
+        }
+        else
+        {
+            InventoryWidgetInstance->AddToViewport();
+            UE_LOG(LogTemp, Warning, TEXT("Inventory opened"));
+        }
+        bIsInventoryOpen = !bIsInventoryOpen;
+    }
+    else
+    {
+        if (InventoryWidgetClass)
+        {
+            InventoryWidgetInstance = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
+            if (InventoryWidgetInstance)
+            {
+                InventoryWidgetInstance->AddToViewport();
+                UE_LOG(LogTemp, Warning, TEXT("Inventory opened"));
+                bIsInventoryOpen = true;
+            }
+        }
+    }
+}
+
 
 void APJECharacterPlayer::ShowPopUI()
 {
@@ -200,15 +227,6 @@ void APJECharacterPlayer::Attack()
 
 }
 
-void APJECharacterPlayer::TakeItem(UItem* Item)
-{
-    if (Inventory)
-    {
-        Inventory->AddItem(Item);
-
-        Item->ConditionalBeginDestroy();
-    }
-}
 
 void APJECharacterPlayer::OnInteractBegin()
 {

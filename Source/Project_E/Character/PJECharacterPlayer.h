@@ -11,8 +11,8 @@ class IPJEInteractInterface;
 class UBoxComponent;
 class UInputMappingContext;
 class UInputAction;
-class UItem;
 class UInventory;
+class UInventoryWidget;
 
 struct FInputActionValue;
 
@@ -20,6 +20,7 @@ UCLASS()
 class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IABCharacterHUDInterface*/, public IPJECharacterItemInterface
 {
 	GENERATED_BODY()
+
 public:
 	APJECharacterPlayer();
 	
@@ -72,22 +73,24 @@ protected:
 	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* TakeAction;
+	UInputAction* InventoryAction;
 
 private:
 	void OnMove(const FInputActionValue& Value);	
 	void OnLook(const FInputActionValue& Value);
+	void OpenInventory();
+
+	bool bIsInventoryOpen = false; 
+	UInventoryWidget* InventoryWidgetInstance = nullptr;
 
 	// UI Section
 protected:
-	//virtual void SetupHUDWidget(class UABHUDWidget* InHUDWidget) override;
-
 	void ShowPopUI();
 	void Attack();
 
  //Item Section
 protected:
-	virtual void TakeItem(UItem* Item) override;
+	//virtual void TakeItem(UItem* Item) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UInventory* Inventory;
@@ -97,6 +100,13 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	int32 HandItemCode = 0;
+
+	UPROPERTY()
+	UInventoryWidget* InventoryWidget;
+
+private:
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 
 //Interact Section
 protected:
