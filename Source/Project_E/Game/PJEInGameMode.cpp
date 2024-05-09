@@ -7,7 +7,7 @@
 
 APJEInGameMode::APJEInGameMode()
 {
-	
+	SetDefaultPawnClass();
 	SetPlayerControllerClass();
 	// HUDClass = APJEInGameMode::StaticClass();
 	// GameStateClass = APJEInGameMode::StaticClass();

@@ -13,16 +13,24 @@ class PROJECT_E_API UPJEIgnitionHandleInputComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UPJEIgnitionHandleInputComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
+	void NotifyState();
 
-public:	
-	// Called every frame
+public:
+	void SetupInputBinding();
+	void TurnClockwise();
+	void TurnCounterClockwise();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+protected:
+	UPROPERTY(EditAnywhere, Category = "Platform")
+	TArray<TObjectPtr<APJERotatingPlatform>> RotationPlatforms;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	ERotateState CurrentRotateState;
+	ERotateState LastRotateState;
+	
+	
 };

@@ -18,11 +18,10 @@ APJEPlayerController::APJEPlayerController()
 void APJEPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	SetPlayerStart();
 
-	// PlayerPawn을 PlayerStart 위치에 생성
-	PlayerPawn = GetWorld()->SpawnActor<APawn>(PlayableCharacterClass, SpawnLocation, SpawnRotation);
-	Possess(PlayerPawn);	
+	// 멀티 서버 선택에 따라 캐릭터 달라진다 (PlayerStart)
+	
+	PlayerPawn = GetPawn();
 }
 
 void APJEPlayerController::SwitchInputToIgnitionHandle()
