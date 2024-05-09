@@ -16,14 +16,20 @@ class PROJECT_E_API APJEPlayerController : public APlayerController
 
 public:
 	APJEPlayerController();
-	
-	void SetupInputComponent() override;
+
+	virtual void BeginPlay() override;
 	
 	void GameOver();
-
-protected:
 	void SwitchInputToIgnitionHandle();
 	void SwitchInputToPlayer();
+	void SetPlayerStart();
 
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Spawn")
+	TSubclassOf<APawn> PlayableCharacterClass;
 
+	APawn* PlayerPawn;
+	
+	FVector SpawnLocation = FVector::ZeroVector;
+	FRotator SpawnRotation = FRotator::ZeroRotator;
 };
