@@ -6,6 +6,7 @@
 #include "NavigationSystem.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "AI/PJEAI.h"
 
 UBTTask_Teleport::UBTTask_Teleport()
 {
@@ -30,7 +31,7 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
     FVector CurrentLocation = Pawn->GetActorLocation();
     FNavLocation RandomNavLocation;
-    float Radius = 400.0f;
+    float Radius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_TELEPORTRANGE);
 
     UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     if (!NavSys)
@@ -59,7 +60,7 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
     }
 
     Pawn->SetActorLocation(RandomNavLocation.Location);
-    OwnerComp.GetBlackboardComponent()->SetValueAsBool("bIsPlayerNearby", false);
+    OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, false);
     return EBTNodeResult::Succeeded;
 }
 

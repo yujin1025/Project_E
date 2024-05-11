@@ -35,11 +35,17 @@ protected:
 public:
 	FORCEINLINE void SetCurrentHP(int32 CurrentHp);
 	FORCEINLINE int32 GetCurrentHP() const;
+	FORCEINLINE float GetMoveSpeed() const;
 
 protected:
 	EMonsterRank MonsterRank;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	int32 MaxHp;
+
 	int32 CurrentHp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MoveSpeed;
 
 };

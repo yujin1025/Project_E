@@ -4,19 +4,19 @@
 #include "AI/Enemies/BTTask_Blink.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "AI/PJEAI.h"
 
 UBTTask_Blink::UBTTask_Blink()
 {
 	bNotifyTick = true;
-    StartTime = 0;
-    AccumulatedTime = 0.0f;
 }
 
 EBTNodeResult::Type UBTTask_Blink::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-	StartTime = GetWorld()->GetTimeSeconds();
-    AccumulatedTime = 0.0f;
+    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_BLINKSTARTTIME, GetWorld()->GetTimeSeconds());
+    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME, 0.0);
 	return EBTNodeResult::InProgress;
 }
 
@@ -40,12 +40,12 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
     USkeletalMeshComponent* Mesh = ControlledPawn->GetMesh();
 
-    AccumulatedTime += DeltaSeconds;
+    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME, OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME) + DeltaSeconds);
 
-    if (AccumulatedTime >= FlashDuration)
+    if (OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME) >= OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_SINGLEBLINKDURATION))
     {
 
-        if (GetWorld()->TimeSeconds - StartTime >= 0.2f)
+        if (GetWorld()->TimeSeconds - OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_BLINKSTARTTIME) >= OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_BLINKDURATION))
         {
             Mesh->SetVisibility(true);
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -53,7 +53,7 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
         }
 
         Mesh->SetVisibility(!Mesh->IsVisible());
-        AccumulatedTime -= FlashDuration;
+        OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME, OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME) - OwnerComp.GetBlackboardComponent()->GetValueAsFloat(TEXT("SingleBlinkDuration")));
     }
 }
 
