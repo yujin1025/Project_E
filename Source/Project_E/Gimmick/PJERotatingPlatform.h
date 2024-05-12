@@ -22,13 +22,11 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+	FORCEINLINE UPJERotateComponent* GetRotationComponent() const { return RotationComponent; }
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> PlatformMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UPJERotateComponent> RotationComponent;
-
-public:
-	
 };

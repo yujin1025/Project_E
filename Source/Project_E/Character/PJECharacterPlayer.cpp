@@ -78,7 +78,7 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
-            Subsystem->AddMappingContext(DefaultContext, 0);
+            Subsystem->AddMappingContext(DefaultContext, 1);
         }
     }
 

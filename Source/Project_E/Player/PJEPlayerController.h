@@ -13,11 +13,26 @@ UCLASS()
 class PROJECT_E_API APJEPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
 public:
 	APJEPlayerController();
-	void GameClear();
-	void GameOver();
-protected:
+
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 	
+	void GameOver();
+	void SwitchInputToOther();
+	void SwitchInputToPawn();
+	void SetPlayerStart();
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Spawn")
+	TSubclassOf<APawn> PlayableCharacterClass;
+
+	TObjectPtr<APawn> PlayerPawn = NULL;
+	TObjectPtr<AActor> LastBindingActor = NULL;
+	TObjectPtr<AActor> CurrentBindingActor = NULL;
+	
+	FVector SpawnLocation = FVector::ZeroVector;
+	FRotator SpawnRotation = FRotator::ZeroRotator;
 };
