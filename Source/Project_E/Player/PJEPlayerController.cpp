@@ -12,11 +12,6 @@ APJEPlayerController::APJEPlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/PC/BP_Cat"));
-	if(PlayerPawnBPClass.Class != NULL)
-	{
-		PlayableCharacterClass = PlayerPawnBPClass.Class;
-	}
 }
 
 void APJEPlayerController::BeginPlay()
@@ -50,33 +45,24 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 
 void APJEPlayerController::SwitchInputToOther()
 {
-	UnPossess(); // 플레이어 UnPossess
-
 	IPJEInputInterface* InputInterface = Cast<IPJEInputInterface>(CurrentBindingActor);
 	if(InputInterface)
 	{
+		UnPossess(); // 플레이어 UnPossess
 		InputInterface->SetupInputBinding(this);
 	}
 }
 
 void APJEPlayerController::SwitchInputToPawn()
 {
-	Possess(PlayerPawn);
-}
-
-void APJEPlayerController::SetPlayerStart()
-{
-	// 일단 PlayerStart 위치로 시작위치 설정한다
-	TArray<AActor*> PlayerStarts;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
-	if(PlayerStarts.Num() > 0)
+	APJECharacterPlayer* PlayerCharacter = Cast<APJECharacterPlayer>(PlayerPawn);
+	if(PlayerCharacter)
 	{
-		AActor* ChosenStart = PlayerStarts[0];
-
-		SpawnLocation = ChosenStart->GetActorLocation();
-		SpawnRotation = ChosenStart->GetActorRotation();
+		Possess(PlayerPawn);
+		PlayerCharacter->SetupPlayerInputComponent(PlayerCharacter->InputComponent);
 	}
 }
+
 
 void APJEPlayerController::GameOver()
 {

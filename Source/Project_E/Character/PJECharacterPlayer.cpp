@@ -16,6 +16,7 @@
 #include "Components/BoxComponent.h"
 #include "Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractInterface.h"
+#include "Player/PJEPlayerController.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -57,14 +58,12 @@ void APJECharacterPlayer::BeginPlay()
 
     Inventory = NewObject<UInventory>(this);
 
-    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+    APJEPlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
     if (PlayerController)
     {
         EnableInput(PlayerController);
     }
 
-    InputComponent->BindAction("Interact", IE_Pressed, this, &APJECharacterPlayer::OnInteractBegin);
-    InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
 
     Volume->OnComponentBeginOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapBegin);
     Volume->OnComponentEndOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapEnd);
@@ -74,10 +73,11 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    if (APJEPlayerController* PlayerController = Cast<APJEPlayerController>(Controller))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
+            Subsystem->ClearAllMappings();
             Subsystem->AddMappingContext(DefaultContext, 1);
         }
     }
@@ -88,6 +88,9 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
         //EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
     }
+    
+    InputComponent->BindAction("Interact", IE_Pressed, this, &APJECharacterPlayer::OnInteractBegin);
+    InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
 }
 
 void APJECharacterPlayer::Tick(float DeltaTime)
