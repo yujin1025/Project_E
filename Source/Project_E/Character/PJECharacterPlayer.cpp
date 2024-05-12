@@ -16,6 +16,7 @@
 #include "Components/BoxComponent.h"
 #include "Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractInterface.h"
+#include "Player/PJEPlayerController.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -57,7 +58,7 @@ void APJECharacterPlayer::BeginPlay()
 
     Inventory = NewObject<UInventory>(this);
 
-    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+    APJEPlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
     if (PlayerController)
     {
         EnableInput(PlayerController);
@@ -74,10 +75,11 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    if (APJEPlayerController* PlayerController = Cast<APJEPlayerController>(Controller))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
+            Subsystem->ClearAllMappings();
             Subsystem->AddMappingContext(DefaultContext, 1);
         }
     }

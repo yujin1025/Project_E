@@ -23,14 +23,13 @@ public:
 	void GameOver();
 	void SwitchInputToOther();
 	void SwitchInputToPawn();
-	void SetPlayerStart();
 
+	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
+	
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Spawn")
-	TSubclassOf<APawn> PlayableCharacterClass;
-
 	TObjectPtr<APawn> PlayerPawn = NULL;
 	TObjectPtr<AActor> LastBindingActor = NULL;
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<AActor> CurrentBindingActor = NULL;
 	
 	FVector SpawnLocation = FVector::ZeroVector;

@@ -33,19 +33,17 @@ protected:
 	void NotifyState(ERotateState RotateState, float Speed);
 
 	/* Interact Section **/
-	virtual void BeginInteracting(const AActor* InteractActor) override;
 	virtual void EndInteracting(const AActor* InteractActor) override;
-	virtual void BreakInteracting() override;
 	
 	virtual void ShowInteractWidget() override;
 	virtual void HideInteractWidget() override;
 
 	virtual void SetupInputBinding(APJEPlayerController* PlayerController) override;
 	/* End Interact Section **/
-
 	
 	/** Behavior Section */
-	void DoRotation();
+	void ReturnPawn();
+	void DoRotation(const FInputActionValue& Value);
 	void StopRotation();
 	/** End Behavior Section */
 public:	
@@ -65,7 +63,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	ERotateState CurrentRotateState;
 	ERotateState LastRotateState;
-	
+
+	float RotateSpeed = 0;
+	bool bIsPossessed = false;
 	float TimeAfterInput;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float DelayTime;
@@ -76,4 +76,7 @@ protected:
 	UInputAction* TurnAction;
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputAction* InterruptAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<APJEPlayerController> CurrentPossessingController;
 };

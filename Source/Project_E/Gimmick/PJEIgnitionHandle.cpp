@@ -54,12 +54,6 @@ void APJEIgnitionHandle::NotifyState(ERotateState RotateState, float Speed)
 
 
 /* Interact Section **/
-
-void APJEIgnitionHandle::BeginInteracting(const AActor* InteractActor)
-{
-	IPJEInteractInterface::BeginInteracting(InteractActor);
-}
-
 void APJEIgnitionHandle::EndInteracting(const AActor* InteractActor)
 {
 	IPJEInteractInterface::EndInteracting(InteractActor);
@@ -71,16 +65,16 @@ void APJEIgnitionHandle::EndInteracting(const AActor* InteractActor)
 	{
 		InteractCharacter->InteractActor = this;
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("hello"));
 }
 
-void APJEIgnitionHandle::BreakInteracting()
+void APJEIgnitionHandle::ReturnPawn()
 {
-	IPJEInteractInterface::BreakInteracting();
+	bIsPossessed = false;
 
-	// Unbind All Input
-	// Possess back to Pawn
+	UE_LOG(LogTemp, Warning, TEXT("End Interaction"))
+
+	APJECharacterPlayer* MyPlayer = Cast<APJECharacterPlayer>(CurrentPossessingController->GetPlayerPawn());
+	MyPlayer->InteractActor = NULL;
 }
 
 void APJEIgnitionHandle::ShowInteractWidget()
@@ -101,33 +95,35 @@ void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* MyPlayerControl
 {
 	IPJEInputInterface::SetupInputBinding(MyPlayerController);
 
+	CurrentPossessingController = MyPlayerController;
+	bIsPossessed = true;
+	
 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(MyPlayerController->GetLocalPlayer());
 	if(EnhancedInputSubsystem)
 	{
+		EnhancedInputSubsystem->ClearAllMappings();
 		EnhancedInputSubsystem->AddMappingContext(HandleContext, 0);
-		
 	}
 		
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(MyPlayerController->InputComponent);
 	if(EnhancedInputComponent)
 	{
-		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &APJEIgnitionHandle::DoRotation);
+		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Started, this, &APJEIgnitionHandle::DoRotation);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::StopRotation);
-		EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::BreakInteracting);
+		EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::ReturnPawn);
 	}
 
-	MyPlayerController->InputComponent->BindAction("Interact", IE_Pressed, this, &APJEIgnitionHandle::StopRotation);
 }
 
-void APJEIgnitionHandle::DoRotation()
+void APJEIgnitionHandle::DoRotation(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Do Rotation"));
 	CurrentRotateState = ERotateState::Rotating;
+
+	RotateSpeed = Value.Get<float>() * 10;
 }
 
 void APJEIgnitionHandle::StopRotation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Stop Rotation"));
 	CurrentRotateState = ERotateState::Interrupt;
 }
 
@@ -141,7 +137,22 @@ void APJEIgnitionHandle::Tick(float DeltaTime)
 
 	if(CurrentRotateState != LastRotateState)
 	{
-		NotifyState(CurrentRotateState, -10);
+		NotifyState(CurrentRotateState, RotateSpeed);
 	}
 	LastRotateState = CurrentRotateState;
+
+	if(CurrentRotateState == ERotateState::Rotating)
+	{
+		TimeAfterInput = 0.f;
+	}
+	
+	if(bIsPossessed)
+	{
+		TimeAfterInput += DeltaTime;
+	}
+
+	if(TimeAfterInput >= DelayTime)
+	{
+		CurrentRotateState = ERotateState::Returning;
+	}
 }
