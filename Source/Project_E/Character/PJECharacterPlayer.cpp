@@ -64,8 +64,6 @@ void APJECharacterPlayer::BeginPlay()
         EnableInput(PlayerController);
     }
 
-    InputComponent->BindAction("Interact", IE_Pressed, this, &APJECharacterPlayer::OnInteractBegin);
-    InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
 
     Volume->OnComponentBeginOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapBegin);
     Volume->OnComponentEndOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapEnd);
@@ -90,6 +88,9 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
         //EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
     }
+    
+    InputComponent->BindAction("Interact", IE_Pressed, this, &APJECharacterPlayer::OnInteractBegin);
+    InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
 }
 
 void APJECharacterPlayer::Tick(float DeltaTime)
