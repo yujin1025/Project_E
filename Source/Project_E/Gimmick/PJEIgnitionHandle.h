@@ -3,16 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
+#include "InputMappingContext.h"
+#include "PJEInputInterface.h"
+#include "PJEInteractInterface.h"
 #include "GameFramework/Actor.h"
 #include "PJEIgnitionHandle.generated.h"
 
+struct FInputActionValue;
+class UInputAction;
+class UWidgetComponent;
+class UBoxComponent;
 enum class ERotateState : uint8;
 class APJERotatingPlatform;
 class APJECharacterPlayer;
 class UPJERotationPlatform;
 
 UCLASS()
-class PROJECT_E_API APJEIgnitionHandle : public AActor
+class PROJECT_E_API APJEIgnitionHandle : public AActor, public IPJEInteractInterface, public IPJEInputInterface
 {
 	GENERATED_BODY()
 	
@@ -22,13 +30,35 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void NotifyState(ERotateState RotateState);
+	void NotifyState(ERotateState RotateState, float Speed);
 
+	/* Interact Section **/
+	virtual void BeginInteracting(const AActor* InteractActor) override;
+	virtual void EndInteracting(const AActor* InteractActor) override;
+	virtual void BreakInteracting() override;
+	
+	virtual void ShowInteractWidget() override;
+	virtual void HideInteractWidget() override;
+
+	virtual void SetupInputBinding(APJEPlayerController* PlayerController) override;
+	/* End Interact Section **/
+
+	
+	/** Behavior Section */
+	void DoRotation();
+	void StopRotation();
+	/** End Behavior Section */
 public:	
 	virtual void Tick(float DeltaTime) override;
 	
-	
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UStaticMeshComponent> BaseMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UWidgetComponent> Widget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UBoxComponent> InteractTrigger;
+	
 	UPROPERTY(EditAnywhere, Category = "Platform")
 	TArray<TObjectPtr<APJERotatingPlatform>> RotationPlatforms;
 	
@@ -37,5 +67,13 @@ protected:
 	ERotateState LastRotateState;
 	
 	float TimeAfterInput;
+	UPROPERTY(EditAnywhere, Category = "Movement")
 	float DelayTime;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputMappingContext* HandleContext;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* TurnAction;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	UInputAction* InterruptAction;
 };

@@ -3,11 +3,15 @@
 
 #include "PJEPlayerController.h"
 
+#include "Character/PJECharacterPlayer.h"
 #include "GameFramework/PlayerStart.h"
+#include "Gimmick/PJEInputInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 APJEPlayerController::APJEPlayerController()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/PC/BP_Cat"));
 	if(PlayerPawnBPClass.Class != NULL)
 	{
@@ -22,16 +26,42 @@ void APJEPlayerController::BeginPlay()
 	// 멀티 서버 선택에 따라 캐릭터 달라진다 (PlayerStart)
 	
 	PlayerPawn = GetPawn();
+
 }
 
-void APJEPlayerController::SwitchInputToIgnitionHandle()
+void APJEPlayerController::Tick(float DeltaSeconds)
 {
-	
+	Super::Tick(DeltaSeconds);
+
+	CurrentBindingActor = Cast<APJECharacterPlayer>(PlayerPawn)->InteractActor;
+	if(LastBindingActor != CurrentBindingActor)
+	{
+		if(CurrentBindingActor != NULL)
+		{
+			SwitchInputToOther();
+		}
+		else
+		{
+			SwitchInputToPawn();
+		}
+	}
+	LastBindingActor = CurrentBindingActor;
 }
 
-void APJEPlayerController::SwitchInputToPlayer()
+void APJEPlayerController::SwitchInputToOther()
 {
-	
+	UnPossess(); // 플레이어 UnPossess
+
+	IPJEInputInterface* InputInterface = Cast<IPJEInputInterface>(CurrentBindingActor);
+	if(InputInterface)
+	{
+		InputInterface->SetupInputBinding(this);
+	}
+}
+
+void APJEPlayerController::SwitchInputToPawn()
+{
+	Possess(PlayerPawn);
 }
 
 void APJEPlayerController::SetPlayerStart()

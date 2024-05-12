@@ -18,17 +18,20 @@ public:
 	APJEPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	void GameOver();
-	void SwitchInputToIgnitionHandle();
-	void SwitchInputToPlayer();
+	void SwitchInputToOther();
+	void SwitchInputToPawn();
 	void SetPlayerStart();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Spawn")
 	TSubclassOf<APawn> PlayableCharacterClass;
 
-	APawn* PlayerPawn;
+	TObjectPtr<APawn> PlayerPawn = NULL;
+	TObjectPtr<AActor> LastBindingActor = NULL;
+	TObjectPtr<AActor> CurrentBindingActor = NULL;
 	
 	FVector SpawnLocation = FVector::ZeroVector;
 	FRotator SpawnRotation = FRotator::ZeroRotator;
