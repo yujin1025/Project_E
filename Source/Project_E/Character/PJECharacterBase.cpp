@@ -2,10 +2,10 @@
 
 
 #include "PJECharacterBase.h"
-#include "CharacterStat/PJECharacterStatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/DamageEvents.h"
+#include "../Game/PJEGameModeBase.h"
 
 // Sets default values
 APJECharacterBase::APJECharacterBase()
@@ -36,12 +36,30 @@ APJECharacterBase::APJECharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
-	// Stat Component 
-	Stat = CreateDefaultSubobject<UPJECharacterStatComponent>(TEXT("Stat"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	// TODO : Implement Movement 
 	
 	// TODO : Implement Attack 
+
+	switch (CharacterType)
+	{
+	case ECharacterType::Cat:
+		CharacterId = 0;
+		break;
+	case ECharacterType::Duck:
+		CharacterId = 1;
+		break;
+	case ECharacterType::ShadowA:
+		CharacterId = 2;
+		break;
+	case ECharacterType::ShadowB:
+		CharacterId = 3;
+		break;
+	case ECharacterType::ShadowC:
+		CharacterId = 4;
+		break;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -49,15 +67,6 @@ void APJECharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-float APJECharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	Stat->ApplyDamage(DamageAmount);
-
-	return DamageAmount;
 }
 
 void APJECharacterBase::SetDead()
@@ -104,5 +113,10 @@ void APJECharacterBase::Look(const FVector2D Value)
 		AddControllerYawInput(Value.X);
 		AddControllerPitchInput(Value.Y);
 	}
+}
+
+bool APJECharacterBase::IsPlayer()
+{
+	return Controller->IsPlayerController();
 }
 

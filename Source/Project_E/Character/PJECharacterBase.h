@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PJECharacterBase.generated.h"
 
+class UHealthComponent;
+
 UCLASS()
 class PROJECT_E_API APJECharacterBase : public ACharacter
 {
@@ -19,18 +21,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-// Attack Hit Section
-protected:
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 // Dead Section
 protected:
 	virtual void SetDead();
 
 	float DeadEventDelayTime = 5.0f;
-// Stat Section
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UPJECharacterStatComponent> Stat;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -43,4 +38,20 @@ public:
 
 	void Move(const FVector2D Value);
 	virtual void Look(const FVector2D Value);
+
+public:
+	bool IsPlayer(); //플레이어인지 여부
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Id, meta = (AllowPrivateAccess = "true"))
+	int CharacterId;
+
+	UHealthComponent* HealthComponent;
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+	ECharacterType GetCharacterType() const { return CharacterType; }
+
+protected:
+	// Character type
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	ECharacterType CharacterType;
 };

@@ -3,7 +3,6 @@
 
 #include "PopUpWidget.h"
 #include <Kismet/GameplayStatics.h>
-#include "../CharacterStat/PJECharacterStatComponent.h"
 
 void UPopUpWidget::NativeConstruct()
 {

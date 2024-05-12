@@ -3,24 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "PJEAnimNotifyState.generated.h"
+#include "Animation/PJEAnimNotifyState.h"
+#include "AnimNotifyAttackState.generated.h"
 
 class APJECharacterBase;
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API UPJEAnimNotifyState : public UAnimNotifyState
+class PROJECT_E_API UAnimNotifyAttackState : public UPJEAnimNotifyState
 {
 	GENERATED_BODY()
 	
 public:
+	void TryAttack(USkeletalMeshComponent* MeshComp);
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
+	
+	bool TryGetOverlapResult(APJECharacterBase* Owner, TArray<FOverlapResult>& OverlapResults);
+	bool TryGetOverlapTargets(APJECharacterBase* Character, OUT TArray<APJECharacterBase*>& FoundTargets);
 
-public:
-	APJECharacterBase* GetCharacter(const FOverlapResult& OverlapResult);
-	APJECharacterBase* GetCharacter(USkeletalMeshComponent* MeshComp);
+protected:
+	int CurrentAttackCount = 0;
+
+	UPROPERTY(EditAnywhere)
+	FVector CenterOffset;
+
+	UPROPERTY(EditAnywhere)
+	int DamageAmount;
 };

@@ -34,3 +34,11 @@ void APJEGameModeBase::OpenWidget()
 		InGameWindowWidget->AddToViewport();
 	}
 }
+
+FCharacterStatData* APJEGameModeBase::GetCharacterStat(ECharacterType type)
+{
+	int IntType = (int)type;
+	FName StringType = *FString::FromInt(IntType);
+
+	return CharacterStatTable->FindRow<FCharacterStatData>(StringType, TEXT(""));
+}
