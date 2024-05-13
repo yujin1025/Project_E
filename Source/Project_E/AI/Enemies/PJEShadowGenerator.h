@@ -24,7 +24,7 @@ protected:
 // Spawn Section
 public:
     template <typename ShadowType>
-    void SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass);
+    void SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass, bool bAddToManager = true);
 
 protected:
     FTimerHandle SpawnTimerHandle;

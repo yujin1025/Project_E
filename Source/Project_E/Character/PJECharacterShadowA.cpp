@@ -2,13 +2,13 @@
 
 
 #include "Character/PJECharacterShadowA.h"
-#include "AI/Managers/PJEShadowGeneratorManager.h"
 #include "AI/Enemies/PJEShadowAAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "AI/Managers/PJEShadowGeneratorManager.h"
 
 APJECharacterShadowA::APJECharacterShadowA()
 {

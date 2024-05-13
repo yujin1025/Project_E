@@ -10,17 +10,7 @@
 
 APJEShadowAAIController::APJEShadowAAIController()
 {
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(TEXT("/Script/AIModule.BlackboardData'/Game/BluePrints/AI/Enemies/BB_PJE_ShadowA.BB_PJE_ShadowA'"));
-	if (nullptr != BBAssetRef.Object)
-	{
-		BBAsset = BBAssetRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(TEXT("/Script/AIModule.BehaviorTree'/Game/BluePrints/AI/Enemies/BT_PJE_ShadowA.BT_PJE_ShadowA'"));
-	if (nullptr != BTAssetRef.Object)
-	{
-		BTAsset = BTAssetRef.Object;
-	}
+	;
 }
 
 void APJEShadowAAIController::InitBB()
