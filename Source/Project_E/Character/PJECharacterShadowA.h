@@ -16,12 +16,27 @@ class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow
 public:
 	APJECharacterShadowA();
 
+
+// Stat Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxKeepMovingTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float BlinkDuration;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float SingleBlinkDuration;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float TeleportRange;
+
+public:
+	float GetMaxKeepMovingTime();
+	float GetBlinkDuration();
+	float GetSingleBlinkDuration();
+	float GetTeleportRange();
+
+
 protected:
 	virtual void BeginPlay() override;
-	float PlayerDetectionRange;
-	float KeepMovingDuration;
-	float BlinkDuration;
-	float TeleportRange;
 
 // AI Section
 protected:
@@ -32,9 +47,6 @@ protected:
 
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 	virtual void AttackByAI() override;
-
-public:
-	float GetKeepMovingDuration();
 
 
 };

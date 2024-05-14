@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/PJEPlayerController.h"
+#include "../Game/PJEGameModeBase.h"
 
 
 APJECharacterCat::APJECharacterCat()
@@ -26,6 +27,16 @@ void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void APJECharacterCat::BeginPlay()
 {
     Super::BeginPlay();
+
+    auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
+    if (GameMode == nullptr)
+        return;
+
+    auto* Data = GameMode->GetCharacterStat(ECharacterType::Cat);
+    if (Data == nullptr)
+        return;
+
+    GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
 }
 
 void APJECharacterCat::Landed(const FHitResult& Hit)
@@ -41,7 +52,7 @@ void APJECharacterCat::DoubleJump()
     {
         bFirstJump = false;
         JumpCount++;
-        Jump();
+        LaunchCharacter(FVector(0.0f, 0.0f, JumpHeight), false, true);
         return;
     }
 

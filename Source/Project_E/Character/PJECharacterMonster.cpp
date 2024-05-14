@@ -22,3 +22,8 @@ int32 APJECharacterMonster::GetCurrentHP() const
 {
 	return CurrentHp;
 }
+
+float APJECharacterMonster::GetMoveSpeed() const
+{
+	return MoveSpeed;
+}

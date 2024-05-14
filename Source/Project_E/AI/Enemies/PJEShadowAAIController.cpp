@@ -10,24 +10,19 @@
 
 APJEShadowAAIController::APJEShadowAAIController()
 {
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(TEXT("/Script/AIModule.BlackboardData'/Game/BluePrints/AI/Enemies/BB_PJE_ShadowA.BB_PJE_ShadowA'"));
-	if (nullptr != BBAssetRef.Object)
-	{
-		BBAsset = BBAssetRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(TEXT("/Script/AIModule.BehaviorTree'/Game/BluePrints/AI/Enemies/BT_PJE_ShadowA.BT_PJE_ShadowA'"));
-	if (nullptr != BTAssetRef.Object)
-	{
-		BTAsset = BTAssetRef.Object;
-	}
+	;
 }
 
 void APJEShadowAAIController::InitBB()
 {
 	Super::InitBB();
 	APJECharacterShadowA* OwnCharacter = Cast<APJECharacterShadowA>(GetPawn());
-	Blackboard->SetValueAsFloat("MaxKeepMovingTime", OwnCharacter->GetKeepMovingDuration());
+	Blackboard->SetValueAsFloat(TEXT("MaxKeepMovingTime"), OwnCharacter->GetMaxKeepMovingTime());
+	Blackboard->SetValueAsFloat(TEXT("BlinkDuration"), OwnCharacter->GetBlinkDuration());
+	Blackboard->SetValueAsFloat(TEXT("SingleBlinkDuration"), OwnCharacter->GetSingleBlinkDuration());
+	Blackboard->SetValueAsFloat(TEXT("TeleportRange"), OwnCharacter->GetTeleportRange());
+	Blackboard->SetValueAsFloat(TEXT("PlayerDetectRange"), OwnCharacter->GetPlayerDetectRange());
+	Blackboard->SetValueAsVector(TEXT("OriPos"), OwnCharacter->GetActorLocation());
 }
 
 

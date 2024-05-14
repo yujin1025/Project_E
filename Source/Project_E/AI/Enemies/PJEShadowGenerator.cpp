@@ -24,7 +24,7 @@ void APJEShadowGenerator::BeginPlay()
 }
 
 template <typename ShadowType>
-void APJEShadowGenerator::SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass)
+void APJEShadowGenerator::SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass, bool bAddToManager)
 {
     if (MonsterClass)
     {
@@ -52,7 +52,7 @@ void APJEShadowGenerator::SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> M
                 FVector BoundsExtent = SpawnedMonster->GetComponentsBoundingBox().GetExtent();
                 SpawnLocation.Z += BoundsExtent.Z;
                 SpawnedMonster->SetActorLocation(SpawnLocation);
-                UPJEShadowGeneratorManager::GetInstance()->AddSpawnedMonster(SpawnedMonster);
+                if (bAddToManager == true) UPJEShadowGeneratorManager::GetInstance()->AddSpawnedMonster(SpawnedMonster);
             }
             else
             {
@@ -77,8 +77,10 @@ void APJEShadowGenerator::StartSpawnTimer()
 
 void APJEShadowGenerator::SpawnShadowAWithTimer()
 {
-    if (UPJEShadowGeneratorManager::GetInstance()->GetShadowACount() <= 5)
+    if (UPJEShadowGeneratorManager::GetInstance()->GetShadowACount() < 20)
     {
         for (int32 i = 0; i < 3; i++) SpawnMonsterAtRandomLocation(ShadowAClass);
     }
+    
+    //for (int32 i = 0; i < 3; i++) SpawnMonsterAtRandomLocation(ShadowBClass, false);
 }

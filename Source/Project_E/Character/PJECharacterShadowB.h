@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadowA
+class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadow
 {
 	GENERATED_BODY()
 public:

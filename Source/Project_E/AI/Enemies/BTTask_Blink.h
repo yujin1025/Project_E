@@ -22,7 +22,5 @@ protected:
     virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 private:
-    float StartTime;
-    float AccumulatedTime;
-    const float FlashDuration = 0.2 / 6.0;
+   
 };
