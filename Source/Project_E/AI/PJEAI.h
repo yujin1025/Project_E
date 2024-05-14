@@ -1,9 +1,11 @@
 #pragma once
 
 #define BBKEY_DESTPOS TEXT("DestPos")
+#define BBKEY_SUBDESTPOS TEXT("SubDestPos")
 #define BBKEY_ORIPOS TEXT("OriPos")
 #define BBKEY_PLAYERDETECTRANGE TEXT("PlayerDetectRange")
 #define BBKEY_ISPLAYERNEARBY TEXT("bIsPlayerNearby")
+#define BBKEY_PROGRESS TEXT("Progress")
 
 #define BBKEY_MAXKEEPMOVINGTIME TEXT("MaxKeepMovingTime")
 #define BBKEY_KEEPMOVINGTIME TEXT("KeepMovingTime")

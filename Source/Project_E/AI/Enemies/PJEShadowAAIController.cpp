@@ -17,11 +17,12 @@ void APJEShadowAAIController::InitBB()
 {
 	Super::InitBB();
 	APJECharacterShadowA* OwnCharacter = Cast<APJECharacterShadowA>(GetPawn());
-	Blackboard->SetValueAsFloat("MaxKeepMovingTime", OwnCharacter->GetMaxKeepMovingTime());
-	Blackboard->SetValueAsFloat("BlinkDuration", OwnCharacter->GetBlinkDuration());
-	Blackboard->SetValueAsFloat("SingleBlinkDuration", OwnCharacter->GetSingleBlinkDuration());
-	Blackboard->SetValueAsFloat("TeleportRange", OwnCharacter->GetTeleportRange());
-	Blackboard->SetValueAsFloat("PlayerDetectRange", OwnCharacter->GetPlayerDetectRange());
+	Blackboard->SetValueAsFloat(TEXT("MaxKeepMovingTime"), OwnCharacter->GetMaxKeepMovingTime());
+	Blackboard->SetValueAsFloat(TEXT("BlinkDuration"), OwnCharacter->GetBlinkDuration());
+	Blackboard->SetValueAsFloat(TEXT("SingleBlinkDuration"), OwnCharacter->GetSingleBlinkDuration());
+	Blackboard->SetValueAsFloat(TEXT("TeleportRange"), OwnCharacter->GetTeleportRange());
+	Blackboard->SetValueAsFloat(TEXT("PlayerDetectRange"), OwnCharacter->GetPlayerDetectRange());
+	Blackboard->SetValueAsVector(TEXT("OriPos"), OwnCharacter->GetActorLocation());
 }
 
 
