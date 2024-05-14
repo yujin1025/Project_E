@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DashAction;
 
+	UPROPERTY(EditAnywhere, Category = "Jump")
+	float JumpHeight = 500.0f; 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	bool bFirstJump = true;
 
