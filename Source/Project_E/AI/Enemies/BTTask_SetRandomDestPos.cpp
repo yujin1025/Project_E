@@ -29,14 +29,17 @@ EBTNodeResult::Type UBTTask_SetRandomDestPos::ExecuteTask(UBehaviorTreeComponent
 
 	FVector OriPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_ORIPOS);
 	FNavLocation NextPatrolPos;
+	FNavLocation SubPatrolPos;
 
-	if (NavSystem->GetRandomPointInNavigableRadius(OriPos, 1000.0f, NextPatrolPos))
+	if (NavSystem->GetRandomPointInNavigableRadius(OriPos, 2000.0f, NextPatrolPos))
+	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_DESTPOS, NextPatrolPos.Location);
+	}
+	if (NavSystem->GetRandomPointInNavigableRadius(OriPos, 1000.0f, SubPatrolPos))
 	{
 
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_DESTPOS, NextPatrolPos.Location);
-		return EBTNodeResult::Succeeded;
-
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_SUBDESTPOS, SubPatrolPos.Location);
 	}
 
-	return EBTNodeResult::Failed;
+	return EBTNodeResult::Succeeded;
 }

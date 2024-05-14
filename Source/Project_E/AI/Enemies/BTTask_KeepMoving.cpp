@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "AI/PJEAI.h"
 
 UBTTask_KeepMoving::UBTTask_KeepMoving()
 {
@@ -41,7 +42,7 @@ void UBTTask_KeepMoving::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
         return;
     }
 
-    if (GetWorld()->TimeSeconds - OwnerComp.GetBlackboardComponent()->GetValueAsFloat("KeepMovingTime") >= 2.0f)
+    if (GetWorld()->TimeSeconds - OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_KEEPMOVINGTIME) >= OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_MAXKEEPMOVINGTIME))
     {
         AICon->StopMovement();
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

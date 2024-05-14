@@ -27,9 +27,9 @@ public:
 	TObjectPtr<class UBehaviorTree> GetBT();
 
 protected:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BehaviorTree")
 	TObjectPtr<class UBlackboardData> BBAsset;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BehaviorTree")
 	TObjectPtr<class UBehaviorTree> BTAsset;
 };

@@ -2,14 +2,26 @@
 
 
 #include "Character/PJECharacterShadowB.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/Character.h"
+#include "AI/Managers/PJEShadowGeneratorManager.h"
 
 APJECharacterShadowB::APJECharacterShadowB()
 {
+	MonsterRank = EMonsterRank::Elite;
+	MaxHp = 100;
+	MoveSpeed = 1.5f;
+	PlayerDetectionRange = 1.0f;
+	AttackSize = 1.6f;
 }
 
 void APJECharacterShadowB::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+	SetCurrentHP(MaxHp);
 }
 
 float APJECharacterShadowB::GetAIPatrolRadius()

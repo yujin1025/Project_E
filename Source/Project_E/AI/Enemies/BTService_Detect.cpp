@@ -23,7 +23,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     {
         UWorld* World = AIControllerPawn->GetWorld();
         TArray<AActor*> OverlappedActors;
-        float DetectionRadius = 300.0f;
+        float DetectionRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_PLAYERDETECTRANGE);
         FVector AIControllerLocation = AIControllerPawn->GetActorLocation();
 
         UKismetSystemLibrary::SphereOverlapActors(
@@ -47,7 +47,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
             }
         }
 
-        OwnerComp.GetBlackboardComponent()->SetValueAsBool(GetSelectedBlackboardKey(), bIsPlayerNearby);
+        OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, bIsPlayerNearby);
     }
 
 }
