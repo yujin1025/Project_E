@@ -72,10 +72,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UBaseWidget> InGameWindowWidgetClass;
 
-public:
-	FCharacterStatData* GetCharacterStat(ECharacterType type);
-
 private:
 	UPROPERTY(EditAnywhere, Category = Data)
 	class UDataTable* CharacterStatTable;
+
+public:
+	FCharacterStatData* GetCharacterStat(ECharacterType type);
+
 };
