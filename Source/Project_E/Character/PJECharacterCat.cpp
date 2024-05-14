@@ -32,11 +32,11 @@ void APJECharacterCat::BeginPlay()
     if (GameMode == nullptr)
         return;
 
-    auto* Data = GameMode->GetCharacterStat(ECharacterType::Cat);
-    if (Data == nullptr)
-        return;
+   // auto* Data = GameMode->GetCharacterStat(ECharacterType::Cat);
+    //if (Data == nullptr)
+     //   return;
 
-    GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
+    //GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
 }
 
 void APJECharacterCat::Landed(const FHitResult& Hit)
@@ -44,6 +44,12 @@ void APJECharacterCat::Landed(const FHitResult& Hit)
     Super::Landed(Hit);
     bFirstJump = true;
     JumpCount = 0;
+}
+
+void APJECharacterCat::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+    MovementSpeed = this->GetVelocity().Size();
 }
 
 void APJECharacterCat::DoubleJump()

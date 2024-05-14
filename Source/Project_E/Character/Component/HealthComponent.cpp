@@ -25,12 +25,12 @@ void UHealthComponent::BeginPlay()
 	if (GameMode == nullptr)
 		return;
 
-	auto* Data = GameMode->GetCharacterStat(CharacterType);
-	if (Data == nullptr)
-		return;
+	//auto* Data = GameMode->GetCharacterStat(CharacterType);
+	//if (Data == nullptr)
+	//	return;
 
-	MaxHealth = Data->MaxHp;
-	CurrentHealth = MaxHealth;
+	//MaxHealth = Data->MaxHp;
+	//CurrentHealth = MaxHealth;
 }
 
 
@@ -55,7 +55,7 @@ void UHealthComponent::ChangeHealth(float Amount)
 	if (Character == nullptr)
 		return;
 
-	if (Character->IsPlayer()) // ¿µÇâ ¹Þ´Â ¾Ö°¡ ÇÃ·¹ÀÌ¾î
+	if (Character->IsPlayer()) // ï¿½ï¿½ï¿½ï¿½ ï¿½Þ´ï¿½ ï¿½Ö°ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½
 	{
 		GameMode->MyPlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
 		UE_LOG(LogTemp, Warning, TEXT("Player Number : (%d) Current Health: %d"), Character->CharacterId, CurrentHealth);

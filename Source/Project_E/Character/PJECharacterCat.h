@@ -41,11 +41,17 @@ protected:
 
 	int32 JumpCount = 0;
 
+
+	//TEST
+	UPROPERTY(VisibleAnywhere, Category = "Movement")
+	float MovementSpeed;
+
+	virtual void Tick(float DeltaSeconds) override;
 	// Action Section
 protected:
 	void DoubleJump();
 	void Dash();
 	void StopDash();
-	void Attack(); //Àâ±â
+	void Attack(); //ï¿½ï¿½ï¿½
 	void Swing();
 };
