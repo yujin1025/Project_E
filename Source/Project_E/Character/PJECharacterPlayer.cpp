@@ -146,6 +146,10 @@ void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator Ta
 {
     UE_LOG(LogTemp, Warning, TEXT("Move Camera"));
 
+    // Save Original Position
+    OrgLocation = FollowCamera->GetComponentLocation();
+    OrgRotation = FollowCamera->GetComponentRotation();
+    
     // Move Camera
      FollowCamera->SetWorldLocation(TargetLocation);
      FollowCamera->SetWorldRotation(TargetRotation);
@@ -155,10 +159,9 @@ void APJECharacterPlayer::BackCameraToPawn()
 {
     UE_LOG(LogTemp, Warning, TEXT("Back Camera"));
 
-    //SpringArm Setting After 1.5s??
-    CameraBoom->bEnableCameraLag = false;
-
     // Move Camera to Origin Position
+    FollowCamera->SetWorldLocation(OrgLocation);
+    FollowCamera->SetWorldRotation(OrgRotation);
 }
 
 

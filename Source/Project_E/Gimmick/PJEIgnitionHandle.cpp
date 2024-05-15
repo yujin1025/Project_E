@@ -60,12 +60,19 @@ void APJEIgnitionHandle::NotifyState(ERotateState RotateState, float Speed)
 void APJEIgnitionHandle::EndInteracting(const AActor* InteractActor)
 {
 	IPJEInteractInterface::EndInteracting(InteractActor);
+	// Prevent duplicate controls
+	if(bIsInteract)
+	{
+		return;
+	}
+	bIsInteract = true;
 	
 	AActor* CCInteractActor = const_cast<AActor*>(InteractActor);
 	APJECharacterPlayer* InteractCharacter = Cast<APJECharacterPlayer>(CCInteractActor);
 
 	if(IsValid(InteractCharacter))
 	{
+		// EndInteracting -> SetupInputBinding 순서
 		InteractCharacter->InteractActor = this;
 		InteractCharacter->MoveCameraToTarget(Campos->GetArrowLocation(), Campos->GetArrowRotation());
 	}
@@ -81,11 +88,18 @@ void APJEIgnitionHandle::ReturnPawn()
 		return;
 	}
 	APJECharacterPlayer* MyPlayer = Cast<APJECharacterPlayer>(CurrentPossessingController->GetPlayerPawn());
+	CurrentPossessingController = NULL;
 	if(MyPlayer)
 	{
+		if(UInputComponent* PlayerInputComponent = MyPlayer->InputComponent)
+		{
+			PlayerInputComponent->ClearActionBindings();
+		}
 		MyPlayer->InteractActor = NULL;
 		MyPlayer->BackCameraToPawn();
 	}
+	
+	bIsInteract = false;
 }
 
 void APJEIgnitionHandle::ShowInteractWidget()
@@ -126,7 +140,7 @@ void APJEIgnitionHandle::HideInteractWidget()
 // }
 
 void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* PlayerController)
-{
+{	
 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 	CurrentPossessingController = PlayerController;
 	
@@ -146,9 +160,7 @@ void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* PlayerControlle
 }
 
 void APJEIgnitionHandle::DoRotation(const FInputActionValue& Value)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Log"));
-	
+{	
 	CurrentRotateState = ERotateState::Rotating;
 
 	RotateSpeed = Value.Get<float>() * 10;

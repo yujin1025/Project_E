@@ -122,4 +122,12 @@ public:
 	// 현재 상호작용하고있는 Actor, 없다면 NULL
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AActor> InteractActor = NULL;
+
+
+
+
+	
+	//Test
+	FVector OrgLocation;
+	FRotator OrgRotation;
 };

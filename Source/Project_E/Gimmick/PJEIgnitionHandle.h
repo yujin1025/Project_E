@@ -71,6 +71,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float DelayTime;
 
+	bool bIsInteract = false;
+
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputMappingContext* HandleContext;
 	UPROPERTY(VisibleAnywhere, Category = "Input")
@@ -83,4 +85,5 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<APJEPlayerController> CurrentPossessingController;
+
 };
