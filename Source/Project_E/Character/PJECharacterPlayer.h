@@ -61,6 +61,9 @@ protected:
 public:
 	virtual FVector GetTargetPosition(ECollisionChannel Channel, float RayCastDistance);
 
+	void MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation);
+	void BackCameraToPawn();
+
 	// Input Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))

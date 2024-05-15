@@ -142,13 +142,31 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
     return End;
 }
 
+void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Move Camera"));
+
+    // Move Camera
+     FollowCamera->SetWorldLocation(TargetLocation);
+     FollowCamera->SetWorldRotation(TargetRotation);
+}
+
+void APJECharacterPlayer::BackCameraToPawn()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Back Camera"));
+
+    //SpringArm Setting After 1.5s??
+    CameraBoom->bEnableCameraLag = false;
+
+    // Move Camera to Origin Position
+}
 
 
 void APJECharacterPlayer::SetDead()
 {
     //Super::SetDead();
 
-    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+    APlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
     if (PlayerController)
     {
         DisableInput(PlayerController);

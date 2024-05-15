@@ -10,6 +10,7 @@
 #include "GameFramework/Actor.h"
 #include "PJEIgnitionHandle.generated.h"
 
+class APJECamPos;
 struct FInputActionValue;
 class UInputAction;
 class UWidgetComponent;
@@ -30,8 +31,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void NotifyState(ERotateState RotateState, float Speed);
-
 	/* Interact Section **/
 	virtual void EndInteracting(const AActor* InteractActor) override;
 	
@@ -46,6 +45,9 @@ protected:
 	void DoRotation(const FInputActionValue& Value);
 	void StopRotation();
 	/** End Behavior Section */
+
+	void NotifyState(ERotateState RotateState, float Speed);
+	
 public:	
 	virtual void Tick(float DeltaTime) override;
 	
@@ -63,9 +65,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	ERotateState CurrentRotateState;
 	ERotateState LastRotateState;
-
 	float RotateSpeed = 0;
-	bool bIsPossessed = false;
+	
 	float TimeAfterInput;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float DelayTime;
@@ -77,6 +78,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	UInputAction* InterruptAction;
 
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	TObjectPtr<APJECamPos> Campos;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<APJEPlayerController> CurrentPossessingController;
 };
