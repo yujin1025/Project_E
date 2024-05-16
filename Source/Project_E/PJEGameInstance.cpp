@@ -6,7 +6,7 @@
 
 void UPJEGameInstance::Shutdown()
 {
-    UPJEShadowGeneratorManager::GetInstance()->ShutdownInstance();
+    UPJEShadowGeneratorManager::ShutdownInstance();
 
     Super::Shutdown();
 }
