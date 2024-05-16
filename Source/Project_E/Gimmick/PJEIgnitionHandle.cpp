@@ -31,6 +31,8 @@ APJEIgnitionHandle::APJEIgnitionHandle()
 	HandleContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/Input/Gimmick/IgnitionHandle/IMC_IgnitionHandle"));
 	TurnAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/Gimmick/IgnitionHandle/IA_Turn"));
 	InterruptAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/Gimmick/IgnitionHandle/IA_Interrupt"));
+
+	
 }
 
 void APJEIgnitionHandle::BeginPlay()

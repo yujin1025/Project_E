@@ -25,12 +25,12 @@ void UHealthComponent::BeginPlay()
 	if (GameMode == nullptr)
 		return;
 
-	//auto* Data = GameMode->GetCharacterStat(CharacterType);
-	//if (Data == nullptr)
-	//	return;
+	auto* Data = GameMode->GetCharacterStat(CharacterType);
+	if (Data == nullptr)
+		return;
 
-	//MaxHealth = Data->MaxHp;
-	//CurrentHealth = MaxHealth;
+	MaxHealth = Data->MaxHp;
+	CurrentHealth = MaxHealth;
 }
 
 
