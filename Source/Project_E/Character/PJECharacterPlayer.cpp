@@ -142,13 +142,34 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
     return End;
 }
 
+void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Move Camera"));
+
+    // Save Original Position
+    OrgLocation = FollowCamera->GetComponentLocation();
+    OrgRotation = FollowCamera->GetComponentRotation();
+    
+    // Move Camera
+     FollowCamera->SetWorldLocation(TargetLocation);
+     FollowCamera->SetWorldRotation(TargetRotation);
+}
+
+void APJECharacterPlayer::BackCameraToPawn()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Back Camera"));
+
+    // Move Camera to Origin Position
+    FollowCamera->SetWorldLocation(OrgLocation);
+    FollowCamera->SetWorldRotation(OrgRotation);
+}
 
 
 void APJECharacterPlayer::SetDead()
 {
     //Super::SetDead();
 
-    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+    APlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
     if (PlayerController)
     {
         DisableInput(PlayerController);

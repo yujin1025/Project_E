@@ -61,6 +61,9 @@ protected:
 public:
 	virtual FVector GetTargetPosition(ECollisionChannel Channel, float RayCastDistance);
 
+	void MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation);
+	void BackCameraToPawn();
+
 	// Input Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -119,4 +122,12 @@ public:
 	// 현재 상호작용하고있는 Actor, 없다면 NULL
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AActor> InteractActor = NULL;
+
+
+
+
+	
+	//Test
+	FVector OrgLocation;
+	FRotator OrgRotation;
 };
