@@ -16,7 +16,7 @@ class PROJECT_E_API UPJEShadowGeneratorManager : public UObject
 
 public:
     static UPJEShadowGeneratorManager* GetInstance();
-    void ShutdownInstance();
+    static void ShutdownInstance();
 
 private:
     static UPJEShadowGeneratorManager* Instance;

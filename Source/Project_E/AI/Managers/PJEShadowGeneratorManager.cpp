@@ -19,7 +19,7 @@ UPJEShadowGeneratorManager* UPJEShadowGeneratorManager::GetInstance()
         Instance->AddToRoot();
         FWorldDelegates::LevelRemovedFromWorld.AddLambda([](ULevel* Level, UWorld* World)
             {
-                UPJEShadowGeneratorManager::GetInstance()->ShutdownInstance();
+                ShutdownInstance();
             });
 
         Instance->FindAllShadowGenerators();
