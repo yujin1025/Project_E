@@ -19,8 +19,5 @@ public:
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-	FVector CalculateQuadraticBezierPoint(float t, FVector p0, FVector p1, FVector p2);
-	void SmoothTransitionToNewTarget(UBehaviorTreeComponent& OwnerComp, FVector& CurrentTarget, FVector& NewTarget, float TransitionSpeed);
-private:
-
+	FVector CalculateQuadraticBezierPoint(float CurrentProgress, FVector Pos0, FVector Pos1, FVector Pos2);
 };
