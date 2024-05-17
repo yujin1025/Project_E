@@ -17,7 +17,6 @@ enum class EInteractType : uint8
 };
 
 
-
 UCLASS()
 class PROJECT_E_API APJEInteractiveActor : public AActor
 {
@@ -29,17 +28,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void ShowDenoteInteractionWidget();
-	void HideDenoteInteractionWidget();
-	void ShowPointInteractionWidget();
-	void HidePointInteractionWidget();
-
 	virtual void InteractionKeyPressed();
 	virtual void InteractionKeyReleased();
 	virtual void BreakInteracting();
 
-	void AbleInteraction();
-	void DisableInteraction();
+	virtual void AbleInteraction();
+	virtual void DisableInteraction();
+
+	virtual void UpdateWidget();
+	
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -53,10 +50,11 @@ protected:
 	TObjectPtr<UBoxComponent> InteractionTriggerBox;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Widget")
-	TObjectPtr<UWidgetComponent> DenoteInteractionWidget; 
+	TObjectPtr<UWidgetComponent> NotifyInteractionWidget; 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Widget")
 	TObjectPtr<UWidgetComponent> PointInteractionWidget;
 
+	// 모든 상호작용 입력은 InteractAble을 통한다
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bIsInteractAble;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
@@ -65,6 +63,4 @@ protected:
 	bool bIsActive;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	EInteractType InteractType;
-
-	
 };
