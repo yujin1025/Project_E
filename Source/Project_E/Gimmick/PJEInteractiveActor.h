@@ -29,32 +29,42 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void ShowInteractionWidget();
-	void HideInteractionWidget();
+	void ShowDenoteInteractionWidget();
+	void HideDenoteInteractionWidget();
 	void ShowPointInteractionWidget();
 	void HidePointInteractionWidget();
 
-	void InteractionKeyPressed();
-	void InteractionKeyReleased();
-	
-	
+	virtual void InteractionKeyPressed();
+	virtual void InteractionKeyReleased();
+	virtual void BreakInteracting();
+
+	void AbleInteraction();
+	void DisableInteraction();
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
+	TObjectPtr<USceneComponent> SceneComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Trigger")
 	TObjectPtr<UBoxComponent> WidgetTriggerBox;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Trigger")
 	TObjectPtr<UBoxComponent> InteractionTriggerBox;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Widget")
-	TObjectPtr<UWidgetComponent> InteractionWidget; 
+	TObjectPtr<UWidgetComponent> DenoteInteractionWidget; 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Widget")
 	TObjectPtr<UWidgetComponent> PointInteractionWidget;
 
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	bool bIsInteractAble;
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bIsInteracting;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bIsActive;
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	EInteractType InteractType;
+
 	
 };
