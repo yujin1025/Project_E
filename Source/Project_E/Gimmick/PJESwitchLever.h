@@ -36,5 +36,5 @@ protected:
 
 	//TEST FUNCTION
 private:
-	void TEST_FUNCTION();
+	void TEST_FUNCTION();	
 };

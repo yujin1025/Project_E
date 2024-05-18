@@ -16,8 +16,8 @@ APJESwitchLever::APJESwitchLever()
 
 void APJESwitchLever::BeginPlay()
 {
-	Super::BeginPlay();
 	RotateComponent->SetRotateTarget(LeverPivot);
+	Super::BeginPlay();
 }
 
 void APJESwitchLever::TEST_FUNCTION()
