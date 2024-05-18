@@ -42,7 +42,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
-	TObjectPtr<USceneComponent> SceneComponent;
+	TObjectPtr<USceneComponent> Root;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Trigger")
 	TObjectPtr<UBoxComponent> WidgetTriggerBox;
@@ -59,7 +59,8 @@ protected:
 	bool bIsInteractAble;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bIsInteracting;
-	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	// 잠시 테스트 위해 EditAnywhere로 설정해뒀습니다.
+	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bIsActive;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	EInteractType InteractType;

@@ -5,6 +5,8 @@
 #include "Gimmick/PJEInteractiveActor.h"
 #include "PJESwitchLever.generated.h"
 
+class UPJERotateComponent;
+
 UCLASS()
 class PROJECT_E_API APJESwitchLever : public APJEInteractiveActor
 {
@@ -25,6 +27,10 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
 	TObjectPtr<UStaticMeshComponent> LeverBaseMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh");
+	TObjectPtr<UPrimitiveComponent> LeverPivot;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
 	TObjectPtr<UStaticMeshComponent> LeverMesh;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
+	//TObjectPtr<UPJERotateComponent> RotateComponent;
 };

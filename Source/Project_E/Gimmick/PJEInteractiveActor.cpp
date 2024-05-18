@@ -10,8 +10,8 @@ APJEInteractiveActor::APJEInteractiveActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Interactive Actor"));
-	RootComponent = SceneComponent;
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Interactive Actor"));
+	RootComponent = Root;
 	
 	WidgetTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
 	WidgetTriggerBox->SetupAttachment(RootComponent);
