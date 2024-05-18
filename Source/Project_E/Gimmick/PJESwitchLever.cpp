@@ -4,20 +4,32 @@
 
 APJESwitchLever::APJESwitchLever()
 {
-	//LeverBaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Lever Base"));
-	//LeverBaseMesh->SetupAttachment(RootComponent);
-	//LeverPivot = CreateDefaultSubobject<UPrimitiveComponent>(TEXT("Lever Pivot"));
-	//LeverPivot->SetupAttachment(LeverBaseMesh);
-	//LeverMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Lever"));
-	//LeverMesh->SetupAttachment(LeverPivot);
+	LeverBaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Lever Base"));
+	LeverBaseMesh->SetupAttachment(RootComponent);
+	LeverPivot = CreateDefaultSubobject<USceneComponent>(TEXT("Lever Pivot"));
+	LeverPivot->SetupAttachment(LeverBaseMesh);
+	LeverMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Lever"));
+	LeverMesh->SetupAttachment(LeverPivot);
 
-	//RotateComponent = CreateDefaultSubobject<UPJERotateComponent>(TEXT("Rotate Component"));
+	RotateComponent = CreateDefaultSubobject<UPJERotateComponent>(TEXT("Rotate Component"));
 }
 
 void APJESwitchLever::BeginPlay()
 {
 	Super::BeginPlay();
-	//RotateComponent->SetRotateTarget(LeverPivot);
+	RotateComponent->SetRotateTarget(LeverPivot);
+}
+
+void APJESwitchLever::TEST_FUNCTION()
+{
+	if(!bIsActive)
+	{
+		RotateComponent->SetRotateState(ERotateState::Rotating);
+	}
+	else
+	{
+		RotateComponent->SetRotateState(ERotateState::Returning);
+	}
 }
 
 void APJESwitchLever::InteractionKeyReleased()
@@ -33,17 +45,19 @@ void APJESwitchLever::ActivateLever()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Lever On"));
 		bIsActive = true;
-		//RotateComponent->SetRotateState(ERotateState::Rotating);
+		RotateComponent->SetRotateState(ERotateState::Rotating);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Lever Off"));
 		bIsActive = false;
-		//RotateComponent->SetRotateState(ERotateState::Returning);
+		RotateComponent->SetRotateState(ERotateState::Returning);
 	}
 }
 
 void APJESwitchLever::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	TEST_FUNCTION();
 }

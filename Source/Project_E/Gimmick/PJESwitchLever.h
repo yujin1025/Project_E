@@ -28,9 +28,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
 	TObjectPtr<UStaticMeshComponent> LeverBaseMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh");
-	TObjectPtr<UPrimitiveComponent> LeverPivot;
+	TObjectPtr<USceneComponent> LeverPivot;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
 	TObjectPtr<UStaticMeshComponent> LeverMesh;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
-	//TObjectPtr<UPJERotateComponent> RotateComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
+	TObjectPtr<UPJERotateComponent> RotateComponent;
+
+	//TEST FUNCTION
+private:
+	void TEST_FUNCTION();
 };

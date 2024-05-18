@@ -42,7 +42,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	ERotateState RotateState;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	TObjectPtr<UPrimitiveComponent> RotateTarget;
+	TObjectPtr<USceneComponent> RotateTarget;
 	
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -51,12 +51,12 @@ public:
 	FORCEINLINE void SetRotationOffset(float NewMaxRotateDegree) { MaxRotateDegree = NewMaxRotateDegree; }
 	FORCEINLINE void SetRotationSpeed(float NewRotationSpeed) { RotationSpeed = NewRotationSpeed; }
 	FORCEINLINE void SetRotateState(ERotateState NewRotateState) { RotateState = NewRotateState; }
-	FORCEINLINE void SetRotateTarget(UPrimitiveComponent* NewRotateTarget) {RotateTarget = NewRotateTarget;}
+	FORCEINLINE void SetRotateTarget(USceneComponent* NewRotateTarget) {RotateTarget = NewRotateTarget;}
 	
 	FORCEINLINE FRotator GetRotationAngle() const { return RotationAngle; }
 	FORCEINLINE float GetMaxRotateDegree() const { return MaxRotateDegree; }
 	FORCEINLINE float GetRotationSpeed() const { return RotationSpeed; }
 	FORCEINLINE ERotateState GetRotateState() const { return RotateState; }
-	FORCEINLINE UPrimitiveComponent* GetRotateTarget() const { return RotateTarget; }
+	FORCEINLINE USceneComponent* GetRotateTarget() const { return RotateTarget; }
 
 };

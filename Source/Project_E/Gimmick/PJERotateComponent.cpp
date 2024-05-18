@@ -45,7 +45,9 @@ void UPJERotateComponent::BeginPlay()
 
 	if(RotateTarget)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Setting Original Rotation..."));
 		OriginRotation = RotateTarget->GetComponentRotation();
+		UE_LOG(LogTemp, Warning, TEXT("OriginRotation : %s"), *OriginRotation.ToString());
 	}
 }
 
