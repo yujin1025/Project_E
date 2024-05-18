@@ -48,7 +48,6 @@ void APJEPlayerController::SwitchInputToOther()
 	IPJEInputInterface* InputInterface = Cast<IPJEInputInterface>(CurrentBindingActor);
 	if(InputInterface)
 	{
-		UnPossess(); // 플레이어 UnPossess
 		InputInterface->SetupInputBinding(this);
 	}
 }
@@ -58,7 +57,6 @@ void APJEPlayerController::SwitchInputToPawn()
 	APJECharacterPlayer* PlayerCharacter = Cast<APJECharacterPlayer>(PlayerPawn);
 	if(PlayerCharacter)
 	{
-		Possess(PlayerPawn);
 		PlayerCharacter->SetupPlayerInputComponent(PlayerCharacter->InputComponent);
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "PJECamPos.h"
 #include "PJERotateComponent.h"
 
 #include "PJERotatingPlatform.h"
@@ -54,27 +55,51 @@ void APJEIgnitionHandle::NotifyState(ERotateState RotateState, float Speed)
 
 
 /* Interact Section **/
+
+// ** BEGIN INTERACT **
 void APJEIgnitionHandle::EndInteracting(const AActor* InteractActor)
 {
 	IPJEInteractInterface::EndInteracting(InteractActor);
+	// Prevent duplicate controls
+	if(bIsInteract)
+	{
+		return;
+	}
+	bIsInteract = true;
 	
 	AActor* CCInteractActor = const_cast<AActor*>(InteractActor);
 	APJECharacterPlayer* InteractCharacter = Cast<APJECharacterPlayer>(CCInteractActor);
 
 	if(IsValid(InteractCharacter))
 	{
+		// EndInteracting -> SetupInputBinding 순서
 		InteractCharacter->InteractActor = this;
+		InteractCharacter->MoveCameraToTarget(Campos->GetArrowLocation(), Campos->GetArrowRotation());
 	}
 }
 
+
+// ** END INTERACT **
 void APJEIgnitionHandle::ReturnPawn()
 {
-	bIsPossessed = false;
-
-	UE_LOG(LogTemp, Warning, TEXT("End Interaction"))
-
+	if(CurrentPossessingController == NULL)
+	{
+		UE_LOG(LogTemp,Warning, TEXT("There is No Possesing Controller"))
+		return;
+	}
 	APJECharacterPlayer* MyPlayer = Cast<APJECharacterPlayer>(CurrentPossessingController->GetPlayerPawn());
-	MyPlayer->InteractActor = NULL;
+	CurrentPossessingController = NULL;
+	if(MyPlayer)
+	{
+		if(UInputComponent* PlayerInputComponent = MyPlayer->InputComponent)
+		{
+			PlayerInputComponent->ClearActionBindings();
+		}
+		MyPlayer->InteractActor = NULL;
+		MyPlayer->BackCameraToPawn();
+	}
+	
+	bIsInteract = false;
 }
 
 void APJEIgnitionHandle::ShowInteractWidget()
@@ -91,32 +116,51 @@ void APJEIgnitionHandle::HideInteractWidget()
 	Widget->SetVisibility(false);
 }
 
-void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* MyPlayerController)
-{
-	IPJEInputInterface::SetupInputBinding(MyPlayerController);
+// void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* MyPlayerController)
+// {
+// 	IPJEInputInterface::SetupInputBinding(MyPlayerController);
+//
+// 	CurrentPossessingController = MyPlayerController;
+// 	
+// 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(MyPlayerController->GetLocalPlayer());
+// 	if(EnhancedInputSubsystem)
+// 	{
+// 		EnhancedInputSubsystem->ClearAllMappings();
+// 		EnhancedInputSubsystem->AddMappingContext(HandleContext, 0);
+// 	}
+// 		
+// 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(MyPlayerController->InputComponent);
+// 	if(EnhancedInputComponent)
+// 	{
+// 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Started, this, &APJEIgnitionHandle::DoRotation);
+// 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::StopRotation);
+// 		EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::ReturnPawn);
+// 	}
+//
+// }
 
-	CurrentPossessingController = MyPlayerController;
-	bIsPossessed = true;
+void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* PlayerController)
+{	
+	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	CurrentPossessingController = PlayerController;
 	
-	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(MyPlayerController->GetLocalPlayer());
 	if(EnhancedInputSubsystem)
 	{
 		EnhancedInputSubsystem->ClearAllMappings();
 		EnhancedInputSubsystem->AddMappingContext(HandleContext, 0);
 	}
-		
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(MyPlayerController->InputComponent);
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->GetPlayerPawn()->InputComponent);
 	if(EnhancedInputComponent)
 	{
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Started, this, &APJEIgnitionHandle::DoRotation);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::StopRotation);
 		EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::ReturnPawn);
 	}
-
 }
 
 void APJEIgnitionHandle::DoRotation(const FInputActionValue& Value)
-{
+{	
 	CurrentRotateState = ERotateState::Rotating;
 
 	RotateSpeed = Value.Get<float>() * 10;
@@ -145,11 +189,8 @@ void APJEIgnitionHandle::Tick(float DeltaTime)
 	{
 		TimeAfterInput = 0.f;
 	}
-	
-	if(bIsPossessed)
-	{
-		TimeAfterInput += DeltaTime;
-	}
+
+	TimeAfterInput += DeltaTime;
 
 	if(TimeAfterInput >= DelayTime)
 	{
