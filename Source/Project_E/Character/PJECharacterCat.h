@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/PJECharacterPlayer.h"
+#include "PJECharacterPlayer.h"
 #include "PJECharacterCat.generated.h"
 
 /**
@@ -22,36 +22,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void Landed(const FHitResult& Hit) override;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
+	UInputAction* SwingAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* DashAction;
-
-	UPROPERTY(EditAnywhere, Category = "Jump")
-	float JumpHeight = 500.0f; 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	bool bFirstJump = true;
-
-	UPROPERTY(EditAnywhere)
-	bool bIsWalking = true;
-
-	int32 JumpCount = 0;
-
-
-	//TEST
-	UPROPERTY(VisibleAnywhere, Category = "Movement")
-	float MovementSpeed;
-
-	virtual void Tick(float DeltaSeconds) override;
-	// Action Section
 protected:
-	void DoubleJump();
-	void Dash();
-	void StopDash();
-	void Attack(); //���
+	void Grab() override; 
 	void Swing();
 };

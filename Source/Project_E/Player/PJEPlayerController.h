@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "PJEPlayerController.generated.h"
 
+class APJECharacterBase;
 /**
  * 
  */
@@ -25,6 +26,13 @@ public:
 	void SwitchInputToPawn();
 
 	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
+
+private:
+	void OnPossessCharacter(APJECharacterBase* aCharacter);
+	APJECharacterBase* OwnerCharacter;
+
+public:
+	APJECharacterBase* GetCharacter();
 	
 protected:
 	TObjectPtr<APawn> PlayerPawn = NULL;

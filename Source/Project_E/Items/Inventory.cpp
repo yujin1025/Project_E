@@ -37,6 +37,18 @@ void UInventory::RemoveItem(UItem* Item)
 	UE_LOG(LogTemp, Warning, TEXT("Removed item: %s"), *Item->Name);
 }
 
+UItem* UInventory::RemoveLastItem()
+{
+    UItem* RemovedItem = nullptr;
+
+    if (WeaponInventory.Num() > 0)
+    {
+        RemovedItem = WeaponInventory.Pop();
+    }
+
+    return RemovedItem;
+}
+
 /*
 bool UInventory::IsFull() const
 {

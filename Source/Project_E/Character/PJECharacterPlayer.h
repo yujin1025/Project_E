@@ -75,9 +75,34 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DashAction;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	//UInputAction* InventoryAction;
 
+	UPROPERTY(EditAnywhere, Category = "Jump")
+	float JumpHeight = 500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	bool bFirstJump = true;
+
+	UPROPERTY(EditAnywhere)
+	bool bIsWalking = true;
+
+	int32 JumpCount = 0;
+
+	bool isShift = false;
+
+protected:
+	virtual void Landed(const FHitResult& Hit) override;
+	void DoubleJump();
+	void Dash();
+	void StopDash();
+	virtual void Grab();
 
 private:
 	void OnMove(const FInputActionValue& Value);	
@@ -87,17 +112,12 @@ private:
 	bool bIsInventoryOpen = false; 
 	UInventoryWidget* InventoryWidgetInstance = nullptr;
 
-	// UI Section
-protected:
-	void ShowPopUI();
-	void Attack();
-
  //Item Section
 protected:
 	//virtual void TakeItem(UItem* Item) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-	UInventory* Inventory;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	//UInventory* Inventory;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float PopupDistance;
@@ -110,6 +130,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
+
 //Interact Section
 protected:
 	UPROPERTY(EditAnywhere)

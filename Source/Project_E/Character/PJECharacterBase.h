@@ -54,4 +54,7 @@ protected:
 	// Character type
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	ECharacterType CharacterType;
+
+public:
+	virtual FVector GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget);
 };

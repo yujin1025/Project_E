@@ -120,3 +120,9 @@ bool APJECharacterBase::IsPlayer()
 	return Controller->IsPlayerController();
 }
 
+FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget)
+{
+	IsFoundTarget = false;
+	return FVector::ZeroVector;
+}
+

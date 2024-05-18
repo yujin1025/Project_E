@@ -14,9 +14,9 @@
 #include "../UI/InventoryWidget.h"
 #include <Interface/PJEGameInterface.h>
 #include "Components/BoxComponent.h"
-#include "Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractInterface.h"
 #include "Player/PJEPlayerController.h"
+#include "../Game/PJEGameModeBase.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -56,7 +56,7 @@ void APJECharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();
 
-    Inventory = NewObject<UInventory>(this);
+    //Inventory = NewObject<UInventory>(this);
 
     APJEPlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
     if (PlayerController)
@@ -64,6 +64,21 @@ void APJECharacterPlayer::BeginPlay()
         EnableInput(PlayerController);
     }
 
+    APJECharacterBase* Character = Cast<APJECharacterBase>(GetOwner());
+    if (Character == nullptr)
+        return;
+
+    ECharacterType Type = Character->GetCharacterType();
+
+    auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
+    if (GameMode == nullptr)
+        return;
+
+    auto* Data = GameMode->GetCharacterStat(CharacterType);
+    if (Data == nullptr)
+        return;
+
+    GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
 
     Volume->OnComponentBeginOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapBegin);
     Volume->OnComponentEndOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapEnd);
@@ -86,6 +101,9 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     {
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
+        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DoubleJump);
+        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterPlayer::Dash);
+        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::StopDash);
         //EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
     }
     
@@ -196,6 +214,58 @@ void APJECharacterPlayer::OnLook(const FInputActionValue& Value)
     Look(LookAxisVector);
 }
 
+
+void APJECharacterPlayer::Landed(const FHitResult& Hit)
+{
+    Super::Landed(Hit);
+    bFirstJump = true;
+    JumpCount = 0;
+}
+
+void APJECharacterPlayer::DoubleJump()
+{
+    if (bFirstJump)
+    {
+        bFirstJump = false;
+        JumpCount++;
+        LaunchCharacter(FVector(0.0f, 0.0f, JumpHeight), false, true);
+        return;
+    }
+
+    else if (!bFirstJump && JumpCount < 2)
+    {
+        UCharacterMovementComponent* PlayerMovement = GetCharacterMovement();
+        if (PlayerMovement)
+        {
+            LaunchCharacter(FVector(0.0f, 0.0f, JumpHeight), false, true);
+            JumpCount++;
+
+        }
+        return;
+    }
+}
+
+void APJECharacterPlayer::Dash()
+{
+    if (bIsWalking)
+    {
+        GetCharacterMovement()->MaxWalkSpeed *= 2.0f;
+    }
+}
+
+void APJECharacterPlayer::StopDash()
+{
+    if (bIsWalking)
+    {
+        GetCharacterMovement()->MaxWalkSpeed /= 2.0f;
+    }
+}
+
+void APJECharacterPlayer::Grab()
+{
+
+}
+
 /*
 void APJECharacterPlayer::OpenInventory()
 {
@@ -227,30 +297,6 @@ void APJECharacterPlayer::OpenInventory()
         }
     }
 }*/
-
-
-void APJECharacterPlayer::ShowPopUI()
-{
-    FVector TargetPosition = GetTargetPosition(ECollisionChannel::ECC_GameTraceChannel1, 100.0f);
-
-    if (TargetPosition != FVector::ZeroVector)
-    {
-        APlayerController* PlayerController = Cast<APlayerController>(GetController());
-        if (PlayerController)
-        {
-            IPJEGameInterface* ABGameMode = Cast<IPJEGameInterface>(GetWorld()->GetAuthGameMode());
-            if (ABGameMode)
-            {
-                //ABGameMode->ShowPopupWidget();
-            }
-        }
-    }
-}
-
-void APJECharacterPlayer::Attack()
-{
-
-}
 
 
 
