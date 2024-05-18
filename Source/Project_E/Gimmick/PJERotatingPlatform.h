@@ -25,8 +25,10 @@ public:
 	FORCEINLINE UPJERotateComponent* GetRotationComponent() const { return RotationComponent; }
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
+	TObjectPtr<USceneComponent> Root;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
 	TObjectPtr<UStaticMeshComponent> PlatformMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
 	TObjectPtr<UPJERotateComponent> RotationComponent;
 };

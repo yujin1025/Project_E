@@ -12,7 +12,7 @@
 APJEButtonBase::APJEButtonBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	ButtonBorderMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button Boarder"));
 	RootComponent = ButtonBorderMesh;
 	ButtonBorderMesh->SetGenerateOverlapEvents(false);
@@ -29,8 +29,6 @@ APJEButtonBase::APJEButtonBase()
 
 	WidgetTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
 	WidgetTrigger->SetupAttachment(RootComponent);
-
-
 }
 
 // Called when the game starts or when spawned
