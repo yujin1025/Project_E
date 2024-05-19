@@ -35,7 +35,10 @@ protected:
 	virtual void AbleInteraction();
 	virtual void DisableInteraction();
 
-	virtual void UpdateWidget();
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -57,9 +60,8 @@ protected:
 	// 모든 상호작용 입력은 InteractAble을 통한다
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bIsInteractAble;
-	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bIsInteracting;
-	// 잠시 테스트 위해 EditAnywhere로 설정해뒀습니다.
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bIsActive;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")

@@ -2,6 +2,7 @@
 
 #include "Gimmick/PJEInteractiveActor.h"
 
+#include "Character/PJECharacterPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 
@@ -15,6 +16,7 @@ APJEInteractiveActor::APJEInteractiveActor()
 	
 	WidgetTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
 	WidgetTriggerBox->SetupAttachment(RootComponent);
+	WidgetTriggerBox->SetCollisionProfileName(TEXT("NotifyInteraction"));
 	InteractionTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
 	InteractionTriggerBox->SetupAttachment(RootComponent);
 
@@ -36,6 +38,9 @@ void APJEInteractiveActor::BeginPlay()
 	bIsInteracting = false;
 	bIsActive = false;
 	InteractType = EInteractType::Click;
+
+	WidgetTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &APJEInteractiveActor::OnOverlapBegin);
+	WidgetTriggerBox->OnComponentEndOverlap.AddDynamic(this, &APJEInteractiveActor::OnOverlapEnd);
 }
 
 /* Functions that contain functionality to act when an interaction key is pressed **/
@@ -72,30 +77,23 @@ void APJEInteractiveActor::DisableInteraction()
 	PointInteractionWidget->SetVisibility(false);
 }
 
-/* Update Widget **/
-void APJEInteractiveActor::UpdateWidget()
+void APJEInteractiveActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(!bIsInteractAble) return;
-	
-	TArray<AActor*> NotifyOverlappingActors, PointOverlappingActors;
-	WidgetTriggerBox->GetOverlappingActors(NotifyOverlappingActors);
-	if(NotifyOverlappingActors.Num() == 0)
-	{
-		NotifyInteractionWidget->SetVisibility(false);
-	}
-	else
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
+	if(CharacterPlayer)
 	{
 		NotifyInteractionWidget->SetVisibility(true);
 	}
+}
 
-	InteractionTriggerBox->GetOverlappingActors(PointOverlappingActors);
-	if(PointOverlappingActors.Num() == 0)
+void APJEInteractiveActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
+	if(CharacterPlayer)
 	{
-		PointInteractionWidget->SetVisibility(false);
-	}
-	else
-	{
-		PointInteractionWidget->SetVisibility(true);
+		NotifyInteractionWidget->SetVisibility(false);
 	}
 }
 
@@ -103,6 +101,6 @@ void APJEInteractiveActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateWidget();
+	
 }
 

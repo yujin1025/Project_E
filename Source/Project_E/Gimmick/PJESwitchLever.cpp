@@ -22,7 +22,7 @@ void APJESwitchLever::BeginPlay()
 
 void APJESwitchLever::TEST_FUNCTION()
 {
-	if(!bIsActive)
+	if(bIsInteracting)
 	{
 		RotateComponent->SetRotateState(ERotateState::Rotating);
 	}
