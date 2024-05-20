@@ -24,20 +24,19 @@ public:
 	UPJERotateComponent();
 
 protected:
+	virtual void BeginPlay() override;
+	
 	void OperateRotation(float DeltaTime);
 	void StopRotation();
 	void ResetRotation(float DeltaTime);
-	
-protected:
-	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	FRotator OriginRotation;
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Movement|DP_Settings")
 	FRotator RotationAngle;
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Movement|DP_Settings")
 	float MaxRotateDegree;
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Movement|DP_Settings")
 	float RotationSpeed = 0.f;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	ERotateState RotateState;
