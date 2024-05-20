@@ -118,29 +118,6 @@ void APJEIgnitionHandle::HideInteractWidget()
 	Widget->SetVisibility(false);
 }
 
-// void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* MyPlayerController)
-// {
-// 	IPJEInputInterface::SetupInputBinding(MyPlayerController);
-//
-// 	CurrentPossessingController = MyPlayerController;
-// 	
-// 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(MyPlayerController->GetLocalPlayer());
-// 	if(EnhancedInputSubsystem)
-// 	{
-// 		EnhancedInputSubsystem->ClearAllMappings();
-// 		EnhancedInputSubsystem->AddMappingContext(HandleContext, 0);
-// 	}
-// 		
-// 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(MyPlayerController->InputComponent);
-// 	if(EnhancedInputComponent)
-// 	{
-// 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Started, this, &APJEIgnitionHandle::DoRotation);
-// 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::StopRotation);
-// 		EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &APJEIgnitionHandle::ReturnPawn);
-// 	}
-//
-// }
-
 void APJEIgnitionHandle::SetupInputBinding(APJEPlayerController* PlayerController)
 {	
 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());

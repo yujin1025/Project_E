@@ -7,6 +7,7 @@
 #include "Interface/PJECharacterItemInterface.h"
 #include "PJECharacterPlayer.generated.h"
 
+class APJEInteractiveActor;
 class IPJEInteractInterface;
 class UBoxComponent;
 class UInputMappingContext;
@@ -40,12 +41,7 @@ public:
 	void OnInteractBegin();
 	void OnInteractEnd();
 
-	UFUNCTION()
-	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	IPJEInteractInterface* GetClosestInterface();
+	APJEInteractiveActor* GetClosestActor();
 	
 	// Camera Section
 protected:
@@ -134,10 +130,10 @@ private:
 //Interact Section
 protected:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UBoxComponent> Volume;
+	TObjectPtr<UBoxComponent> InteractionTrigger;
 
-	// Crash occurs when UPROPERTY added (reason unknown)
-	TObjectPtr<IPJEInteractInterface> Interface;
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	TObjectPtr<APJEInteractiveActor> InteractableActor = NULL;
 
 public:
 	// 현재 상호작용하고있는 Actor, 없다면 NULL

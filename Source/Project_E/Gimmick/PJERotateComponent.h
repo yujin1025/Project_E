@@ -59,4 +59,7 @@ public:
 	FORCEINLINE ERotateState GetRotateState() const { return RotateState; }
 	FORCEINLINE USceneComponent* GetRotateTarget() const { return RotateTarget; }
 
+	UPROPERTY(VisibleAnywhere, Category = "Movement")
+	bool bIsMaxRotate = false;
+
 };

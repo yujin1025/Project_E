@@ -39,8 +39,11 @@ void APJEInteractiveActor::BeginPlay()
 	bIsActive = false;
 	InteractType = EInteractType::Click;
 
-	WidgetTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &APJEInteractiveActor::OnOverlapBegin);
-	WidgetTriggerBox->OnComponentEndOverlap.AddDynamic(this, &APJEInteractiveActor::OnOverlapEnd);
+	WidgetTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &APJEInteractiveActor::NotifyOverlapBegin);
+	WidgetTriggerBox->OnComponentEndOverlap.AddDynamic(this, &APJEInteractiveActor::NotifyOverlapEnd);
+
+	InteractionTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &APJEInteractiveActor::PointOverlapBegin);
+	InteractionTriggerBox->OnComponentEndOverlap.AddDynamic(this, &APJEInteractiveActor::PointOverlapEnd);
 }
 
 /* Functions that contain functionality to act when an interaction key is pressed **/
@@ -77,8 +80,8 @@ void APJEInteractiveActor::DisableInteraction()
 	PointInteractionWidget->SetVisibility(false);
 }
 
-void APJEInteractiveActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APJEInteractiveActor::NotifyOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
 	if(CharacterPlayer)
@@ -87,7 +90,7 @@ void APJEInteractiveActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 	}
 }
 
-void APJEInteractiveActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+void APJEInteractiveActor::NotifyOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
@@ -97,10 +100,38 @@ void APJEInteractiveActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AAc
 	}
 }
 
+void APJEInteractiveActor::PointOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
+	if(CharacterPlayer)
+	{
+		bIsPlayerNearby = true;
+	}
+}
+
+void APJEInteractiveActor::PointOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
+	if(CharacterPlayer)
+	{
+		bIsPlayerNearby = false;
+	}
+}
+
+void APJEInteractiveActor::ShowPointWidget()
+{
+	PointInteractionWidget->SetVisibility(true);
+}
+
+void APJEInteractiveActor::HidePointWidget()
+{
+	PointInteractionWidget->SetVisibility(false);
+}
+
 void APJEInteractiveActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	
 }
 

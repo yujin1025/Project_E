@@ -2,9 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "PJEInteractInterface.h"
+#include "PJERotateComponent.h"
 #include "Gimmick/PJEInteractiveActor.h"
 #include "PJESwitchLever.generated.h"
 
+class APJEPlatform;
 class UPJERotateComponent;
 
 UCLASS()
@@ -19,6 +21,9 @@ protected:
 	virtual void InteractionKeyReleased() override;
 
 	void ActivateLever();
+
+	void CheckActive();
+	void NotifyPlatform(bool bActive);
 	
 public:
 	virtual void Tick(float DeltaSeconds) override;
@@ -34,7 +39,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
 	TObjectPtr<UPJERotateComponent> RotateComponent;
 
-	//TEST FUNCTION
-private:
-	void TEST_FUNCTION();	
+	UPROPERTY(EditAnywhere, Category = "Interaction|Platform")
+	TArray<TObjectPtr<APJEPlatform>> Platforms;
 };

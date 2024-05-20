@@ -17,6 +17,7 @@
 #include "Gimmick/PJEInteractInterface.h"
 #include "Player/PJEPlayerController.h"
 #include "../Game/PJEGameModeBase.h"
+#include "Gimmick/PJEInteractiveActor.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -29,8 +30,8 @@ APJECharacterPlayer::APJECharacterPlayer()
     FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
     FollowCamera->bUsePawnControlRotation = false;
 
-    Volume = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
-    Volume->SetupAttachment(RootComponent);
+    InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
+    InteractionTrigger->SetupAttachment(RootComponent);
 }
 
 bool APJECharacterPlayer::GetItem(int32 ItemCode)
@@ -79,9 +80,6 @@ void APJECharacterPlayer::BeginPlay()
         return;
 
     GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
-
-    Volume->OnComponentBeginOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapBegin);
-    Volume->OnComponentEndOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapEnd);
 }
 
 void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -115,16 +113,16 @@ void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if(Interface)
+    if(InteractableActor)
     {
-        Interface->HideInteracPointWidget();
+        InteractableActor->HidePointWidget();
     }
     
-    Interface = GetClosestInterface();
+    InteractableActor = GetClosestActor();
     
-    if(Interface)
+    if(InteractableActor)
     {
-        Interface->ShowInteractPointWidget();    
+        InteractableActor->ShowPointWidget();
     }
 }
 
@@ -162,8 +160,6 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
 
 void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Move Camera"));
-
     // Save Original Position
     OrgLocation = FollowCamera->GetComponentLocation();
     OrgRotation = FollowCamera->GetComponentRotation();
@@ -175,8 +171,6 @@ void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator Ta
 
 void APJECharacterPlayer::BackCameraToPawn()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Back Camera"));
-
     // Move Camera to Origin Position
     FollowCamera->SetWorldLocation(OrgLocation);
     FollowCamera->SetWorldRotation(OrgRotation);
@@ -302,71 +296,48 @@ void APJECharacterPlayer::OpenInventory()
 
 void APJECharacterPlayer::OnInteractBegin()
 {
-    if (Interface)
+    if(InteractableActor)
     {
-        Interface->BeginInteracting(Cast<AActor>(this));
+        InteractableActor->InteractionKeyPressed();
     }
 }
 
 void APJECharacterPlayer::OnInteractEnd()
 {
-    if (Interface)
+    if(InteractableActor)
     {
-        Interface->EndInteracting(Cast<AActor>(this));
+        InteractableActor->InteractionKeyReleased();
     }
 }
 
-void APJECharacterPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-    if(IPJEInteractInterface* OtherActorInterface = Cast<IPJEInteractInterface>(OtherActor))
-    {
-        // If Cast Succeed
-        OtherActorInterface->ShowInteractWidget();
-    }
-}
-
-void APJECharacterPlayer::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-    if(IPJEInteractInterface* OtherActorInterface = Cast<IPJEInteractInterface>(OtherActor))
-    {
-        // If Cast Succeed
-        OtherActorInterface->HideInteractWidget();
-    }
-}
-
-IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
-{
+APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
+{    
     TArray<AActor*> OverlappingActors;
-    TArray<IPJEInteractInterface*> OverlappingInterfaces;
-    IPJEInteractInterface* ClosestInterface = nullptr;
+    TArray<APJEInteractiveActor*> InteractableActors;
+    APJEInteractiveActor* ClosestActor = nullptr;
 
-    Volume->GetOverlappingActors(OverlappingActors);
-
+    InteractionTrigger->GetOverlappingActors(OverlappingActors);
+    
     for (auto CurrentActor : OverlappingActors)
     {
-        if (IPJEInteractInterface* CInterface = Cast<IPJEInteractInterface>(CurrentActor))
+        APJEInteractiveActor* TempActor = Cast<APJEInteractiveActor>(CurrentActor);
+        if(TempActor)
         {
-            OverlappingInterfaces.Add(CInterface);
+            if(TempActor->bIsPlayerNearby) InteractableActors.Add(TempActor);
         }
     }
 
-    if (OverlappingInterfaces.IsEmpty())
-    {
-        return nullptr;
-    }
+    if(InteractableActors.IsEmpty()) return nullptr;
 
-    ClosestInterface = OverlappingInterfaces[0];
+    ClosestActor = InteractableActors[0];
 
-    for (auto CurrentInterface : OverlappingInterfaces)
+    for(auto CurrentActor : InteractableActors)
     {
-        if (GetDistanceTo(Cast<AActor>(CurrentInterface)) <
-            GetDistanceTo(Cast<AActor>(ClosestInterface)))
+        if(GetDistanceTo(CurrentActor) < GetDistanceTo(ClosestActor))
         {
-            ClosestInterface = CurrentInterface;
+            ClosestActor = CurrentActor;
         }
     }
 
-    return ClosestInterface;
+    return ClosestActor;
 }

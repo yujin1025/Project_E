@@ -24,25 +24,35 @@ class PROJECT_E_API APJEInteractiveActor : public AActor
 	
 public:	
 	APJEInteractiveActor();
-
-protected:
-	virtual void BeginPlay() override;
-
+	
 	virtual void InteractionKeyPressed();
 	virtual void InteractionKeyReleased();
 	virtual void BreakInteracting();
+	
+	void ShowPointWidget();
+	void HidePointWidget();
 
+protected:
+	virtual void BeginPlay() override;
+	
 	virtual void AbleInteraction();
 	virtual void DisableInteraction();
 
 	UFUNCTION()
-	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void NotifyOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
-	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void NotifyOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+	UFUNCTION()
+	void PointOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void PointOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	bool bIsPlayerNearby = false;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
 	TObjectPtr<USceneComponent> Root;

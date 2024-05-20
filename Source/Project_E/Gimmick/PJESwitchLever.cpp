@@ -1,5 +1,6 @@
 #include "Gimmick/PJESwitchLever.h"
 
+#include "PJEPlatform.h"
 #include "PJERotateComponent.h"
 
 APJESwitchLever::APJESwitchLever()
@@ -20,18 +21,6 @@ void APJESwitchLever::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APJESwitchLever::TEST_FUNCTION()
-{
-	if(bIsInteracting)
-	{
-		RotateComponent->SetRotateState(ERotateState::Rotating);
-	}
-	else
-	{
-		RotateComponent->SetRotateState(ERotateState::Returning);
-	}
-}
-
 void APJESwitchLever::InteractionKeyReleased()
 {
 	Super::InteractionKeyReleased();
@@ -41,23 +30,52 @@ void APJESwitchLever::InteractionKeyReleased()
 
 void APJESwitchLever::ActivateLever()
 {
-	if(!bIsActive)
+	if(!bIsInteracting)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Lever On"));
-		bIsActive = true;
+		bIsInteracting = true;
 		RotateComponent->SetRotateState(ERotateState::Rotating);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Lever Off"));
-		bIsActive = false;
+		bIsInteracting = false;
 		RotateComponent->SetRotateState(ERotateState::Returning);
+	}
+}
+
+void APJESwitchLever::CheckActive()
+{
+	bool bTemp = bIsActive;
+	bIsActive = RotateComponent->bIsMaxRotate;
+	if(bTemp != bIsActive)
+	{
+		if(bIsActive)
+		{
+			NotifyPlatform(true);
+		}
+		else
+		{
+			NotifyPlatform(false);
+		}
+	}
+}
+
+void APJESwitchLever::NotifyPlatform(bool bActive)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Now Button State : %d"), bActive);
+	if(!Platforms.IsEmpty())
+	{
+		for(auto Platform:Platforms)
+		{
+			Platform->SetbPlatformActive(bActive);
+		}
 	}
 }
 
 void APJESwitchLever::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	TEST_FUNCTION();
+	
+	CheckActive();
 }

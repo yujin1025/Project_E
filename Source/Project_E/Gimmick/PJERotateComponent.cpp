@@ -18,9 +18,9 @@ void UPJERotateComponent::OperateRotation(float DeltaTime)
 	float AngleDegree = FMath::RadiansToDegrees(AngleRadian);
 	if(AngleDegree > MaxRotateDegree)
 	{
+		bIsMaxRotate = true;
 		return;
 	}
-	
 	RotateTarget->SetWorldRotation(NewRotator);
 }
 
@@ -32,7 +32,8 @@ void UPJERotateComponent::StopRotation()
 void UPJERotateComponent::ResetRotation(float DeltaTime)
 {
 	if(!RotateTarget) return;
-	
+
+	bIsMaxRotate = false;
 	FRotator CurrentRotator = RotateTarget->GetComponentRotation();
 	float Speed = FMath::Abs(RotationSpeed);
 	FRotator NewRotation = FMath::RInterpConstantTo(CurrentRotator, OriginRotation, DeltaTime, Speed);
