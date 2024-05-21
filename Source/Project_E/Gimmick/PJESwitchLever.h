@@ -6,6 +6,7 @@
 #include "Gimmick/PJEInteractiveActor.h"
 #include "PJESwitchLever.generated.h"
 
+class APJECharacterPlayer;
 class APJEPlatform;
 class UPJERotateComponent;
 
@@ -20,7 +21,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	virtual void InteractionKeyReleased() override;
+	virtual void InteractionKeyReleased(APJECharacterPlayer* Character) override;
 
 	void ActivateLever();
 

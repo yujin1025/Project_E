@@ -21,9 +21,9 @@ void APJESwitchLever::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APJESwitchLever::InteractionKeyReleased()
+void APJESwitchLever::InteractionKeyReleased(APJECharacterPlayer* Character)
 {
-	Super::InteractionKeyReleased();
+	Super::InteractionKeyReleased(Character);
 
 	ActivateLever();
 }

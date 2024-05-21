@@ -69,7 +69,6 @@ void APJELockedDoor::EndInteracting(const AActor* InteractActor)
 		UE_LOG(LogTemp, Warning, TEXT("No Matching Key!"));
 	}
 }
-
 /** End Interact Interface */
 
 void APJELockedDoor::MoveDoor(float DeltaTime)

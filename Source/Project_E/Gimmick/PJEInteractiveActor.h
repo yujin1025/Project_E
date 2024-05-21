@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "PJEInteractiveActor.generated.h"
 
+class APJECharacterPlayer;
 class UWidgetComponent;
 class UBoxComponent;
 
@@ -25,8 +26,8 @@ class PROJECT_E_API APJEInteractiveActor : public AActor
 public:	
 	APJEInteractiveActor();
 	
-	virtual void InteractionKeyPressed();
-	virtual void InteractionKeyReleased();
+	virtual void InteractionKeyPressed(APJECharacterPlayer* Character);
+	virtual void InteractionKeyReleased(APJECharacterPlayer* Character);
 	virtual void BreakInteracting();
 	
 	void ShowPointWidget();
@@ -52,6 +53,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	bool bIsPlayerNearby = false;
+
+	// 모든 상호작용 입력은 InteractAble을 통한다
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	bool bIsInteractAble;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
@@ -66,10 +71,7 @@ protected:
 	TObjectPtr<UWidgetComponent> NotifyInteractionWidget; 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Widget")
 	TObjectPtr<UWidgetComponent> PointInteractionWidget;
-
-	// 모든 상호작용 입력은 InteractAble을 통한다
-	UPROPERTY(VisibleAnywhere, Category = "Interaction")
-	bool bIsInteractAble;
+	
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bIsInteracting;
 	UPROPERTY(EditAnywhere, Category = "Interaction")

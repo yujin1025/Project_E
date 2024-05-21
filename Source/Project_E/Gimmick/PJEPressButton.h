@@ -35,6 +35,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
 	TObjectPtr<UPJEMovingComponent> MovingComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh|DP_Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Component|Mesh|DP_Settings")
 	TArray<TObjectPtr<APJEPlatform>> Platforms;
 };

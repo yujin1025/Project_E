@@ -298,7 +298,7 @@ void APJECharacterPlayer::OnInteractBegin()
 {
     if(InteractableActor)
     {
-        InteractableActor->InteractionKeyPressed();
+        InteractableActor->InteractionKeyPressed(this);
     }
 }
 
@@ -306,7 +306,7 @@ void APJECharacterPlayer::OnInteractEnd()
 {
     if(InteractableActor)
     {
-        InteractableActor->InteractionKeyReleased();
+        InteractableActor->InteractionKeyReleased(this);
     }
 }
 
@@ -323,7 +323,7 @@ APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
         APJEInteractiveActor* TempActor = Cast<APJEInteractiveActor>(CurrentActor);
         if(TempActor)
         {
-            if(TempActor->bIsPlayerNearby) InteractableActors.Add(TempActor);
+            if(TempActor->bIsPlayerNearby && TempActor->bIsInteractAble) InteractableActors.Add(TempActor);
         }
     }
 

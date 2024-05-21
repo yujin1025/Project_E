@@ -48,12 +48,12 @@ void APJEInteractiveActor::BeginPlay()
 }
 
 /* Functions that contain functionality to act when an interaction key is pressed **/
-void APJEInteractiveActor::InteractionKeyPressed()
+void APJEInteractiveActor::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
 	if(!bIsInteractAble) return;
 }
 /* Functions that contain functionality to act when an interaction key is released **/
-void APJEInteractiveActor::InteractionKeyReleased()
+void APJEInteractiveActor::InteractionKeyReleased(APJECharacterPlayer* Character)
 {
 	if(!bIsInteractAble) return;
 }
@@ -84,6 +84,8 @@ void APJEInteractiveActor::DisableInteraction()
 void APJEInteractiveActor::NotifyOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if(!bIsInteractAble) return;
+	
 	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
 	if(CharacterPlayer)
 	{
@@ -94,6 +96,8 @@ void APJEInteractiveActor::NotifyOverlapBegin(UPrimitiveComponent* OverlappedCom
 void APJEInteractiveActor::NotifyOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if(!bIsInteractAble) return;
+	
 	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
 	if(CharacterPlayer)
 	{
@@ -118,6 +122,7 @@ void APJEInteractiveActor::PointOverlapEnd(UPrimitiveComponent* OverlappedComp, 
 	if(CharacterPlayer)
 	{
 		bIsPlayerNearby = false;
+		//bIsInteracting = false;
 	}
 }
 
