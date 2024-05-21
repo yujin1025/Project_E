@@ -32,13 +32,11 @@ void APJESwitchLever::ActivateLever()
 {
 	if(!bIsInteracting)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Lever On"));
 		bIsInteracting = true;
 		RotateComponent->SetRotateState(ERotateState::Rotating);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Lever Off"));
 		bIsInteracting = false;
 		RotateComponent->SetRotateState(ERotateState::Returning);
 	}
@@ -63,7 +61,6 @@ void APJESwitchLever::CheckActive()
 
 void APJESwitchLever::NotifyPlatform(bool bActive)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Now Button State : %d"), bActive);
 	if(!Platforms.IsEmpty())
 	{
 		for(auto Platform:Platforms)

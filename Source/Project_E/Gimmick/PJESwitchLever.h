@@ -18,6 +18,8 @@ public:
 	APJESwitchLever();
 
 protected:
+	virtual void BeginPlay() override;
+	
 	virtual void InteractionKeyReleased() override;
 
 	void ActivateLever();
@@ -27,7 +29,6 @@ protected:
 	
 public:
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void BeginPlay() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
@@ -39,6 +40,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
 	TObjectPtr<UPJERotateComponent> RotateComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Interaction|Platform")
+	UPROPERTY(EditAnywhere, Category = "Interaction|Platform|DP_Settings")
 	TArray<TObjectPtr<APJEPlatform>> Platforms;
 };

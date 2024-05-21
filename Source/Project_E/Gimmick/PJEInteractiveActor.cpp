@@ -19,6 +19,7 @@ APJEInteractiveActor::APJEInteractiveActor()
 	WidgetTriggerBox->SetCollisionProfileName(TEXT("NotifyInteraction"));
 	InteractionTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
 	InteractionTriggerBox->SetupAttachment(RootComponent);
+	InteractionTriggerBox->SetCollisionProfileName(TEXT("PointInteraction"));
 
 	NotifyInteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Denote Interaction Widget"));
 	NotifyInteractionWidget->SetupAttachment(RootComponent);
