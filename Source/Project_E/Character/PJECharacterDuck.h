@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 	UInventory* Inventory;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	class UDataTable* ItemDatabase;
+
 	FTimerHandle ShootDelayTimer;
 	FTimerHandle RapidFireDelayTimer;
 	bool bCanShoot;

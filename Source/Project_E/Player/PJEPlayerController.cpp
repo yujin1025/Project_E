@@ -30,6 +30,7 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
+	/*
 	CurrentBindingActor = Cast<APJECharacterPlayer>(PlayerPawn)->InteractActor;
 	if(LastBindingActor != CurrentBindingActor)
 	{
@@ -42,7 +43,7 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 			SwitchInputToPawn();
 		}
 	}
-	LastBindingActor = CurrentBindingActor;
+	LastBindingActor = CurrentBindingActor;*/
 }
 
 void APJEPlayerController::SwitchInputToOther()

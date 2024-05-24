@@ -33,6 +33,7 @@ void APJECharacterDuck::BeginPlay()
 	Super::BeginPlay();
 
     Inventory = NewObject<UInventory>(this);
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
 }
 
 
@@ -44,8 +45,6 @@ void APJECharacterDuck::Swallow()
 {
     if (Inventory)// && !Inventory->IsFull())
     {
-        UDataTable* ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
-
         UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (NewItem)
         {

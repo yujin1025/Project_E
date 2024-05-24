@@ -60,6 +60,26 @@ public:
 	void MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation);
 	void BackCameraToPawn();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_DoubleJump();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DoubleJump();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Dash();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Dash();
+
+	UFUNCTION(Server, Reliable)
+	void Server_StopDash();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StopDash();
+
 	// Input Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -80,7 +100,7 @@ protected:
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	//UInputAction* InventoryAction;
 
-	UPROPERTY(EditAnywhere, Category = "Jump")
+	UPROPERTY(Replicated, EditAnywhere, Category = "Jump")
 	float JumpHeight = 500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")

@@ -18,6 +18,7 @@
 #include "Player/PJEPlayerController.h"
 #include "../Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractiveActor.h"
+#include "Net/UnrealNetwork.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -33,6 +34,14 @@ APJECharacterPlayer::APJECharacterPlayer()
     InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
     InteractionTrigger->SetupAttachment(RootComponent);
 }
+
+void APJECharacterPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(APJECharacterPlayer, JumpHeight);
+}
+
 
 bool APJECharacterPlayer::GetItem(int32 ItemCode)
 {
@@ -218,6 +227,16 @@ void APJECharacterPlayer::Landed(const FHitResult& Hit)
 
 void APJECharacterPlayer::DoubleJump()
 {
+    Server_DoubleJump();
+}
+
+void APJECharacterPlayer::Server_DoubleJump_Implementation()
+{
+    Multicast_DoubleJump();
+}
+
+void APJECharacterPlayer::Multicast_DoubleJump_Implementation()
+{
     if (bFirstJump)
     {
         bFirstJump = false;
@@ -241,6 +260,16 @@ void APJECharacterPlayer::DoubleJump()
 
 void APJECharacterPlayer::Dash()
 {
+    Server_Dash();
+}
+
+void APJECharacterPlayer::Server_Dash_Implementation()
+{
+    Multicast_Dash();
+}
+
+void APJECharacterPlayer::Multicast_Dash_Implementation()
+{
     if (bIsWalking)
     {
         GetCharacterMovement()->MaxWalkSpeed *= 2.0f;
@@ -248,6 +277,16 @@ void APJECharacterPlayer::Dash()
 }
 
 void APJECharacterPlayer::StopDash()
+{
+    Server_StopDash();
+}
+
+void APJECharacterPlayer::Server_StopDash_Implementation()
+{
+    Multicast_StopDash();
+}
+
+void APJECharacterPlayer::Multicast_StopDash_Implementation()
 {
     if (bIsWalking)
     {
