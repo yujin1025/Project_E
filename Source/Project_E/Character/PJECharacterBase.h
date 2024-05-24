@@ -7,6 +7,7 @@
 #include "PJECharacterBase.generated.h"
 
 class UHealthComponent;
+class UHitDeadComponent;
 
 UCLASS()
 class PROJECT_E_API APJECharacterBase : public ACharacter
@@ -38,6 +39,9 @@ public:
 
 	void Move(const FVector2D Value);
 	virtual void Look(const FVector2D Value);
+	virtual void OnHit();
+	virtual void OnDie();
+
 
 public:
 	bool IsPlayer(); //플레이어인지 여부
@@ -46,6 +50,9 @@ public:
 	int CharacterId;
 
 	UHealthComponent* HealthComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Motion, meta = (AllowPrivateAccess = "true"))
+	UHitDeadComponent* HitDeadComponent;
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 	ECharacterType GetCharacterType() const { return CharacterType; }

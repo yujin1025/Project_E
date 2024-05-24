@@ -13,6 +13,7 @@ APJECharacterDuck::APJECharacterDuck()
 {
     bCanShoot = true;
     bCanRapidFire = true;
+    bIsSwallowed = false;
 }
 
 void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -49,6 +50,12 @@ void APJECharacterDuck::Swallow()
         if (NewItem)
         {
             Inventory->AddItem(NewItem);
+
+            if (Inventory->GetInventoryCount() > 5 || (NewItem->ItemCode == 1 && Inventory->GetInventoryCount() > 3))
+            {
+                GetCharacterMovement()->MaxWalkSpeed *= SwallowedSpeed;
+                bIsSwallowed = true;
+            }
         }
     }
 
@@ -63,6 +70,11 @@ void APJECharacterDuck::Shoot()
         if (RemovedItem)
         {
             UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+
+            if (RemovedItem->ItemCode == 1 && Inventory->GetInventoryCount() <= 5)
+                ResetSpeed();
+            else if (Inventory->GetInventoryCount() <= 3)
+                ResetSpeed();
         }
 
         bCanShoot = false;
@@ -81,14 +93,24 @@ void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
     UE_LOG(LogTemp, Warning, TEXT("RapidFire"));
     if (bCanRapidFire && Inventory->GetWeaponCount() > 2)
     {
+        bool bHasMagicBall = false;
+
         for (int32 i = 0; i < 3; ++i)
         {
             UItem* RemovedItem = Inventory->RemoveLastItem();
             if (RemovedItem)
             {
                 UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+
+                if (RemovedItem->ItemCode == 1)
+                    bHasMagicBall = true;
             }
         }
+
+        if (bHasMagicBall && Inventory->GetInventoryCount() <= 5)
+            ResetSpeed();
+        else if (Inventory->GetInventoryCount() <= 3)
+            ResetSpeed();
 
         bCanRapidFire = false;
         GetWorld()->GetTimerManager().SetTimer(RapidFireDelayTimer, this, &APJECharacterDuck::ResetRapidFire, 1.0f, false);
@@ -98,5 +120,26 @@ void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 void APJECharacterDuck::ResetRapidFire()
 {
     bCanRapidFire = true;
+}
+
+void APJECharacterDuck::ResetSpeed()
+{
+    GetCharacterMovement()->MaxWalkSpeed /= SwallowedSpeed;
+    bIsSwallowed = false;
+}
+
+void APJECharacterDuck::Dash()
+{
+    if (bIsWalking)
+    {
+        if (bIsSwallowed) 
+        {
+            GetCharacterMovement()->MaxWalkSpeed *= (DashSpeed * SwallowedSpeed);
+        }
+        else 
+        {
+            GetCharacterMovement()->MaxWalkSpeed *= DashSpeed;
+        }
+    }
 }
 

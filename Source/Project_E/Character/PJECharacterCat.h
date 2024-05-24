@@ -25,7 +25,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwingAction;
 
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float DashSpeed = 1.5f;
+
 protected:
 	void Grab() override; 
 	void Swing();
+	void Dash();
 };

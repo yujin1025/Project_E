@@ -38,6 +38,8 @@ protected:
 	void ResetShoot();
 	void RapidFire(const FInputActionValue& Value);
 	void ResetRapidFire();
+	void ResetSpeed();
+	void Dash();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
@@ -50,4 +52,12 @@ protected:
 	FTimerHandle RapidFireDelayTimer;
 	bool bCanShoot;
 	bool bCanRapidFire;
+
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float DashSpeed = 1.2f;
+
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float SwallowedSpeed = 0.7;
+
+	bool bIsSwallowed;
 };
