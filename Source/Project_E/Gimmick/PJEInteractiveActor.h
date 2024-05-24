@@ -57,6 +57,8 @@ public:
 	// 모든 상호작용 입력은 InteractAble을 통한다
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bIsInteractAble;
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	bool bCanGetController = false;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
