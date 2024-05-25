@@ -10,6 +10,8 @@
 #include "AI/PJEAI.h"
 #include "Engine/World.h"
 #include "Math/UnrealMathUtility.h"
+#include "Project_E/Character/PJECharacterShadowA.h"
+#include "Project_E/AI/PJEAIController.h"
 
 UBTTask_RunAwayFromPlayer::UBTTask_RunAwayFromPlayer()
 {
@@ -20,15 +22,25 @@ UBTTask_RunAwayFromPlayer::UBTTask_RunAwayFromPlayer()
 EBTNodeResult::Type UBTTask_RunAwayFromPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
-    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_KEEPMOVINGTIME, GetWorld()->TimeSeconds);
+
+    APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
+
+    APJECharacterShadowA* OwnerActor = Cast<APJECharacterShadowA>(OwnerController->GetPawn());
+
+    FRunAwayFromPlayerTaskMemory* TaskMemory = (FRunAwayFromPlayerTaskMemory*)NodeMemory;
+
+    TaskMemory->TargetActor = OwnerActor;
+    TaskMemory->KeepMovingTime = GetWorld()->TimeSeconds;
     float RandomAngle = FMath::RandRange(-30.0f, 30.0f);
-    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_RANDOMDEGREE, RandomAngle);
+    TaskMemory->RandomDegree = RandomAngle;
     return EBTNodeResult::InProgress;
 }
 
 void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
     Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
+    FRunAwayFromPlayerTaskMemory* TaskMemory = (FRunAwayFromPlayerTaskMemory*)NodeMemory;
 
     AAIController* AICon = OwnerComp.GetAIOwner();
     if (!AICon)
@@ -47,8 +59,8 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     }
 
     float CurrentTime = GetWorld()->TimeSeconds;
-    float KeepMovingTime = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_KEEPMOVINGTIME);
-    float MaxKeepMovingTime = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_MAXKEEPMOVINGTIME);
+    float KeepMovingTime = TaskMemory->KeepMovingTime;
+    float MaxKeepMovingTime = TaskMemory->TargetActor->GetMaxKeepMovingTime();
 
     if (CurrentTime - KeepMovingTime >= MaxKeepMovingTime)
     {
@@ -72,7 +84,7 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     FVector DirectionAwayFromPlayer = -DirectionToPlayer.GetSafeNormal();
 
     
-    FRotator RandomRotation = FRotator(0, OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_RANDOMDEGREE), 0);
+    FRotator RandomRotation = FRotator(0, TaskMemory->RandomDegree, 0);
     FVector RandomDirectionAwayFromPlayer = RandomRotation.RotateVector(DirectionAwayFromPlayer);
 
     FVector NewLocation = AIPos + RandomDirectionAwayFromPlayer * ControlledPawn->GetCharacterMovement()->MaxWalkSpeed * DeltaSeconds * 100.0f;

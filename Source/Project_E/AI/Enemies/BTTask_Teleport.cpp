@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/PJEAI.h"
+#include "Project_E/Character/PJECharacterShadowA.h"
+#include "Project_E/AI/PJEAIController.h"
 
 UBTTask_Teleport::UBTTask_Teleport()
 {
@@ -17,21 +19,15 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    AAIController* AICon = OwnerComp.GetAIOwner();
-    if (!AICon)
-    {
-        return EBTNodeResult::Failed;
-    }
+    
 
-    APawn* Pawn = AICon->GetPawn();
-    if (!Pawn)
-    {
-        return EBTNodeResult::Failed;
-    }
+    APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
 
-    FVector CurrentLocation = Pawn->GetActorLocation();
+    APJECharacterShadowA* OwnerActor = Cast<APJECharacterShadowA>(OwnerController->GetPawn());
+
+    FVector CurrentLocation = OwnerActor->GetActorLocation();
     FNavLocation RandomNavLocation;
-    float Radius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_TELEPORTRANGE);
+    float Radius = OwnerActor->GetTeleportRange();
 
     UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     if (!NavSys)
@@ -59,7 +55,7 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
         return EBTNodeResult::Failed;
     }
 
-    Pawn->SetActorLocation(RandomNavLocation.Location);
+    OwnerActor->SetActorLocation(RandomNavLocation.Location);
     OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, false);
     return EBTNodeResult::Succeeded;
 }

@@ -24,3 +24,15 @@ protected:
 private:
    
 };
+
+USTRUCT()
+struct FBTBlinkTaskMemory
+{
+    GENERATED_BODY()
+    
+public:
+    UPROPERTY()
+    TObjectPtr<class APJECharacterShadowA> TargetActor;
+    float BlinkStartTime;
+    float AccumulatedSingleBlinkTime;
+};

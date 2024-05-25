@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/PJEAI.h"
+#include "Project_E/Character/PJECharacterShadowA.h"
+#include "Project_E/AI/PJEAIController.h"
 
 UBTTask_Blink::UBTTask_Blink()
 {
@@ -15,8 +17,19 @@ UBTTask_Blink::UBTTask_Blink()
 EBTNodeResult::Type UBTTask_Blink::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_BLINKSTARTTIME, GetWorld()->GetTimeSeconds());
-    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME, 0.0);
+
+    APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
+
+    APJECharacterShadowA* OwnerActor = Cast<APJECharacterShadowA>(OwnerController->GetPawn());
+
+    FBTBlinkTaskMemory* TaskMemory = (FBTBlinkTaskMemory*)NodeMemory;
+
+    if (TaskMemory != nullptr)
+    {
+        TaskMemory->TargetActor = OwnerActor;
+        TaskMemory->AccumulatedSingleBlinkTime = 0.0f;
+        TaskMemory->BlinkStartTime = GetWorld()->GetTimeSeconds();
+    }
 	return EBTNodeResult::InProgress;
 }
 
@@ -40,12 +53,14 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
     USkeletalMeshComponent* Mesh = ControlledPawn->GetMesh();
 
-    OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME, OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME) + DeltaSeconds);
+    FBTBlinkTaskMemory* TaskMemory = (FBTBlinkTaskMemory*)NodeMemory;
 
-    if (OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME) >= OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_SINGLEBLINKDURATION))
+    TaskMemory->AccumulatedSingleBlinkTime += DeltaSeconds;
+
+    if (TaskMemory->AccumulatedSingleBlinkTime >= TaskMemory->TargetActor->GetSingleBlinkDuration())
     {
 
-        if (GetWorld()->TimeSeconds - OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_BLINKSTARTTIME) >= OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_BLINKDURATION))
+        if (GetWorld()->TimeSeconds - TaskMemory->BlinkStartTime >= TaskMemory->TargetActor->GetBlinkDuration())
         {
             Mesh->SetVisibility(true);
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -53,7 +68,7 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
         }
 
         Mesh->SetVisibility(!Mesh->IsVisible());
-        OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME, OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_ACCUMULATEDSINGLEBLINKTIME) - OwnerComp.GetBlackboardComponent()->GetValueAsFloat(TEXT("SingleBlinkDuration")));
+        TaskMemory->AccumulatedSingleBlinkTime -= TaskMemory->TargetActor->GetSingleBlinkDuration();
     }
 }
 

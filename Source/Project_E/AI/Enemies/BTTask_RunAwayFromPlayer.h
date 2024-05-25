@@ -19,3 +19,16 @@ public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };
+
+
+USTRUCT()
+struct FRunAwayFromPlayerTaskMemory
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY()
+	TObjectPtr<class APJECharacterShadowA> TargetActor;
+	float KeepMovingTime;
+	float RandomDegree;
+};

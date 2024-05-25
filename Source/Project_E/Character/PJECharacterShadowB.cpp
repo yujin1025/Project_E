@@ -22,6 +22,8 @@ void APJECharacterShadowB::BeginPlay()
 	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	SetCurrentHP(MaxHp);
+
+	PlayerDetectionRange = 4.0f;
 }
 
 float APJECharacterShadowB::GetAIPatrolRadius()
