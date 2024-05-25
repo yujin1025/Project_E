@@ -133,6 +133,8 @@ void APJECharacterPlayer::Tick(float DeltaTime)
     {
         InteractableActor->ShowPointWidget();
     }
+
+    OnFalling();
 }
 
 FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance)
@@ -297,6 +299,32 @@ void APJECharacterPlayer::Multicast_StopDash_Implementation()
 void APJECharacterPlayer::Grab()
 {
 
+}
+
+void APJECharacterPlayer::OnFalling()
+{
+    if (GetCharacterMovement()->IsFalling())
+    {
+        if (!bIsFalling)
+        {
+            FallingStartLocation = GetActorLocation();
+            bIsFalling = true;
+        }
+        else
+        {
+            float HeightChange = FMath::Abs(GetActorLocation().Z - FallingStartLocation.Z);
+
+            if (HeightChange >= 400.0f)
+            {
+                SetDead();
+                UE_LOG(LogTemp, Warning, TEXT("Dead - Falling"));
+            }
+        }
+    }
+    else
+    {
+        bIsFalling = false;
+    }
 }
 
 /*

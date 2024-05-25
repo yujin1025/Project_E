@@ -40,6 +40,7 @@ protected:
 	void ResetRapidFire();
 	void ResetSpeed();
 	void Dash();
+	//void ShootProjectile(const FVector& StartLocation, const FVector& LaunchVelocity);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")

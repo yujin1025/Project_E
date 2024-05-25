@@ -113,12 +113,16 @@ protected:
 
 	bool isShift = false;
 
+	bool bIsFalling = false;
+	FVector FallingStartLocation;
+
 protected:
 	virtual void Landed(const FHitResult& Hit) override;
 	void DoubleJump();
 	void Dash();
 	void StopDash();
 	virtual void Grab();
+	void OnFalling();
 
 private:
 	void OnMove(const FInputActionValue& Value);	

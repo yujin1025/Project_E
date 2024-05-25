@@ -77,6 +77,7 @@ void APJECharacterDuck::Shoot()
                 ResetSpeed();
         }
 
+        //if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, outVelocity, startLoc, targetLoc, GetWorld()->GetGravityZ(), arcValue))
         bCanShoot = false;
         GetWorld()->GetTimerManager().SetTimer(ShootDelayTimer, this, &APJECharacterDuck::ResetShoot, 0.2f, false);
     }
@@ -142,4 +143,3 @@ void APJECharacterDuck::Dash()
         }
     }
 }
-
