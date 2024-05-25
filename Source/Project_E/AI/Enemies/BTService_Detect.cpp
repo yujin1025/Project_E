@@ -37,17 +37,21 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         );
 
         bool bIsPlayerNearby = false;
+        AActor* PlayerActor = nullptr;
         for (AActor* Actor : OverlappedActors)
         {
             APawn* Pawn = Cast<APawn>(Actor);
             if (Pawn && Pawn->IsPlayerControlled())
             {
                 bIsPlayerNearby = true;
+                PlayerActor = Actor;
                 break;
             }
         }
 
         OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, bIsPlayerNearby);
+        if (PlayerActor != nullptr)
+            OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, PlayerActor);
     }
 
 }

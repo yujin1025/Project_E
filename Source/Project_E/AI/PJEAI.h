@@ -14,3 +14,5 @@
 #define BBKEY_ACCUMULATEDSINGLEBLINKTIME TEXT("AccumulatedSingleBlinkTime")
 #define BBKEY_BLINKSTARTTIME TEXT("BlinkStartTime")
 #define BBKEY_TELEPORTRANGE TEXT("TeleportRange")
+#define BBKEY_PLAYERACTOR TEXT("PlayerActor")
+#define BBKEY_RANDOMDEGREE TEXT("RandomDegree")
