@@ -6,17 +6,20 @@
 APJERotatingPlatform::APJERotatingPlatform()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Rotating Platform"));
+	RootComponent = Root;
+	
 	PlatformMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Platform Mesh"));
-	RootComponent = PlatformMesh;
-
+	PlatformMesh->SetupAttachment(RootComponent);
+	
 	RotationComponent = CreateDefaultSubobject<UPJERotateComponent>(TEXT("Rotation Component"));
 }
 
 void APJERotatingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	RotationComponent->SetRotateTarget(PlatformMesh);	
 }
 
 // Called every frame

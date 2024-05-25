@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/DamageEvents.h"
+#include "Component/HitDeadComponent.h"
 #include "../Game/PJEGameModeBase.h"
 
 // Sets default values
@@ -37,6 +38,7 @@ APJECharacterBase::APJECharacterBase()
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HitDeadComponent = CreateDefaultSubobject<UHitDeadComponent>(TEXT("HitDeadComponent"));
 
 	// TODO : Implement Movement 
 	
@@ -115,8 +117,30 @@ void APJECharacterBase::Look(const FVector2D Value)
 	}
 }
 
+void APJECharacterBase::OnHit()
+{
+	if (HitDeadComponent)
+	{
+		HitDeadComponent->PlayHitMontage();
+	}
+}
+
+void APJECharacterBase::OnDie()
+{
+	if (HitDeadComponent)
+	{
+		HitDeadComponent->PlayDeadMontage();
+	}
+}
+
 bool APJECharacterBase::IsPlayer()
 {
 	return Controller->IsPlayerController();
+}
+
+FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget)
+{
+	IsFoundTarget = false;
+	return FVector::ZeroVector;
 }
 

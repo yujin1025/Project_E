@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "Gimmick/PJEInputInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Camera/PlayerCameraManager.h"
+
 
 APJEPlayerController::APJEPlayerController()
 {
@@ -27,7 +29,8 @@ void APJEPlayerController::BeginPlay()
 void APJEPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	
+	/*
 	CurrentBindingActor = Cast<APJECharacterPlayer>(PlayerPawn)->InteractActor;
 	if(LastBindingActor != CurrentBindingActor)
 	{
@@ -40,7 +43,7 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 			SwitchInputToPawn();
 		}
 	}
-	LastBindingActor = CurrentBindingActor;
+	LastBindingActor = CurrentBindingActor;*/
 }
 
 void APJEPlayerController::SwitchInputToOther()
@@ -59,6 +62,16 @@ void APJEPlayerController::SwitchInputToPawn()
 	{
 		PlayerCharacter->SetupPlayerInputComponent(PlayerCharacter->InputComponent);
 	}
+}
+
+void APJEPlayerController::OnPossessCharacter(APJECharacterBase* aCharacter)
+{
+	this->OwnerCharacter = aCharacter;
+}
+
+APJECharacterBase* APJEPlayerController::GetCharacter()
+{
+	return OwnerCharacter;
 }
 
 

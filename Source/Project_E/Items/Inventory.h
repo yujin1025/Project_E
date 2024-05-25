@@ -27,6 +27,13 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Inventory")
     void RemoveItem(UItem* Item);
 
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    UItem* RemoveLastItem();
+
+    int32 GetWeaponCount() { return WeaponInventory.Num(); }
+    int32 GetNonWeaponCount() { return NonWeaponInventory.Num(); }
+    int32 GetInventoryCount() const { return WeaponInventory.Num() + NonWeaponInventory.Num(); }
+
     //UFUNCTION(BlueprintCallable, Category = "Inventory")
     //bool IsFull() const;
 };

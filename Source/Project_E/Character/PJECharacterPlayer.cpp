@@ -14,9 +14,11 @@
 #include "../UI/InventoryWidget.h"
 #include <Interface/PJEGameInterface.h>
 #include "Components/BoxComponent.h"
-#include "Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractInterface.h"
 #include "Player/PJEPlayerController.h"
+#include "../Game/PJEGameModeBase.h"
+#include "Gimmick/PJEInteractiveActor.h"
+#include "Net/UnrealNetwork.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -29,9 +31,17 @@ APJECharacterPlayer::APJECharacterPlayer()
     FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
     FollowCamera->bUsePawnControlRotation = false;
 
-    Volume = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
-    Volume->SetupAttachment(RootComponent);
+    InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
+    InteractionTrigger->SetupAttachment(RootComponent);
 }
+
+void APJECharacterPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(APJECharacterPlayer, JumpHeight);
+}
+
 
 bool APJECharacterPlayer::GetItem(int32 ItemCode)
 {
@@ -56,7 +66,7 @@ void APJECharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();
 
-    Inventory = NewObject<UInventory>(this);
+    //Inventory = NewObject<UInventory>(this);
 
     APJEPlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
     if (PlayerController)
@@ -64,9 +74,21 @@ void APJECharacterPlayer::BeginPlay()
         EnableInput(PlayerController);
     }
 
+    APJECharacterBase* Character = Cast<APJECharacterBase>(GetOwner());
+    if (Character == nullptr)
+        return;
 
-    Volume->OnComponentBeginOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapBegin);
-    Volume->OnComponentEndOverlap.AddDynamic(this, &APJECharacterPlayer::OnOverlapEnd);
+    ECharacterType Type = Character->GetCharacterType();
+
+    auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
+    if (GameMode == nullptr)
+        return;
+
+    auto* Data = GameMode->GetCharacterStat(CharacterType);
+    if (Data == nullptr)
+        return;
+
+    GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
 }
 
 void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -86,6 +108,9 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     {
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
+        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DoubleJump);
+        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterPlayer::Dash);
+        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::StopDash);
         //EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
     }
     
@@ -97,16 +122,16 @@ void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if(Interface)
+    if(InteractableActor)
     {
-        Interface->HideInteracPointWidget();
+        InteractableActor->HidePointWidget();
     }
     
-    Interface = GetClosestInterface();
+    InteractableActor = GetClosestActor();
     
-    if(Interface)
+    if(InteractableActor)
     {
-        Interface->ShowInteractPointWidget();    
+        InteractableActor->ShowPointWidget();
     }
 }
 
@@ -144,8 +169,6 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
 
 void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Move Camera"));
-
     // Save Original Position
     OrgLocation = FollowCamera->GetComponentLocation();
     OrgRotation = FollowCamera->GetComponentRotation();
@@ -157,8 +180,6 @@ void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator Ta
 
 void APJECharacterPlayer::BackCameraToPawn()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Back Camera"));
-
     // Move Camera to Origin Position
     FollowCamera->SetWorldLocation(OrgLocation);
     FollowCamera->SetWorldRotation(OrgRotation);
@@ -196,6 +217,88 @@ void APJECharacterPlayer::OnLook(const FInputActionValue& Value)
     Look(LookAxisVector);
 }
 
+
+void APJECharacterPlayer::Landed(const FHitResult& Hit)
+{
+    Super::Landed(Hit);
+    bFirstJump = true;
+    JumpCount = 0;
+}
+
+void APJECharacterPlayer::DoubleJump()
+{
+    Server_DoubleJump();
+}
+
+void APJECharacterPlayer::Server_DoubleJump_Implementation()
+{
+    Multicast_DoubleJump();
+}
+
+void APJECharacterPlayer::Multicast_DoubleJump_Implementation()
+{
+    if (bFirstJump)
+    {
+        bFirstJump = false;
+        JumpCount++;
+        LaunchCharacter(FVector(0.0f, 0.0f, JumpHeight), false, true);
+        return;
+    }
+
+    else if (!bFirstJump && JumpCount < 2)
+    {
+        UCharacterMovementComponent* PlayerMovement = GetCharacterMovement();
+        if (PlayerMovement)
+        {
+            LaunchCharacter(FVector(0.0f, 0.0f, JumpHeight), false, true);
+            JumpCount++;
+
+        }
+        return;
+    }
+}
+
+void APJECharacterPlayer::Dash()
+{
+    Server_Dash();
+}
+
+void APJECharacterPlayer::Server_Dash_Implementation()
+{
+    Multicast_Dash();
+}
+
+void APJECharacterPlayer::Multicast_Dash_Implementation()
+{
+    if (bIsWalking)
+    {
+        GetCharacterMovement()->MaxWalkSpeed *= 2.0f;
+    }
+}
+
+void APJECharacterPlayer::StopDash()
+{
+    Server_StopDash();
+}
+
+void APJECharacterPlayer::Server_StopDash_Implementation()
+{
+    Multicast_StopDash();
+}
+
+void APJECharacterPlayer::Multicast_StopDash_Implementation()
+{
+    if (bIsWalking)
+    {
+        GetCharacterMovement()->MaxWalkSpeed /= 2.0f;
+    }
+}
+
+void APJECharacterPlayer::Grab()
+{
+
+}
+
 /*
 void APJECharacterPlayer::OpenInventory()
 {
@@ -229,98 +332,51 @@ void APJECharacterPlayer::OpenInventory()
 }*/
 
 
-void APJECharacterPlayer::ShowPopUI()
-{
-    FVector TargetPosition = GetTargetPosition(ECollisionChannel::ECC_GameTraceChannel1, 100.0f);
-
-    if (TargetPosition != FVector::ZeroVector)
-    {
-        APlayerController* PlayerController = Cast<APlayerController>(GetController());
-        if (PlayerController)
-        {
-            IPJEGameInterface* ABGameMode = Cast<IPJEGameInterface>(GetWorld()->GetAuthGameMode());
-            if (ABGameMode)
-            {
-                //ABGameMode->ShowPopupWidget();
-            }
-        }
-    }
-}
-
-void APJECharacterPlayer::Attack()
-{
-
-}
-
-
 
 void APJECharacterPlayer::OnInteractBegin()
 {
-    if (Interface)
+    if(InteractableActor)
     {
-        Interface->BeginInteracting(Cast<AActor>(this));
+        InteractableActor->InteractionKeyPressed(this);
     }
 }
 
 void APJECharacterPlayer::OnInteractEnd()
 {
-    if (Interface)
+    if(InteractableActor)
     {
-        Interface->EndInteracting(Cast<AActor>(this));
+        InteractableActor->InteractionKeyReleased(this);
     }
 }
 
-void APJECharacterPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-    if(IPJEInteractInterface* OtherActorInterface = Cast<IPJEInteractInterface>(OtherActor))
-    {
-        // If Cast Succeed
-        OtherActorInterface->ShowInteractWidget();
-    }
-}
-
-void APJECharacterPlayer::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-    if(IPJEInteractInterface* OtherActorInterface = Cast<IPJEInteractInterface>(OtherActor))
-    {
-        // If Cast Succeed
-        OtherActorInterface->HideInteractWidget();
-    }
-}
-
-IPJEInteractInterface* APJECharacterPlayer::GetClosestInterface()
-{
+APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
+{    
     TArray<AActor*> OverlappingActors;
-    TArray<IPJEInteractInterface*> OverlappingInterfaces;
-    IPJEInteractInterface* ClosestInterface = nullptr;
+    TArray<APJEInteractiveActor*> InteractableActors;
+    APJEInteractiveActor* ClosestActor = nullptr;
 
-    Volume->GetOverlappingActors(OverlappingActors);
-
+    InteractionTrigger->GetOverlappingActors(OverlappingActors);
+    
     for (auto CurrentActor : OverlappingActors)
     {
-        if (IPJEInteractInterface* CInterface = Cast<IPJEInteractInterface>(CurrentActor))
+        APJEInteractiveActor* TempActor = Cast<APJEInteractiveActor>(CurrentActor);
+        if(TempActor)
         {
-            OverlappingInterfaces.Add(CInterface);
+            if(TempActor->bIsPlayerNearby && TempActor->bIsInteractAble) InteractableActors.Add(TempActor);
         }
     }
 
-    if (OverlappingInterfaces.IsEmpty())
-    {
-        return nullptr;
-    }
+    if(InteractableActors.IsEmpty()) return nullptr;
 
-    ClosestInterface = OverlappingInterfaces[0];
+    ClosestActor = InteractableActors[0];
 
-    for (auto CurrentInterface : OverlappingInterfaces)
+    for(auto CurrentActor : InteractableActors)
     {
-        if (GetDistanceTo(Cast<AActor>(CurrentInterface)) <
-            GetDistanceTo(Cast<AActor>(ClosestInterface)))
+        if(GetDistanceTo(CurrentActor) < GetDistanceTo(ClosestActor))
         {
-            ClosestInterface = CurrentInterface;
+            ClosestActor = CurrentActor;
         }
     }
 
-    return ClosestInterface;
+    return ClosestActor;
 }

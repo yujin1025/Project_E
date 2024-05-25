@@ -8,6 +8,7 @@
 
 APJEGameModeBase::APJEGameModeBase()
 {
+	CharacterStatTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CharacterStat"));
 }
 
 void APJEGameModeBase::BeginPlay()

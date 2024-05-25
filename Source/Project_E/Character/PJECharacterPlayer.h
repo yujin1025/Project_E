@@ -7,6 +7,7 @@
 #include "Interface/PJECharacterItemInterface.h"
 #include "PJECharacterPlayer.generated.h"
 
+class APJEInteractiveActor;
 class IPJEInteractInterface;
 class UBoxComponent;
 class UInputMappingContext;
@@ -40,12 +41,7 @@ public:
 	void OnInteractBegin();
 	void OnInteractEnd();
 
-	UFUNCTION()
-	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	IPJEInteractInterface* GetClosestInterface();
+	APJEInteractiveActor* GetClosestActor();
 	
 	// Camera Section
 protected:
@@ -64,6 +60,26 @@ public:
 	void MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation);
 	void BackCameraToPawn();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_DoubleJump();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DoubleJump();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Dash();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Dash();
+
+	UFUNCTION(Server, Reliable)
+	void Server_StopDash();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StopDash();
+
 	// Input Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -75,9 +91,34 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DashAction;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	//UInputAction* InventoryAction;
 
+	UPROPERTY(Replicated, EditAnywhere, Category = "Jump")
+	float JumpHeight = 500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	bool bFirstJump = true;
+
+	UPROPERTY(EditAnywhere)
+	bool bIsWalking = true;
+
+	int32 JumpCount = 0;
+
+	bool isShift = false;
+
+protected:
+	virtual void Landed(const FHitResult& Hit) override;
+	void DoubleJump();
+	void Dash();
+	void StopDash();
+	virtual void Grab();
 
 private:
 	void OnMove(const FInputActionValue& Value);	
@@ -87,17 +128,12 @@ private:
 	bool bIsInventoryOpen = false; 
 	UInventoryWidget* InventoryWidgetInstance = nullptr;
 
-	// UI Section
-protected:
-	void ShowPopUI();
-	void Attack();
-
  //Item Section
 protected:
 	//virtual void TakeItem(UItem* Item) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-	UInventory* Inventory;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	//UInventory* Inventory;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float PopupDistance;
@@ -110,13 +146,14 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
+
 //Interact Section
 protected:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UBoxComponent> Volume;
+	TObjectPtr<UBoxComponent> InteractionTrigger;
 
-	// Crash occurs when UPROPERTY added (reason unknown)
-	TObjectPtr<IPJEInteractInterface> Interface;
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	TObjectPtr<APJEInteractiveActor> InteractableActor = NULL;
 
 public:
 	// 현재 상호작용하고있는 Actor, 없다면 NULL
