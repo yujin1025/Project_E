@@ -10,7 +10,9 @@
 APJEInteractiveActor::APJEInteractiveActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	bReplicates = true;
+	bAlwaysRelevant = true;
+	
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Interactive Actor"));
 	RootComponent = Root;
 	
@@ -87,7 +89,7 @@ void APJEInteractiveActor::NotifyOverlapBegin(UPrimitiveComponent* OverlappedCom
 	if(!bIsInteractAble) return;
 	
 	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
-	if(CharacterPlayer)
+	if(CharacterPlayer && CharacterPlayer->IsLocallyControlled())
 	{
 		NotifyInteractionWidget->SetVisibility(true);
 	}
@@ -99,7 +101,7 @@ void APJEInteractiveActor::NotifyOverlapEnd(UPrimitiveComponent* OverlappedComp,
 	if(!bIsInteractAble) return;
 	
 	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
-	if(CharacterPlayer)
+	if(CharacterPlayer && CharacterPlayer->IsLocallyControlled())
 	{
 		NotifyInteractionWidget->SetVisibility(false);
 	}
