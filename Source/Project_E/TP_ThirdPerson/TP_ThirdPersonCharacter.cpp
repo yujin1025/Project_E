@@ -71,8 +71,11 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 		}
 	}
 
-	InputComponent->BindAction("Interact", IE_Pressed, this, &ATP_ThirdPersonCharacter::OnInteractBegin);
-	InputComponent->BindAction("Interact", IE_Released, this, &ATP_ThirdPersonCharacter::OnInteractEnd);
+	if(InputComponent)
+	{
+		InputComponent->BindAction("Interact", IE_Pressed, this, &ATP_ThirdPersonCharacter::OnInteractBegin);
+		InputComponent->BindAction("Interact", IE_Released, this, &ATP_ThirdPersonCharacter::OnInteractEnd);
+	}
 }
 
 AActor* ATP_ThirdPersonCharacter::GetClosestActor()

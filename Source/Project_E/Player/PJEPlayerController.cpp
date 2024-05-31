@@ -29,6 +29,30 @@ void APJEPlayerController::BeginPlay()
 void APJEPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	if(PlayerController)
+	{
+		APawn* PossessPawn = PlayerController->GetPawn();
+		if(PossessPawn)
+		{
+			
+		}
+		else
+		{
+			if(GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Yellow,
+				FString(TEXT("No Possessed Pawn"))
+				);
+			}
+			PlayerController->Possess(PlayerPawn);
+		}
+	}
+	
 	
 	/*
 	CurrentBindingActor = Cast<APJECharacterPlayer>(PlayerPawn)->InteractActor;

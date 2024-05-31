@@ -18,10 +18,13 @@
 #include "Player/PJEPlayerController.h"
 #include "../Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractiveActor.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
+    bReplicates = true;
+    
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
     CameraBoom->SetupAttachment(GetMesh());
     CameraBoom->TargetArmLength = 600.0f;
@@ -62,36 +65,36 @@ bool APJECharacterPlayer::GetItem(int32 ItemCode)
     return false;
 }
 
-void APJECharacterPlayer::BeginPlay()
+void APJECharacterPlayer::BeginPlay() // 문제 없음
 {
     Super::BeginPlay();
 
     //Inventory = NewObject<UInventory>(this);
-
-    APJEPlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
+    
+    APJEPlayerController* PlayerController = Cast<APJEPlayerController>(Controller);
     if (PlayerController)
     {
         EnableInput(PlayerController);
     }
-
+    
     APJECharacterBase* Character = Cast<APJECharacterBase>(GetOwner());
     if (Character == nullptr)
         return;
-
+    
     ECharacterType Type = Character->GetCharacterType();
-
+    
     auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
     if (GameMode == nullptr)
         return;
-
+    
     auto* Data = GameMode->GetCharacterStat(CharacterType);
     if (Data == nullptr)
         return;
-
+    
     GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
 }
 
-void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) //의심됨
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -99,7 +102,7 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
-            Subsystem->ClearAllMappings();
+            //Subsystem->ClearAllMappings();
             Subsystem->AddMappingContext(DefaultContext, 1);
         }
     }
@@ -118,18 +121,20 @@ void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInput
     InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
 }
 
+
+
 void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    if(InteractableActor)
+    
+    if(InteractableActor && this->IsLocallyControlled())
     {
         InteractableActor->HidePointWidget();
     }
     
     InteractableActor = GetClosestActor();
     
-    if(InteractableActor)
+    if(InteractableActor && this->IsLocallyControlled())
     {
         InteractableActor->ShowPointWidget();
     }
@@ -188,19 +193,19 @@ void APJECharacterPlayer::BackCameraToPawn()
 
 void APJECharacterPlayer::SetDead()
 {
-    //Super::SetDead();
+    Super::SetDead();
 
-    APlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
-    if (PlayerController)
-    {
-        DisableInput(PlayerController);
-
-        IPJEGameInterface* ABGameMode = Cast<IPJEGameInterface>(GetWorld()->GetAuthGameMode());
-        if (ABGameMode)
-        {
-            ABGameMode->OnPlayerDead(0/*PlayerNumber*/);
-        }
-    }
+     APlayerController* PlayerController = Cast<APJEPlayerController>(GetController());
+     if (PlayerController)
+     {
+         DisableInput(PlayerController);
+    
+         IPJEGameInterface* ABGameMode = Cast<IPJEGameInterface>(GetWorld()->GetAuthGameMode());
+         if (ABGameMode)
+         {
+             ABGameMode->OnPlayerDead(0/*PlayerNumber*/);
+         }
+     }
 }
 
 
@@ -335,6 +340,14 @@ void APJECharacterPlayer::OpenInventory()
 
 void APJECharacterPlayer::OnInteractBegin()
 {
+    Server_OnInteractBegin();   
+}
+void APJECharacterPlayer::Server_OnInteractBegin_Implementation()
+{
+    Multicast_OnInteractBegin();
+}
+void APJECharacterPlayer::Multicast_OnInteractBegin_Implementation()
+{
     if(InteractableActor)
     {
         InteractableActor->InteractionKeyPressed(this);
@@ -343,11 +356,21 @@ void APJECharacterPlayer::OnInteractBegin()
 
 void APJECharacterPlayer::OnInteractEnd()
 {
+    Server_OnInteractEnd();
+}
+void APJECharacterPlayer::Server_OnInteractEnd_Implementation()
+{
+    Multicast_OnInteractEnd();
+}
+void APJECharacterPlayer::Multicast_OnInteractEnd_Implementation()
+{
+    
     if(InteractableActor)
     {
         InteractableActor->InteractionKeyReleased(this);
     }
 }
+
 
 APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
 {    
