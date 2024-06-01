@@ -50,10 +50,10 @@ class PROJECT_E_API APJEAIController : public AAIController
     TObjectPtr<class UBehaviorTree> GetBT();
 
 protected:
-    UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_BBAsset)
+    UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_BBAsset)
     TObjectPtr<class UBlackboardData> BBAsset;
 
-    UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_BTAsset)
+    UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_BTAsset)
     TObjectPtr<class UBehaviorTree> BTAsset;
 
     virtual void InitBB();
