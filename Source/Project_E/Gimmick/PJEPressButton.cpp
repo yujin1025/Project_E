@@ -71,6 +71,8 @@ void APJEPressButton::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if(!HasAuthority()) return;
+	
 	ActivateButton();
 	CheckActive();
 }

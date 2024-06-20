@@ -11,6 +11,7 @@ APJESwitchLever::APJESwitchLever()
 	LeverPivot->SetupAttachment(LeverBaseMesh);
 	LeverMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Lever"));
 	LeverMesh->SetupAttachment(LeverPivot);
+	LeverMesh->SetIsReplicated(true);
 
 	RotateComponent = CreateDefaultSubobject<UPJERotateComponent>(TEXT("Rotate Component"));
 }
@@ -30,15 +31,20 @@ void APJESwitchLever::InteractionKeyReleased(APJECharacterPlayer* Character)
 
 void APJESwitchLever::ActivateLever()
 {
-	if(!bIsInteracting)
+	// 레버 동작은 서버에서만 이루어진다.
+	// 클라이언트는 레버 동작의 결과를 Replicate받는다.
+	if(HasAuthority())
 	{
-		bIsInteracting = true;
-		RotateComponent->SetRotateState(ERotateState::Rotating);
-	}
-	else
-	{
-		bIsInteracting = false;
-		RotateComponent->SetRotateState(ERotateState::Returning);
+		if(!bIsInteracting)
+		{
+			bIsInteracting = true;
+			RotateComponent->SetRotateState(ERotateState::Rotating);
+		}
+		else
+		{
+			bIsInteracting = false;
+			RotateComponent->SetRotateState(ERotateState::Returning);
+		}
 	}
 }
 
@@ -73,6 +79,6 @@ void APJESwitchLever::NotifyPlatform(bool bActive)
 void APJESwitchLever::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
+
 	CheckActive();
 }

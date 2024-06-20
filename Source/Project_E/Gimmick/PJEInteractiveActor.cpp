@@ -5,6 +5,7 @@
 #include "Character/PJECharacterPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 APJEInteractiveActor::APJEInteractiveActor()
@@ -44,20 +45,18 @@ void APJEInteractiveActor::BeginPlay()
 
 	WidgetTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &APJEInteractiveActor::NotifyOverlapBegin);
 	WidgetTriggerBox->OnComponentEndOverlap.AddDynamic(this, &APJEInteractiveActor::NotifyOverlapEnd);
-
-	InteractionTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &APJEInteractiveActor::PointOverlapBegin);
-	InteractionTriggerBox->OnComponentEndOverlap.AddDynamic(this, &APJEInteractiveActor::PointOverlapEnd);
 }
 
 /* Functions that contain functionality to act when an interaction key is pressed **/
 void APJEInteractiveActor::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
-	if(!bIsInteractAble) return;
+	if(!bIsInteractAble || bIsInteracting) return;
 }
+
 /* Functions that contain functionality to act when an interaction key is released **/
 void APJEInteractiveActor::InteractionKeyReleased(APJECharacterPlayer* Character)
 {
-	if(!bIsInteractAble) return;
+	if(!bIsInteractAble || bIsInteracting) return;
 }
 
 /* Break Interacting **/
@@ -107,25 +106,12 @@ void APJEInteractiveActor::NotifyOverlapEnd(UPrimitiveComponent* OverlappedComp,
 	}
 }
 
-void APJEInteractiveActor::PointOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APJEInteractiveActor::CheckIsPlayerNearby()
 {
-	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
-	if(CharacterPlayer)
-	{
-		bIsPlayerNearby = true;
-	}
-}
-
-void APJEInteractiveActor::PointOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
-	if(CharacterPlayer)
-	{
-		bIsPlayerNearby = false;
-		//bIsInteracting = false;
-	}
+	TArray<AActor*> CharacterPlayers;
+	
+	InteractionTriggerBox->GetOverlappingActors(CharacterPlayers, APJECharacterPlayer::StaticClass());
+	bIsPlayerNearby = CharacterPlayers.Num() > 0 ? true : false;
 }
 
 void APJEInteractiveActor::ShowPointWidget()
@@ -138,8 +124,17 @@ void APJEInteractiveActor::HidePointWidget()
 	PointInteractionWidget->SetVisibility(false);
 }
 
+void APJEInteractiveActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, bIsInteracting);
+}
+
 void APJEInteractiveActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	CheckIsPlayerNearby();
 }
 

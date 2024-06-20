@@ -38,9 +38,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION() void OnInteractBegin();
-	UFUNCTION(Server, Reliable)	void Server_OnInteractBegin();
-	UFUNCTION(NetMulticast, Reliable) void Multicast_OnInteractBegin();
+	UFUNCTION()
+	void OnInteractBegin();
+	UFUNCTION(Server, Reliable)
+	void ServerOnInteractBegin();
 	
 	UFUNCTION() void OnInteractEnd();
 	UFUNCTION(Server, Reliable)	void Server_OnInteractEnd();

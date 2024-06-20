@@ -340,13 +340,20 @@ void APJECharacterPlayer::OpenInventory()
 
 void APJECharacterPlayer::OnInteractBegin()
 {
-    Server_OnInteractBegin();   
+    if(HasAuthority())
+    {
+        if(InteractableActor)
+        {
+            InteractableActor->InteractionKeyPressed(this);
+        }
+    }
+    else
+    {
+        ServerOnInteractBegin();   
+    }
 }
-void APJECharacterPlayer::Server_OnInteractBegin_Implementation()
-{
-    Multicast_OnInteractBegin();
-}
-void APJECharacterPlayer::Multicast_OnInteractBegin_Implementation()
+
+void APJECharacterPlayer::ServerOnInteractBegin_Implementation()
 {
     if(InteractableActor)
     {
@@ -389,7 +396,14 @@ APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
         }
     }
 
-    if(InteractableActors.IsEmpty()) return nullptr;
+    if(InteractableActors.IsEmpty())
+    {
+        if(InteractableActor != nullptr)
+        {
+            OnInteractEnd();
+        }
+        return nullptr;
+    }
 
     ClosestActor = InteractableActors[0];
 
