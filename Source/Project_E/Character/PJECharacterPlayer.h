@@ -121,6 +121,13 @@ protected:
 	bool bIsFalling = false;
 	FVector FallingStartLocation;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> DieMessageWidgetClass;
+
+	UUserWidget* DieMessageWidgetInstance;
+
+	bool bHasShownMessage = false;
+
 protected:
 	virtual void Landed(const FHitResult& Hit) override;
 	void DoubleJump();

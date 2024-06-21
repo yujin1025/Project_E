@@ -20,6 +20,7 @@
 #include "Gimmick/PJEInteractiveActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Blueprint/UserWidget.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -36,6 +37,13 @@ APJECharacterPlayer::APJECharacterPlayer()
 
     InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
     InteractionTrigger->SetupAttachment(RootComponent);
+
+    static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/UI/WBP_DieMessage"));
+    if (WidgetClass.Succeeded())
+    {
+        DieMessageWidgetClass = WidgetClass.Class;
+        UE_LOG(LogTemp, Warning, TEXT("Widget class successfully loaded."));
+    }
 }
 
 void APJECharacterPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -321,16 +329,42 @@ void APJECharacterPlayer::OnFalling()
 
             if (HeightChange >= 400.0f)
             {
-                SetDead();
-                UE_LOG(LogTemp, Warning, TEXT("Dead - Falling"));
+                //SetDead();
+                //UE_LOG(LogTemp, Warning, TEXT("Dead - Falling"));
+
+                if (!bHasShownMessage)
+                {
+                    if (DieMessageWidgetClass)
+                    {
+                        DieMessageWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), DieMessageWidgetClass);
+                        if (DieMessageWidgetInstance)
+                        {
+                            UGameViewportClient* GameViewport = GetWorld()->GetGameViewport();
+                            if (GameViewport)
+                            {
+                                DieMessageWidgetInstance->AddToViewport();
+                                bHasShownMessage = true;
+                            }
+                        }
+                    }
+                }
+                
             }
         }
     }
     else
     {
+        
+        if (bIsFalling && DieMessageWidgetInstance)
+        {
+            DieMessageWidgetInstance->RemoveFromViewport();
+            DieMessageWidgetInstance = nullptr;
+            bHasShownMessage = false;
+        }
         bIsFalling = false;
     }
 }
+
 
 /*
 void APJECharacterPlayer::OpenInventory()
