@@ -5,6 +5,8 @@
 
 APJEPlatform::APJEPlatform()
 {
+	bReplicates = true;
+	
 	PrimaryActorTick.bCanEverTick = true;
 	
 	PlatformMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button Boarder"));
@@ -20,6 +22,8 @@ void APJEPlatform::BeginPlay()
 
 void APJEPlatform::MovePlatform(float DeltaTime)
 {
+	if(!HasAuthority()) return;
+	
 	FVector CurrentLocation = GetActorLocation();
 	FVector TargetLocation = OriginLocation + MoveOffset;
 	

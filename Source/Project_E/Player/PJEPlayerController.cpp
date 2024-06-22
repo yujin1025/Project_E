@@ -3,17 +3,17 @@
 
 #include "PJEPlayerController.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Character/PJECharacterPlayer.h"
-#include "GameFramework/PlayerStart.h"
-#include "Gimmick/PJEInputInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Gimmick/IgnitionHandle.h"
 
 
 APJEPlayerController::APJEPlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
 }
 
 void APJEPlayerController::BeginPlay()
@@ -21,9 +21,9 @@ void APJEPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	// 멀티 서버 선택에 따라 캐릭터 달라진다 (PlayerStart)
-	
 	PlayerPawn = GetPawn();
-
+	
+	InitInputPawn();
 }
 
 void APJEPlayerController::Tick(float DeltaSeconds)
@@ -34,69 +34,70 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 	if(PlayerController)
 	{
 		APawn* PossessPawn = PlayerController->GetPawn();
-		if(PossessPawn)
+		if(!PossessPawn)
 		{
-			
-		}
-		else
-		{
-			if(GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-				-1,
-				15.f,
-				FColor::Yellow,
-				FString(TEXT("No Possessed Pawn"))
-				);
-			}
 			PlayerController->Possess(PlayerPawn);
 		}
 	}
+}
+
+
+// Input Switch Function
+
+void APJEPlayerController::InitInputPawn()
+{
+	ControllerOperation = EControllerOperation::ECO_Pawn;
 	
+	APawn* PossessedPawn = GetPawn();
+	if(!PossessedPawn) return;
 	
-	/*
-	CurrentBindingActor = Cast<APJECharacterPlayer>(PlayerPawn)->InteractActor;
-	if(LastBindingActor != CurrentBindingActor)
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(this->GetLocalPlayer());
+	if(Subsystem)
 	{
-		if(CurrentBindingActor != NULL)
-		{
-			SwitchInputToOther();
-		}
-		else
-		{
-			SwitchInputToPawn();
-		}
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(DefaultContext, 0);
 	}
-	LastBindingActor = CurrentBindingActor;*/
-}
 
-void APJEPlayerController::SwitchInputToOther()
-{
-	IPJEInputInterface* InputInterface = Cast<IPJEInputInterface>(CurrentBindingActor);
-	if(InputInterface)
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	if(EnhancedInputComponent)
 	{
-		InputInterface->SetupInputBinding(this);
+		EnhancedInputComponent->ClearActionBindings();
+		APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(PossessedPawn);
+		CharacterPlayer->InitInput(EnhancedInputComponent);
 	}
 }
 
-void APJEPlayerController::SwitchInputToPawn()
-{
-	APJECharacterPlayer* PlayerCharacter = Cast<APJECharacterPlayer>(PlayerPawn);
-	if(PlayerCharacter)
+void APJEPlayerController::InitInputIgnitionHandle()
+{	
+	ControllerOperation = EControllerOperation::ECO_IgnitionHandle;
+
+	if(!OperatingActor) return;
+	
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(this->GetLocalPlayer());
+	if(Subsystem)
 	{
-		PlayerCharacter->SetupPlayerInputComponent(PlayerCharacter->InputComponent);
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(IgnitionHandleContext, 0);
+	}
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	if(EnhancedInputComponent)
+	{
+		EnhancedInputComponent->ClearActionBindings();
+		AIgnitionHandle* IgnitionHandle = Cast<AIgnitionHandle>(OperatingActor);
+		IgnitionHandle->InitInput(EnhancedInputComponent);
 	}
 }
 
-void APJEPlayerController::OnPossessCharacter(APJECharacterBase* aCharacter)
+void APJEPlayerController::InitInputPush()
 {
-	this->OwnerCharacter = aCharacter;
 }
 
-APJECharacterBase* APJEPlayerController::GetCharacter()
+void APJEPlayerController::InitInputRoll()
 {
-	return OwnerCharacter;
 }
+
+// End Input Switch Function
 
 
 void APJEPlayerController::GameOver()

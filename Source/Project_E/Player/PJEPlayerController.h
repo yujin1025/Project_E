@@ -6,6 +6,15 @@
 #include "GameFramework/PlayerController.h"
 #include "PJEPlayerController.generated.h"
 
+UENUM(BlueprintType)
+enum class EControllerOperation : uint8
+{
+	ECO_Pawn UMETA(DisplayName = "플레이어 조작"),
+	ECO_IgnitionHandle UMETA(DisplayName = "점화손잡이 조작"),
+	ECO_Push UMETA(DisplayName = "밀기 조작"),
+	ECO_Roll UMETA(DisplayName = "굴리기 조작"),
+};
+
 class APJECharacterBase;
 /**
  * 
@@ -20,26 +29,31 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	
+
+	// Switch Input Function
+	void InitInputPawn();
+	void InitInputIgnitionHandle();
+	void InitInputPush();
+	void InitInputRoll();
+
 	void GameOver();
-	void SwitchInputToOther();
-	void SwitchInputToPawn();
 
 	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
-
-private:
-	void OnPossessCharacter(APJECharacterBase* aCharacter);
-	APJECharacterBase* OwnerCharacter;
-
-public:
-	APJECharacterBase* GetCharacter();
 	
 protected:
 	TObjectPtr<APawn> PlayerPawn = NULL;
-	TObjectPtr<AActor> LastBindingActor = NULL;
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<AActor> CurrentBindingActor = NULL;
-	
-	FVector SpawnLocation = FVector::ZeroVector;
-	FRotator SpawnRotation = FRotator::ZeroRotator;
+	TObjectPtr<AActor> OperatingActor = NULL;
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* DefaultContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* IgnitionHandleContext;
+
+	UPROPERTY(VisibleAnywhere)
+	EControllerOperation ControllerOperation = EControllerOperation::ECO_Pawn;
+
+public:
+	FORCEINLINE void SetOperatingActor(AActor* OpActor) { OperatingActor = OpActor; }
 };

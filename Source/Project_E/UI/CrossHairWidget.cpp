@@ -33,7 +33,7 @@ FVector2D UCrossHairWidget::GetScreenMousePosition()
     if (Controller == nullptr)
         return FVector2D::ZeroVector;
 
-    APJECharacterBase* Character = Controller->GetCharacter();
+    APJECharacterBase* Character = Cast<APJECharacterBase>(Controller->GetPawn());
     if (Character == nullptr)
         return FVector2D::ZeroVector;
 
@@ -49,17 +49,17 @@ FVector2D UCrossHairWidget::GetAimScreenPosition(UImage* AimImage)
 {
     if (!AimImage) return FVector2D::ZeroVector;
 
-    // ºÎ¸ð À§Á¬ÀÎ Canvas PanelÀ» Ã£½À´Ï´Ù.
+    // ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Canvas Panelï¿½ï¿½ Ã£ï¿½ï¿½ï¿½Ï´ï¿½.
     UCanvasPanel* CanvasPanel = Cast<UCanvasPanel>(AimImage->GetParent());
     if (!CanvasPanel) return FVector2D::ZeroVector;
 
-    // MyImageÀÇ ·ÎÄÃ °ø°£ À§Ä¡¸¦ °¡Á®¿É´Ï´Ù.
+    // MyImageï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½É´Ï´ï¿½.
     FVector2D LocalPosition = AimImage->GetCachedGeometry().LocalToAbsolute(FVector2D::ZeroVector);
 
-    // Canvas PanelÀÇ ·ÎÄÃ °ø°£ À§Ä¡¸¦ °¡Á®¿É´Ï´Ù.
+    // Canvas Panelï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½É´Ï´ï¿½.
     FVector2D CanvasPosition = CanvasPanel->GetCachedGeometry().LocalToAbsolute(FVector2D::ZeroVector);
 
-    // MyImageÀÇ È­¸é °ø°£ À§Ä¡¸¦ °è»êÇÕ´Ï´Ù.
+    // MyImageï¿½ï¿½ È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     FVector2D ScreenPosition = LocalPosition + CanvasPosition;
 
     return ScreenPosition;
