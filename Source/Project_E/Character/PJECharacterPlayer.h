@@ -29,14 +29,15 @@ public:
 	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
 	// INLINE Function for test.. to be Deleted
 	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
-	
+	void InitInput(UEnhancedInputComponent* EnhancedInputComponent);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void SetDead() override;
+	
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
 	void OnInteractBegin();
@@ -45,7 +46,6 @@ public:
 	
 	UFUNCTION() void OnInteractEnd();
 	UFUNCTION(Server, Reliable)	void Server_OnInteractEnd();
-	UFUNCTION(NetMulticast, Reliable) void Multicast_OnInteractEnd();
 
 	APJEInteractiveActor* GetClosestActor();
 	
@@ -63,8 +63,8 @@ protected:
 public:
 	virtual FVector GetTargetPosition(ECollisionChannel Channel, float RayCastDistance);
 
-	void MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation);
-	void BackCameraToPawn();
+	void SetCamLocationRotation(FVector TargetLocation, FRotator TargetRotation);
+	void BackCamera();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -103,6 +103,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DashAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+	
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	//UInputAction* InventoryAction;
 
@@ -118,6 +121,12 @@ protected:
 	int32 JumpCount = 0;
 
 	bool isShift = false;
+
+	// Variables for smooth camera movement
+	FVector OriginCamLocation;
+	FRotator OriginCamRotation;
+	FVector TargetCamLocation;
+	FRotator TargetCamRotation;
 
 protected:
 	virtual void Landed(const FHitResult& Hit) override;
@@ -166,11 +175,4 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AActor> InteractActor = NULL;
 
-
-
-
-	
-	//Test
-	FVector OrgLocation;
-	FRotator OrgRotation;
 };

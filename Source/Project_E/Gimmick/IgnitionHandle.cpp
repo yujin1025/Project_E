@@ -3,8 +3,13 @@
 
 #include "Gimmick/IgnitionHandle.h"
 
+#include "EnhancedInputComponent.h"
+#include "PJECamPos.h"
 #include "PJERotateComponent.h"
 #include "PJERotatingPlatform.h"
+#include "Camera/CameraComponent.h"
+#include "Character/PJECharacterPlayer.h"
+#include "Player/PJEPlayerController.h"
 
 // Sets default values
 AIgnitionHandle::AIgnitionHandle()
@@ -18,7 +23,6 @@ AIgnitionHandle::AIgnitionHandle()
 	BaseMesh->SetupAttachment(Root);
 }
 
-// Called when the game starts or when spawned
 void AIgnitionHandle::BeginPlay()
 {
 	Super::BeginPlay();
@@ -27,40 +31,13 @@ void AIgnitionHandle::BeginPlay()
 	CurrentRotateState = ERotateState::Interrupt;
 }
 
-void AIgnitionHandle::NotifyPlatform(ERotateState RotateState, float Speed)
-{
-	for(auto RotatingPlatform : RotatingPlatforms)
-	{
-		UPJERotateComponent* RotateComponent = RotatingPlatform->GetRotationComponent();
-		RotateComponent->SetRotateState(RotateState);
-		RotateComponent->SetRotationSpeed(Speed);
-	}
-}
-
-void AIgnitionHandle::InteractionKeyPressed(APJECharacterPlayer* Character)
-{
-	Super::InteractionKeyPressed(Character);
-
-	TimeAfterInput = 0.f;
-
-	// 플레이어컨트롤러에 새로운 입력방식 할당
-}
-
-void AIgnitionHandle::InteractionKeyReleased(APJECharacterPlayer* Character)
-{
-	Super::InteractionKeyReleased(Character);
-
-	// 플레이어컨트롤러에 원래 입력방식 할당
-}
-
-// Called every frame
 void AIgnitionHandle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	if(CurrentRotateState != LastRotateState)
 	{
-		NotifyPlatform(CurrentRotateState, 10.f);
+		NotifyPlatform(CurrentRotateState, RotateSpeed);
 	}
 	LastRotateState = CurrentRotateState;
 
@@ -74,3 +51,75 @@ void AIgnitionHandle::Tick(float DeltaTime)
 	}
 }
 
+void AIgnitionHandle::InteractionKeyReleased(APJECharacterPlayer* Character)
+{
+	Super::InteractionKeyReleased(Character);
+	
+	TimeAfterInput = 0.f;
+
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(World->GetFirstPlayerController());
+		if(LocalPlayerController)
+		{
+			LocalPlayerController->SetOperatingActor(this);
+			LocalPlayerController->InitInputIgnitionHandle();
+			
+			APJECharacterPlayer* Player = Cast<APJECharacterPlayer>(LocalPlayerController->GetPawn());
+			if(Player && Campos)
+			{
+				Player->SetCamLocationRotation(Campos->GetArrowLocation(), Campos->GetArrowRotation());
+			}
+		}
+	}
+}
+
+void AIgnitionHandle::ReturnPawn()
+{
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(World->GetFirstPlayerController());
+		if(LocalPlayerController)
+		{
+			LocalPlayerController->SetOperatingActor(nullptr);
+			LocalPlayerController->InitInputPawn();
+			
+			APJECharacterPlayer* Player = Cast<APJECharacterPlayer>(LocalPlayerController->GetPawn());
+			if(Player && Campos)
+			{
+				Player->BackCamera();
+			}
+		}
+	}
+}
+
+void AIgnitionHandle::InitInput(UEnhancedInputComponent* EnhancedInputComponent)
+{
+	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Started, this, &AIgnitionHandle::DoRotation);
+	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Completed, this, &AIgnitionHandle::StopRotation);
+	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &AIgnitionHandle::ReturnPawn);
+}
+
+void AIgnitionHandle::NotifyPlatform(ERotateState RotateState, float Speed)
+{
+	for(auto RotatingPlatform : RotatingPlatforms)
+	{
+		UPJERotateComponent* RotateComponent = RotatingPlatform->GetRotationComponent();
+		RotateComponent->SetRotateState(RotateState);
+		RotateComponent->SetRotationSpeed(Speed);
+	}
+}
+
+void AIgnitionHandle::DoRotation(const FInputActionValue& Value)
+{
+	CurrentRotateState = ERotateState::Rotating;
+
+	RotateSpeed = Value.Get<float>() * 10.f;
+}
+
+void AIgnitionHandle::StopRotation()
+{
+	CurrentRotateState = ERotateState::Interrupt;
+}
