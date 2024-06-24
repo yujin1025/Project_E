@@ -15,10 +15,6 @@ enum class EControllerOperation : uint8
 	ECO_Roll UMETA(DisplayName = "굴리기 조작"),
 };
 
-class APJECharacterBase;
-/**
- * 
- */
 UCLASS()
 class PROJECT_E_API APJEPlayerController : public APlayerController
 {

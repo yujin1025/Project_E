@@ -25,6 +25,7 @@ protected:
 	
 	void ReturnPawn();
 
+	UFUNCTION(Client, Reliable)
 	virtual void InteractionKeyReleased(APJECharacterPlayer* Character) override;
 	
 	void NotifyPlatform(ERotateState RotateState, float RotateSpeed);

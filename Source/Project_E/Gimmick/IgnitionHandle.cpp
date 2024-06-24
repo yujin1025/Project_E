@@ -7,7 +7,6 @@
 #include "PJECamPos.h"
 #include "PJERotateComponent.h"
 #include "PJERotatingPlatform.h"
-#include "Camera/CameraComponent.h"
 #include "Character/PJECharacterPlayer.h"
 #include "Player/PJEPlayerController.h"
 
@@ -51,32 +50,29 @@ void AIgnitionHandle::Tick(float DeltaTime)
 	}
 }
 
-void AIgnitionHandle::InteractionKeyReleased(APJECharacterPlayer* Character)
+void AIgnitionHandle::InteractionKeyReleased_Implementation(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyReleased(Character);
 	
 	TimeAfterInput = 0.f;
+	bIsInteracting = true;
 
-	UWorld* World = GetWorld();
-	if(World)
+	if(!Character) return;
+	
+	APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(Character->GetController());
+
+	if(LocalPlayerController)
 	{
-		APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(World->GetFirstPlayerController());
-		if(LocalPlayerController)
-		{
-			LocalPlayerController->SetOperatingActor(this);
-			LocalPlayerController->InitInputIgnitionHandle();
-			
-			APJECharacterPlayer* Player = Cast<APJECharacterPlayer>(LocalPlayerController->GetPawn());
-			if(Player && Campos)
-			{
-				Player->SetCamLocationRotation(Campos->GetArrowLocation(), Campos->GetArrowRotation());
-			}
-		}
+		LocalPlayerController->SetOperatingActor(this);
+		LocalPlayerController->InitInputIgnitionHandle();
+		Character->SetCamLocationRotation(Campos->GetArrowLocation(), Campos->GetArrowRotation());
 	}
 }
 
 void AIgnitionHandle::ReturnPawn()
 {
+	bIsInteracting = false;
+	
 	UWorld* World = GetWorld();
 	if(World)
 	{
