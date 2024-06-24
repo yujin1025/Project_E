@@ -14,7 +14,8 @@ enum class EInteractType : uint8
 {
 	Click UMETA(DisplayName = "클릭"),
 	Hold UMETA(DisplayName = "홀드"),
-	Damage UMETA(DisplayName = "다회 클릭")
+	Damage UMETA(DisplayName = "다회 클릭"),
+	Control UMETA(DisplayName = "조종"),
 };
 
 
@@ -33,6 +34,8 @@ public:
 	void ShowPointWidget();
 	void HidePointWidget();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -43,11 +46,8 @@ protected:
 	void NotifyOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void NotifyOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
-	UFUNCTION()
-	void PointOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	void PointOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void CheckIsPlayerNearby();
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -74,7 +74,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Widget")
 	TObjectPtr<UWidgetComponent> PointInteractionWidget;
 	
-	UPROPERTY(EditAnywhere, Category = "Interaction")
+	UPROPERTY(EditAnywhere, Category = "Interaction", Replicated)
 	bool bIsInteracting;
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bIsActive;

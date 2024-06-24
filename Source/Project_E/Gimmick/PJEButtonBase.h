@@ -23,7 +23,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void MoveButton(float DeltaTime);
+	void CheckButtonActive(float DeltaTime);
 	
 	void NotifyActiveToPlatform(bool ButtonActive);
 

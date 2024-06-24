@@ -11,6 +11,8 @@
 // Sets default values
 APJEButtonBase::APJEButtonBase()
 {
+	bReplicates = true;
+
 	PrimaryActorTick.bCanEverTick = true;
 	
 	ButtonBorderMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button Boarder"));
@@ -23,6 +25,7 @@ APJEButtonBase::APJEButtonBase()
 	ButtonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button"));
 	ButtonMesh->SetupAttachment(RootComponent);
 	ButtonMesh->SetGenerateOverlapEvents(false);
+	ButtonMesh->SetIsReplicated(true);
 
 	Widget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
 	Widget->SetupAttachment(RootComponent);
@@ -40,27 +43,15 @@ void APJEButtonBase::BeginPlay()
 	Widget->SetVisibility(false);
 }
 
-void APJEButtonBase::MoveButton(float DeltaTime)
+void APJEButtonBase::CheckButtonActive(float DeltaTime)
 {
+	//버튼의 이동은 서버에서만 일어난다.
+	if(!HasAuthority()) return;
+	
 	FVector CurrentLocation = ButtonMesh->GetRelativeLocation();
 	FVector TargetLocation = OriginLocation + MoveOffset;
 	float Speed = FVector::Distance(OriginLocation, TargetLocation) / MoveTime;
 
-	// Interactive 여부에 따라 버튼을 임계점이나 원 위치로 움직이게 한다
-	if(bIsInteracting)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Button Active"));
-		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
-		ButtonMesh->SetRelativeLocation(NewLocation);
-	}
-	else
-	{
-		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, OriginLocation, DeltaTime, Speed);
-		ButtonMesh->SetRelativeLocation(NewLocation);
-	}
-
-	// Button이 임계점까지 움직이면 bButtonActive를 true로 변경
-	// ButtonActive 상태가 변경되면 Platform으로 Notify 보낸다
 	if(FVector::Distance(CurrentLocation, TargetLocation) < 5.f)
 	{
 		if(bButtonActive == false)
@@ -96,7 +87,7 @@ void APJEButtonBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	MoveButton(DeltaTime);
+	CheckButtonActive(DeltaTime);
 }
 
 void APJEButtonBase::ShowInteractWidget()

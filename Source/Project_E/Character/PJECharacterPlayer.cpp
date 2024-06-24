@@ -20,6 +20,7 @@
 #include "Gimmick/PJEInteractiveActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Blueprint/UserWidget.h"
 
 APJECharacterPlayer::APJECharacterPlayer()
 {
@@ -36,6 +37,13 @@ APJECharacterPlayer::APJECharacterPlayer()
 
     InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
     InteractionTrigger->SetupAttachment(RootComponent);
+
+    static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/UI/WBP_DieMessage"));
+    if (WidgetClass.Succeeded())
+    {
+        DieMessageWidgetClass = WidgetClass.Class;
+        UE_LOG(LogTemp, Warning, TEXT("Widget class successfully loaded."));
+    }
 }
 
 void APJECharacterPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -65,7 +73,7 @@ bool APJECharacterPlayer::GetItem(int32 ItemCode)
     return false;
 }
 
-void APJECharacterPlayer::BeginPlay() // 문제 없음
+void APJECharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();
 
@@ -94,34 +102,16 @@ void APJECharacterPlayer::BeginPlay() // 문제 없음
     GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
 }
 
-void APJECharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) //의심됨
+void APJECharacterPlayer::InitInput(UEnhancedInputComponent* EnhancedInputComponent)
 {
-    Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-    if (APJEPlayerController* PlayerController = Cast<APJEPlayerController>(Controller))
-    {
-        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-        {
-            //Subsystem->ClearAllMappings();
-            Subsystem->AddMappingContext(DefaultContext, 1);
-        }
-    }
-
-    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-    {
-        EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
-        EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
-        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DoubleJump);
-        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterPlayer::Dash);
-        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::StopDash);
-        //EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OpenInventory);
-    }
-    
-    InputComponent->BindAction("Interact", IE_Pressed, this, &APJECharacterPlayer::OnInteractBegin);
-    InputComponent->BindAction("Interact", IE_Released, this, &APJECharacterPlayer::OnInteractEnd);
+    EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnMove);
+    EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APJECharacterPlayer::OnLook);
+    EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DoubleJump);
+    EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterPlayer::Dash);
+    EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::StopDash);
+    EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OnInteractBegin);
+    EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::OnInteractEnd);
 }
-
-
 
 void APJECharacterPlayer::Tick(float DeltaTime)
 {
@@ -138,6 +128,8 @@ void APJECharacterPlayer::Tick(float DeltaTime)
     {
         InteractableActor->ShowPointWidget();
     }
+
+    OnFalling();
 }
 
 FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance)
@@ -172,22 +164,19 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
     return End;
 }
 
-void APJECharacterPlayer::MoveCameraToTarget(FVector TargetLocation, FRotator TargetRotation)
+void APJECharacterPlayer::SetCamLocationRotation(FVector TargetLocation, FRotator TargetRotation)
 {
-    // Save Original Position
-    OrgLocation = FollowCamera->GetComponentLocation();
-    OrgRotation = FollowCamera->GetComponentRotation();
+    OriginCamLocation = FollowCamera->GetComponentLocation();
+    OriginCamRotation = FollowCamera->GetComponentRotation();
     
-    // Move Camera
-     FollowCamera->SetWorldLocation(TargetLocation);
-     FollowCamera->SetWorldRotation(TargetRotation);
+    FollowCamera->SetWorldLocation(TargetLocation);
+    FollowCamera->SetWorldRotation(TargetRotation);
 }
 
-void APJECharacterPlayer::BackCameraToPawn()
+void APJECharacterPlayer::BackCamera()
 {
-    // Move Camera to Origin Position
-    FollowCamera->SetWorldLocation(OrgLocation);
-    FollowCamera->SetWorldRotation(OrgRotation);
+    FollowCamera->SetWorldLocation(OriginCamLocation);
+    FollowCamera->SetWorldRotation(OriginCamRotation);
 }
 
 
@@ -304,6 +293,58 @@ void APJECharacterPlayer::Grab()
 
 }
 
+void APJECharacterPlayer::OnFalling()
+{
+    if (GetCharacterMovement()->IsFalling())
+    {
+        if (!bIsFalling)
+        {
+            FallingStartLocation = GetActorLocation();
+            bIsFalling = true;
+        }
+        else
+        {
+            float HeightChange = FMath::Abs(GetActorLocation().Z - FallingStartLocation.Z);
+
+            if (HeightChange >= 400.0f)
+            {
+                //SetDead();
+                //UE_LOG(LogTemp, Warning, TEXT("Dead - Falling"));
+
+                if (!bHasShownMessage)
+                {
+                    if (DieMessageWidgetClass)
+                    {
+                        DieMessageWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), DieMessageWidgetClass);
+                        if (DieMessageWidgetInstance)
+                        {
+                            UGameViewportClient* GameViewport = GetWorld()->GetGameViewport();
+                            if (GameViewport)
+                            {
+                                DieMessageWidgetInstance->AddToViewport();
+                                bHasShownMessage = true;
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+    else
+    {
+        
+        if (bIsFalling && DieMessageWidgetInstance)
+        {
+            DieMessageWidgetInstance->RemoveFromViewport();
+            DieMessageWidgetInstance = nullptr;
+            bHasShownMessage = false;
+        }
+        bIsFalling = false;
+    }
+}
+
+
 /*
 void APJECharacterPlayer::OpenInventory()
 {
@@ -340,13 +381,20 @@ void APJECharacterPlayer::OpenInventory()
 
 void APJECharacterPlayer::OnInteractBegin()
 {
-    Server_OnInteractBegin();   
+    if(HasAuthority())
+    {
+        if(InteractableActor)
+        {
+            InteractableActor->InteractionKeyPressed(this);
+        }
+    }
+    else
+    {
+        ServerOnInteractBegin();   
+    }
 }
-void APJECharacterPlayer::Server_OnInteractBegin_Implementation()
-{
-    Multicast_OnInteractBegin();
-}
-void APJECharacterPlayer::Multicast_OnInteractBegin_Implementation()
+
+void APJECharacterPlayer::ServerOnInteractBegin_Implementation()
 {
     if(InteractableActor)
     {
@@ -356,15 +404,20 @@ void APJECharacterPlayer::Multicast_OnInteractBegin_Implementation()
 
 void APJECharacterPlayer::OnInteractEnd()
 {
-    Server_OnInteractEnd();
+    if(HasAuthority())
+    {
+        if(InteractableActor)
+        {
+            InteractableActor->InteractionKeyReleased(this);
+        }
+    }
+    else
+    {
+        Server_OnInteractEnd();
+    }
 }
 void APJECharacterPlayer::Server_OnInteractEnd_Implementation()
 {
-    Multicast_OnInteractEnd();
-}
-void APJECharacterPlayer::Multicast_OnInteractEnd_Implementation()
-{
-    
     if(InteractableActor)
     {
         InteractableActor->InteractionKeyReleased(this);
@@ -389,7 +442,16 @@ APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
         }
     }
 
-    if(InteractableActors.IsEmpty()) return nullptr;
+    if(InteractableActors.IsEmpty())
+    {
+        if(InteractableActor != nullptr)
+        {
+            // 더 좋은 방식을 생각해보자.
+            //OnInteractEnd();
+            return nullptr;
+        }
+        return nullptr;
+    }
 
     ClosestActor = InteractableActors[0];
 

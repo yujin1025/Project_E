@@ -57,7 +57,7 @@ void UPJERotateComponent::BeginPlay()
 void UPJERotateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	switch (RotateState)
 	{
 	case ERotateState::Rotating:
