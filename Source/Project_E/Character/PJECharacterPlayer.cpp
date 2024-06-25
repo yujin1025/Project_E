@@ -9,16 +9,11 @@
 #include "InputActionValue.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "InputMappingContext.h"
-#include "../Items/Inventory.h"
-#include "../UI/InventoryWidget.h"
 #include <Interface/PJEGameInterface.h>
 #include "Components/BoxComponent.h"
-#include "Gimmick/PJEInteractInterface.h"
 #include "Player/PJEPlayerController.h"
 #include "../Game/PJEGameModeBase.h"
 #include "Gimmick/PJEInteractiveActor.h"
-#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 
@@ -408,7 +403,9 @@ void APJECharacterPlayer::OnInteractEnd()
     {
         if(InteractableActor)
         {
+            InteractableActor->SetOwner(this);
             InteractableActor->InteractionKeyReleased(this);
+            InteractableActor->bIsInteracting = true;
         }
     }
     else
@@ -420,7 +417,9 @@ void APJECharacterPlayer::Server_OnInteractEnd_Implementation()
 {
     if(InteractableActor)
     {
+        InteractableActor->SetOwner(this);
         InteractableActor->InteractionKeyReleased(this);
+        InteractableActor->bIsInteracting = true;
     }
 }
 
