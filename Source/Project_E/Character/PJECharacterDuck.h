@@ -34,8 +34,8 @@ protected:
 protected:
 	void Grab() override;
 	void Swallow();
-	void Shoot();
-	void ResetShoot();
+	void Fire();
+	void ResetFire();
 	void RapidFire(const FInputActionValue& Value);
 	void ResetRapidFire();
 	void ResetSpeed();
@@ -61,4 +61,10 @@ protected:
 	float SwallowedSpeed = 0.7;
 
 	bool bIsSwallowed;
+
+	//projectile
+private:
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<class APJEProjectile> ProjectileClass;
+
 };

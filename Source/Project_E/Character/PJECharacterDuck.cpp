@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "../Game/PJEGameModeBase.h"
 #include "../Items/Inventory.h"
+#include "Projectile/PJEProjectile.h"
 
 
 APJECharacterDuck::APJECharacterDuck()
@@ -23,7 +24,7 @@ void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) 
     {
         EnhancedInputComponent->BindAction(SwallowAction, ETriggerEvent::Started, this, &APJECharacterDuck::Swallow);
-        EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &APJECharacterDuck::Shoot);
+        EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &APJECharacterDuck::Fire);
         EnhancedInputComponent->BindAction(RapidFireAction, ETriggerEvent::Triggered, this, &APJECharacterDuck::RapidFire);
     }
 
@@ -61,8 +62,19 @@ void APJECharacterDuck::Swallow()
 
 }
 
-void APJECharacterDuck::Shoot()
+void APJECharacterDuck::Fire()
 {
+    FVector Location = ProjectileSpawnPoint->GetComponentLocation();
+    FRotator Rotation = ProjectileSpawnPoint->GetComponentRotation();
+
+    APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
+    //Projectile->SetOwner(this);
+
+
+
+
+
+
     UE_LOG(LogTemp, Warning, TEXT("Shoot"));
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
@@ -79,12 +91,12 @@ void APJECharacterDuck::Shoot()
 
         //if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, outVelocity, startLoc, targetLoc, GetWorld()->GetGravityZ(), arcValue))
         bCanShoot = false;
-        GetWorld()->GetTimerManager().SetTimer(ShootDelayTimer, this, &APJECharacterDuck::ResetShoot, 0.2f, false);
+        GetWorld()->GetTimerManager().SetTimer(ShootDelayTimer, this, &APJECharacterDuck::ResetFire, 0.2f, false);
     }
 
 }
 
-void APJECharacterDuck::ResetShoot()
+void APJECharacterDuck::ResetFire()
 {
     bCanShoot = true;
 }

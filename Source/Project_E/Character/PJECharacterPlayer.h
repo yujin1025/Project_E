@@ -154,6 +154,7 @@ private:
 	bool bIsInventoryOpen = false; 
 	UInventoryWidget* InventoryWidgetInstance = nullptr;
 
+
  //Item Section
 protected:
 	//virtual void TakeItem(UItem* Item) override;
@@ -186,4 +187,8 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AActor> InteractActor = NULL;
 
+//Projectile
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* ProjectileSpawnPoint;
 };

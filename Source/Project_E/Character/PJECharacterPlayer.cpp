@@ -17,6 +17,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 
+
 APJECharacterPlayer::APJECharacterPlayer()
 {
     bReplicates = true;
@@ -32,6 +33,9 @@ APJECharacterPlayer::APJECharacterPlayer()
 
     InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
     InteractionTrigger->SetupAttachment(RootComponent);
+
+    ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn Point"));
+    ProjectileSpawnPoint->SetupAttachment(RootComponent);
 
     static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/UI/WBP_DieMessage"));
     if (WidgetClass.Succeeded())
@@ -338,6 +342,7 @@ void APJECharacterPlayer::OnFalling()
         bIsFalling = false;
     }
 }
+
 
 
 /*
