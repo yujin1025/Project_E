@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PJEInteractInterface.h"
 #include "PJERotateComponent.h"
 #include "Gimmick/PJEInteractiveActor.h"
 #include "PJESwitchLever.generated.h"

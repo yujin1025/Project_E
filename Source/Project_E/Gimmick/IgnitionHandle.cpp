@@ -7,8 +7,8 @@
 #include "PJECamPos.h"
 #include "PJERotateComponent.h"
 #include "PJERotatingPlatform.h"
-#include "Camera/CameraComponent.h"
 #include "Character/PJECharacterPlayer.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/PJEPlayerController.h"
 
 // Sets default values
@@ -51,32 +51,38 @@ void AIgnitionHandle::Tick(float DeltaTime)
 	}
 }
 
-void AIgnitionHandle::InteractionKeyReleased(APJECharacterPlayer* Character)
+void AIgnitionHandle::InteractionKeyReleased_Implementation(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyReleased(Character);
-	
-	TimeAfterInput = 0.f;
 
-	UWorld* World = GetWorld();
-	if(World)
+	if(!bIsInteractAble || bIsInteracting) return;
+	
+	//TimeAfterInput = 0.f;
+	bIsInteracting = true;
+
+	if(!Character) return;
+	
+	APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(Character->GetController());
+
+	if(LocalPlayerController)
 	{
-		APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(World->GetFirstPlayerController());
-		if(LocalPlayerController)
-		{
-			LocalPlayerController->SetOperatingActor(this);
-			LocalPlayerController->InitInputIgnitionHandle();
-			
-			APJECharacterPlayer* Player = Cast<APJECharacterPlayer>(LocalPlayerController->GetPawn());
-			if(Player && Campos)
-			{
-				Player->SetCamLocationRotation(Campos->GetArrowLocation(), Campos->GetArrowRotation());
-			}
-		}
+		LocalPlayerController->SetOperatingActor(this);
+		LocalPlayerController->InitInputIgnitionHandle();
+		Character->SetCamLocationRotation(Campos->GetArrowLocation(), Campos->GetArrowRotation());
 	}
 }
 
 void AIgnitionHandle::ReturnPawn()
 {
+	if(HasAuthority())
+	{
+		bIsInteracting = false;
+	}
+	else
+	{
+		ServerInteractionEnd();
+	}
+	
 	UWorld* World = GetWorld();
 	if(World)
 	{
@@ -95,12 +101,26 @@ void AIgnitionHandle::ReturnPawn()
 	}
 }
 
+void AIgnitionHandle::ServerInteractionEnd_Implementation()
+{
+	bIsInteracting = false;
+}
+
 void AIgnitionHandle::InitInput(UEnhancedInputComponent* EnhancedInputComponent)
 {
 	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Started, this, &AIgnitionHandle::DoRotation);
 	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Completed, this, &AIgnitionHandle::StopRotation);
 	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &AIgnitionHandle::ReturnPawn);
 }
+
+void AIgnitionHandle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, CurrentRotateState);
+	DOREPLIFETIME(ThisClass, RotateSpeed);
+}
+
 
 void AIgnitionHandle::NotifyPlatform(ERotateState RotateState, float Speed)
 {
@@ -114,12 +134,36 @@ void AIgnitionHandle::NotifyPlatform(ERotateState RotateState, float Speed)
 
 void AIgnitionHandle::DoRotation(const FInputActionValue& Value)
 {
-	CurrentRotateState = ERotateState::Rotating;
+	if(HasAuthority())
+	{
+		CurrentRotateState = ERotateState::Rotating;
+		RotateSpeed = Value.Get<float>() * 10.f;
+	}
+	else
+	{
+		float Speed = Value.Get<float>() * 10.f;
+		ServerDoRotation(Speed);
+	}
+}
 
-	RotateSpeed = Value.Get<float>() * 10.f;
+void AIgnitionHandle::ServerDoRotation_Implementation(const float Speed)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Server Rotation On"))
+	CurrentRotateState = ERotateState::Rotating;
+	RotateSpeed = Speed;
+	UE_LOG(LogTemp, Warning, TEXT("Rotation Speed : %f"), RotateSpeed);
+	
 }
 
 void AIgnitionHandle::StopRotation()
+{
+	if(HasAuthority())
+		CurrentRotateState = ERotateState::Interrupt;
+	else
+		ServerStopRotation();
+}
+
+void AIgnitionHandle::ServerStopRotation_Implementation()
 {
 	CurrentRotateState = ERotateState::Interrupt;
 }
