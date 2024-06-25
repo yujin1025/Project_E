@@ -57,6 +57,8 @@ public:
 	// 모든 상호작용 입력은 InteractAble을 통한다
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bIsInteractAble;
+	UPROPERTY(VisibleAnywhere, Category = "Interaction", Replicated)
+	bool bIsInteracting;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	bool bCanGetController = false;
 	
@@ -74,8 +76,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Widget")
 	TObjectPtr<UWidgetComponent> PointInteractionWidget;
 	
-	UPROPERTY(EditAnywhere, Category = "Interaction", Replicated)
-	bool bIsInteracting;
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bIsActive;
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")

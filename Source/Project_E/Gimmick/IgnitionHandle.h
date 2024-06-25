@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "PJEInteractiveActor.h"
 #include "GameFramework/Actor.h"
 #include "IgnitionHandle.generated.h"
@@ -19,6 +20,7 @@ public:
 	AIgnitionHandle();
 	virtual void Tick(float DeltaTime) override;
 	void InitInput(UEnhancedInputComponent* EnhancedInputComponent);
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -27,11 +29,18 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	virtual void InteractionKeyReleased(APJECharacterPlayer* Character) override;
+
+	UFUNCTION(Server, Reliable)
+	void ServerInteractionEnd();
 	
 	void NotifyPlatform(ERotateState RotateState, float RotateSpeed);
 
 	void DoRotation(const FInputActionValue& Value);
+	UFUNCTION(Server, Reliable)
+	void ServerDoRotation(const float Speed);
 	void StopRotation();
+	UFUNCTION(Server, Reliable)
+	void ServerStopRotation();
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
@@ -48,9 +57,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
 	class APJECamPos* Campos;
-	
+
+	UPROPERTY(Replicated)
 	ERotateState CurrentRotateState;
 	ERotateState LastRotateState;
+	UPROPERTY(Replicated)
 	float RotateSpeed = 0.f;
 	float TimeAfterInput = 0.f;
 	float DelayTime = 2.f;

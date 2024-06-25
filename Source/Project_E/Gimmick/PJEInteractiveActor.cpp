@@ -50,13 +50,13 @@ void APJEInteractiveActor::BeginPlay()
 /* Functions that contain functionality to act when an interaction key is pressed **/
 void APJEInteractiveActor::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
-	if(!bIsInteractAble || bIsInteracting) return;
+	
 }
 
 /* Functions that contain functionality to act when an interaction key is released **/
 void APJEInteractiveActor::InteractionKeyReleased(APJECharacterPlayer* Character)
 {
-	if(!bIsInteractAble || bIsInteracting) return;
+	
 }
 
 /* Break Interacting **/

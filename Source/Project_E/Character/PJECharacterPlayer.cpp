@@ -343,6 +343,7 @@ void APJECharacterPlayer::OnInteractEnd()
         {
             InteractableActor->SetOwner(this);
             InteractableActor->InteractionKeyReleased(this);
+            InteractableActor->bIsInteracting = true;
         }
     }
     else
@@ -356,6 +357,7 @@ void APJECharacterPlayer::Server_OnInteractEnd_Implementation()
     {
         InteractableActor->SetOwner(this);
         InteractableActor->InteractionKeyReleased(this);
+        InteractableActor->bIsInteracting = true;
     }
 }
 
