@@ -2,13 +2,14 @@
 
 
 #include "PJECharacterDuck.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "../Game/PJEGameModeBase.h"
 #include "../Items/Inventory.h"
 #include "Projectile/PJEProjectile.h"
-
+#include "GameFramework/ProjectileMovementComponent.h"
 
 APJECharacterDuck::APJECharacterDuck()
 {
@@ -65,14 +66,17 @@ void APJECharacterDuck::Swallow()
 void APJECharacterDuck::Fire()
 {
     FVector Location = ProjectileSpawnPoint->GetComponentLocation();
-    FRotator Rotation = ProjectileSpawnPoint->GetComponentRotation();
+    FRotator Rotation = FollowCamera->GetComponentRotation();
 
     APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
     //Projectile->SetOwner(this);
-
-
-
-
+    /*
+    if (Projectile)
+    {
+        FVector LaunchDirection = Rotation.Vector();
+        Projectile->ProjectileMovementComponent->Velocity = LaunchDirection * Projectile->ProjectileMovementComponent->InitialSpeed;
+    }
+    */
 
 
     UE_LOG(LogTemp, Warning, TEXT("Shoot"));

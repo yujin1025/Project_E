@@ -13,10 +13,8 @@ void UInventoryWidget::NativeConstruct()
 
 void UInventoryWidget::UpdateInventory(const TArray<class UItem*>& Items)
 {
-    // ������ ������ ������ ��� �����մϴ�.
     InventoryPanel->ClearChildren();
 
-    // �ֱٿ� ȹ���� �������� ���� �������� ���ĵǵ��� �ε����� �������� ��ȸ�մϴ�.
     for (int32 i = Items.Num() - 1; i >= 0; --i)
     {
         UItem* Item = Items[i];
@@ -33,7 +31,6 @@ void UInventoryWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    //�κ��丮�� ǥ�õ� �� ������ ����
     for (int32 i = 0; i < 9; ++i)
     {
         USlotWidget* NewSlot = CreateSlotWidget();
@@ -49,7 +46,6 @@ void UInventoryWidget::NativeConstruct()
         }
     }
 
-    // ���� �迭�� �߰��� ���� ���� ���
     UE_LOG(LogTemp, Warning, TEXT("Slots in inventory:"));
     for (int32 Index = 0; Index < Slots.Num(); ++Index)
     {
@@ -59,7 +55,6 @@ void UInventoryWidget::NativeConstruct()
 
 USlotWidget* UInventoryWidget::CreateSlotWidget()
 {
-    //���ο� USlotWidget �ν��Ͻ��� ����
     USlotWidget* NewSlot = CreateWidget<USlotWidget>(GetWorld(), SlotWidgetClass);
     UE_LOG(LogTemp, Warning, TEXT("CreateSlotWidget: Creating slot widget"));
     return NewSlot;
@@ -71,7 +66,6 @@ void UInventoryWidget::AddItemToSlot(UItem* Item)
 
     for (int32 Index = 0; Index < Slots.Num(); ++Index)
     {
-        //�ش� ������ ���������
         if (!Slots[Index]->IsOccupied())
         {
             SetItemImage(Slots[Index], Item->ItemImage);

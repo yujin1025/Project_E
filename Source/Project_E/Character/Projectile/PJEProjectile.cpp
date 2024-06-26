@@ -23,7 +23,8 @@ APJEProjectile::APJEProjectile()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	ProjectileMovementComponent->MaxSpeed = 1300.f;
 	ProjectileMovementComponent->InitialSpeed = 1300.f;
-
+	ProjectileMovementComponent->ProjectileGravityScale = 1.0f; 
+	ProjectileMovementComponent->bShouldBounce = false; 
 }
 
 
