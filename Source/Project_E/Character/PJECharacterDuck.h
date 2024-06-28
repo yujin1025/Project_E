@@ -62,9 +62,14 @@ protected:
 
 	bool bIsSwallowed;
 
-	//projectile
+	
 private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<class APJEProjectile> ProjectileClass;
 
+	UPROPERTY()
+	UDuckNonWeaponWidget* InventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UDuckNonWeaponWidget> DuckInventoryClass;
 };

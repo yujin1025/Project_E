@@ -22,22 +22,7 @@ public:
     UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UImage* ItemImage;
 
-    UFUNCTION(BlueprintCallable)
-    void UpdateSlot(class UItem* Item);
-    /*
-public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-    UImage* ItemImg; // Image widget to display item image
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    void SetItem(UItem* Item);
 
-    // Function to set item image
-    UFUNCTION(BlueprintCallable)
-    void SetItemImage(UTexture2D* ItemImage);
-
-    // Function to check if slot is occupied
-    UFUNCTION(BlueprintPure)
-    bool IsOccupied() const;
-
-private:
-    UTexture2D* CurrentItemImage;
-    */
 };

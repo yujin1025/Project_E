@@ -10,6 +10,7 @@
 #include "../Items/Inventory.h"
 #include "Projectile/PJEProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "../UI/DuckNonWeaponWidget.h"
 
 APJECharacterDuck::APJECharacterDuck()
 {
@@ -37,6 +38,12 @@ void APJECharacterDuck::BeginPlay()
 
     Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
+
+    InventoryWidget = CreateWidget<UDuckNonWeaponWidget>(GetWorld(), DuckInventoryClass);
+    if (InventoryWidget)
+    {
+        InventoryWidget->AddToViewport();
+    }
 }
 
 
@@ -48,19 +55,30 @@ void APJECharacterDuck::Swallow()
 {
     if (Inventory)// && !Inventory->IsFull())
     {
+        UE_LOG(LogTemp, Warning, TEXT("Swallow 1"));
         UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (NewItem)
         {
-            Inventory->AddItem(NewItem);
+            Inventory->AddItem(NewItem, true);
 
             if (Inventory->GetInventoryCount() > 5 || (NewItem->ItemCode == 1 && Inventory->GetInventoryCount() > 3))
             {
                 GetCharacterMovement()->MaxWalkSpeed *= SwallowedSpeed;
                 bIsSwallowed = true;
             }
+
+            if (InventoryWidget)
+            {
+                InventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory); // 모든 아이템을 업데이트
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("InventoryWidget is nullptr"));
+            }
         }
     }
-
+    else
+        UE_LOG(LogTemp, Warning, TEXT("Swallow 2"));
 }
 
 void APJECharacterDuck::Fire()
@@ -69,20 +87,11 @@ void APJECharacterDuck::Fire()
     FRotator Rotation = FollowCamera->GetComponentRotation();
 
     APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
-    //Projectile->SetOwner(this);
-    /*
-    if (Projectile)
-    {
-        FVector LaunchDirection = Rotation.Vector();
-        Projectile->ProjectileMovementComponent->Velocity = LaunchDirection * Projectile->ProjectileMovementComponent->InitialSpeed;
-    }
-    */
-
 
     UE_LOG(LogTemp, Warning, TEXT("Shoot"));
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
-        UItem* RemovedItem = Inventory->RemoveLastItem();
+        UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
         {
             UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
@@ -114,7 +123,7 @@ void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 
         for (int32 i = 0; i < 3; ++i)
         {
-            UItem* RemovedItem = Inventory->RemoveLastItem();
+            UItem* RemovedItem = Inventory->RemoveLastItem(true);
             if (RemovedItem)
             {
                 UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);

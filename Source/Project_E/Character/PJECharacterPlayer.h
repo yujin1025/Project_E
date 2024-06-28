@@ -13,7 +13,7 @@ class UBoxComponent;
 class UInputMappingContext;
 class UInputAction;
 class UInventory;
-class UInventoryWidget;
+
 
 struct FInputActionValue;
 
@@ -152,7 +152,6 @@ private:
 	//void OpenInventory();
 
 	bool bIsInventoryOpen = false; 
-	UInventoryWidget* InventoryWidgetInstance = nullptr;
 
 
  //Item Section
@@ -168,11 +167,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int32 HandItemCode = 0;
 
-	UPROPERTY()
-	UInventoryWidget* InventoryWidget;
-private:
-	UPROPERTY(EditAnywhere, Category = UI)
-	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 
 //Interact Section
 protected:

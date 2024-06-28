@@ -21,9 +21,9 @@ APJEProjectile::APJEProjectile()
 	ProjectileMesh->SetupAttachment(CollisionBox);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
-	ProjectileMovementComponent->MaxSpeed = 1300.f;
-	ProjectileMovementComponent->InitialSpeed = 1300.f;
-	ProjectileMovementComponent->ProjectileGravityScale = 1.0f; 
+	ProjectileMovementComponent->MaxSpeed = 1160.f;
+	ProjectileMovementComponent->InitialSpeed = 1160.f;
+	ProjectileMovementComponent->ProjectileGravityScale = 4.0f; //38.445 % 9.8
 	ProjectileMovementComponent->bShouldBounce = false; 
 }
 

@@ -8,32 +8,21 @@
 void USlotWidget::NativeConstruct()
 {
     Super::NativeConstruct();
+
 }
 
-void USlotWidget::UpdateSlot(UItem* Item)
+void USlotWidget::SetItem(UItem* Item)
 {
-    if (Item)
+
+    if (Item && Item->ItemImage)
     {
         ItemImage->SetBrushFromTexture(Item->ItemImage);
+        ItemImage->SetVisibility(ESlateVisibility::Visible);
     }
     else
     {
-        // 빈 슬롯일 경우 이미지와 텍스트를 비웁니다.
-        ItemImage->SetBrushFromTexture(nullptr);
+        ItemImage->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 
-/*
-void USlotWidget::SetItemImage(UTexture2D* ItemImage)
-{
-    if (ItemImg && ItemImage)
-    {
-        ItemImg->SetBrushFromTexture(ItemImage);
-        CurrentItemImage = ItemImage;
-    }
-}
 
-bool USlotWidget::IsOccupied() const
-{
-    return CurrentItemImage != nullptr;
-}*/
