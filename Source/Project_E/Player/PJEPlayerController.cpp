@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Gimmick/IgnitionHandle.h"
+#include "Gimmick/PJEPushableCylinder.h"
 
 
 APJEPlayerController::APJEPlayerController()
@@ -95,6 +96,24 @@ void APJEPlayerController::InitInputPush()
 
 void APJEPlayerController::InitInputRoll()
 {
+	ControllerOperation = EControllerOperation::ECO_Roll;
+
+	if(!OperatingActor) return;
+	
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(this->GetLocalPlayer());
+	if(Subsystem)
+	{
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(CylinderContext, 0);
+	}
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	if(EnhancedInputComponent)
+	{
+		EnhancedInputComponent->ClearActionBindings();
+		APJEPushableCylinder* Cylinder = Cast<APJEPushableCylinder>(OperatingActor);
+		Cylinder->InitInput(EnhancedInputComponent);
+	}
 }
 
 // End Input Switch Function
