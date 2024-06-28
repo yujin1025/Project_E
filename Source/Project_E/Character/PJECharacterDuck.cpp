@@ -10,7 +10,7 @@
 #include "../Items/Inventory.h"
 #include "Projectile/PJEProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "../UI/DuckNonWeaponWidget.h"
+#include "../UI/DuckInventoryWidget.h"
 
 APJECharacterDuck::APJECharacterDuck()
 {
@@ -39,10 +39,16 @@ void APJECharacterDuck::BeginPlay()
     Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
 
-    InventoryWidget = CreateWidget<UDuckNonWeaponWidget>(GetWorld(), DuckInventoryClass);
-    if (InventoryWidget)
+    WeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), WeaponInventoryClass);
+    if (WeaponInventoryWidget)
     {
-        InventoryWidget->AddToViewport();
+        WeaponInventoryWidget->AddToViewport();
+    }
+
+    NonWeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), NonWeaponInventoryClass);
+    if (NonWeaponInventoryWidget)
+    {
+        NonWeaponInventoryWidget->AddToViewport();
     }
 }
 
@@ -67,9 +73,19 @@ void APJECharacterDuck::Swallow()
                 bIsSwallowed = true;
             }
 
-            if (InventoryWidget)
+            if (NewItem->Type == EItemType::Weapon)
             {
-                InventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory); // 모든 아이템을 업데이트
+                if (WeaponInventoryWidget)
+                {
+                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
+                }
+            }
+            else if (NewItem->Type == EItemType::NonWeapon)
+            {
+                if (NonWeaponInventoryWidget)
+                {
+                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
+                }
             }
             else
             {

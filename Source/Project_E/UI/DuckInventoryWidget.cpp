@@ -1,17 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DuckNonWeaponWidget.h"
+#include "DuckInventoryWidget.h"
 #include "SlotWidget.h"
 #include "Components/UniformGridPanel.h"
 
-void UDuckNonWeaponWidget::NativeConstruct()
+void UDuckInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+    InventoryGrid = Cast<UUniformGridPanel>(GetWidgetFromName(TEXT("InventoryGrid")));
 }
 
-void UDuckNonWeaponWidget::UpdateInventory(const TArray<UItem*>& Items)
+void UDuckInventoryWidget::UpdateInventory(const TArray<UItem*>& Items, bool bIsWeaponInventory)
 {
     int32 CurrentSlotCount = Slots.Num();
     int32 ItemCount = Items.Num();

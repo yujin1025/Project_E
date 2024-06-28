@@ -68,8 +68,14 @@ private:
 	TSubclassOf<class APJEProjectile> ProjectileClass;
 
 	UPROPERTY()
-	UDuckNonWeaponWidget* InventoryWidget;
+	UDuckInventoryWidget* WeaponInventoryWidget;
 
 	UPROPERTY(EditAnywhere, Category = UI)
-	TSubclassOf<UDuckNonWeaponWidget> DuckInventoryClass;
+	TSubclassOf<UDuckInventoryWidget> WeaponInventoryClass;
+
+	UPROPERTY()
+	UDuckInventoryWidget* NonWeaponInventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UDuckInventoryWidget> NonWeaponInventoryClass;
 };

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "BaseWidget.h"
 #include "../Items/Item.h"
-#include "DuckNonWeaponWidget.generated.h"
+#include "DuckInventoryWidget.generated.h"
 
 class USlotWidget;
 class UUniformGridPanel;
@@ -13,18 +13,20 @@ class UUniformGridPanel;
  * 
  */
 UCLASS()
-class PROJECT_E_API UDuckNonWeaponWidget : public UBaseWidget
+class PROJECT_E_API UDuckInventoryWidget : public UBaseWidget
 {
 	GENERATED_BODY()
 
 public:
 	virtual void NativeConstruct() override;
 
-	void UpdateInventory(const TArray<UItem*>& Items);
+	void UpdateInventory(const TArray<UItem*>& Items, bool bIsWeaponInventory);
 
 protected:
 	TArray<USlotWidget*> Slots;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UUniformGridPanel* InventoryGrid;
+
+	static const int32 MaxWeaponSlots = 6;
 };

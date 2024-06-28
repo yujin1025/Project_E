@@ -344,41 +344,6 @@ void APJECharacterPlayer::OnFalling()
 }
 
 
-
-/*
-void APJECharacterPlayer::OpenInventory()
-{
-    if (InventoryWidgetInstance)
-    {
-        if (bIsInventoryOpen)
-        {
-            InventoryWidgetInstance->RemoveFromViewport();
-            UE_LOG(LogTemp, Warning, TEXT("Inventory closed"));
-        }
-        else
-        {
-            InventoryWidgetInstance->AddToViewport();
-            UE_LOG(LogTemp, Warning, TEXT("Inventory opened"));
-        }
-        bIsInventoryOpen = !bIsInventoryOpen;
-    }
-    else
-    {
-        if (InventoryWidgetClass)
-        {
-            InventoryWidgetInstance = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
-            if (InventoryWidgetInstance)
-            {
-                InventoryWidgetInstance->AddToViewport();
-                UE_LOG(LogTemp, Warning, TEXT("Inventory opened"));
-                bIsInventoryOpen = true;
-            }
-        }
-    }
-}*/
-
-
-
 void APJECharacterPlayer::OnInteractBegin()
 {
     if(HasAuthority())
@@ -450,7 +415,7 @@ APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
     {
         if(InteractableActor != nullptr)
         {
-            // 더 좋은 방식을 생각해보자.
+            // ??좋�? 방식???�각?�보??
             //OnInteractEnd();
             return nullptr;
         }
