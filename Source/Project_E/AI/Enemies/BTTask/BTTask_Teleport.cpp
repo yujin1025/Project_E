@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/Enemies/BTTask_Teleport.h"
+#include "AI/Enemies/BTTask/BTTask_Teleport.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "GameFramework/Character.h"
@@ -9,6 +9,7 @@
 #include "AI/PJEAI.h"
 #include "Project_E/Character/PJECharacterShadowA.h"
 #include "Project_E/AI/PJEAIController.h"
+#include "Project_E/AI/Enemies/Interface/PJETeleportable.h"
 
 UBTTask_Teleport::UBTTask_Teleport()
 {
@@ -19,15 +20,14 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    
-
     APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
 
-    APJECharacterShadowA* OwnerActor = Cast<APJECharacterShadowA>(OwnerController->GetPawn());
-
+    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
     FVector CurrentLocation = OwnerActor->GetActorLocation();
     FNavLocation RandomNavLocation;
-    float Radius = OwnerActor->GetTeleportRange();
+
+    IPJETeleportable* Teleportable = Cast<IPJETeleportable>(OwnerActor);
+    float Radius = Teleportable->GetTeleportRange();
 
     UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     if (!NavSys)
@@ -57,6 +57,7 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
     OwnerActor->SetActorLocation(RandomNavLocation.Location);
     OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, false);
+    OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, nullptr);
     return EBTNodeResult::Succeeded;
 }
 

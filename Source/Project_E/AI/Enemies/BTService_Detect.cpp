@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Project_E/Character/PJECharacterShadow.h"
 #include "Project_E/AI/PJEAIController.h"
+#include "Project_E/AI/Enemies/Interface/PJEPlayerDectectable.h"
 
 UBTService_Detect::UBTService_Detect()
 {
@@ -22,14 +23,17 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
     APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
 
-    APJECharacterShadow* OwnerActor = Cast<APJECharacterShadow>(OwnerController->GetPawn());
+    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
 
     if (OwnerActor)
     {
         UWorld* World = OwnerActor->GetWorld();
         TArray<AActor*> OverlappedActors;
-        float DetectionRadius = OwnerActor->GetPlayerDetectRange();
         FVector AIControllerLocation = OwnerActor->GetActorLocation();
+        IPJEPlayerDectectable* PlayerDetectable = Cast<IPJEPlayerDectectable>(OwnerActor);
+
+        float DetectionRadius = PlayerDetectable->GetPlayerDetectRange();
+        
 
         UKismetSystemLibrary::SphereOverlapActors(
             World,

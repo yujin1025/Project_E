@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterShadow.h"
+#include "AI/Enemies/Interface/PJETeleportable.h"
+#include "AI/Enemies/Interface/PJEBlinkable.h"
 #include "PJECharacterShadowA.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow
+class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow, public IPJETeleportable, public IPJEBlinkable
 {
 	GENERATED_BODY()
 public:
@@ -30,9 +32,9 @@ protected:
 
 public:
 	float GetMaxKeepMovingTime();
-	float GetBlinkDuration();
-	float GetSingleBlinkDuration();
-	float GetTeleportRange();
+	virtual float GetBlinkDuration() override;
+	virtual float GetSingleBlinkDuration() override;
+	virtual float GetTeleportRange() override;
 
 
 protected:

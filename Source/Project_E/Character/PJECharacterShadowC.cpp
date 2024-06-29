@@ -14,6 +14,21 @@ APJECharacterShadowC::APJECharacterShadowC()
 	PlayerDetectionRange = 1.0f;
 }
 
+float APJECharacterShadowC::GetBlinkDuration()
+{
+	return BlinkDuration;
+}
+
+float APJECharacterShadowC::GetSingleBlinkDuration()
+{
+	return SingleBlinkDuration;
+}
+
+float APJECharacterShadowC::GetTeleportRange()
+{
+	return TeleportRange * 100.0f;
+}
+
 void APJECharacterShadowC::BeginPlay()
 {
 	Super::BeginPlay();

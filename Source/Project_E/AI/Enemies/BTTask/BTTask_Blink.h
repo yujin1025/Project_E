@@ -32,7 +32,7 @@ struct FBTBlinkTaskMemory
     
 public:
     UPROPERTY()
-    TObjectPtr<class APJECharacterShadowA> TargetActor;
+    TObjectPtr<class IPJEBlinkable> Blinkable;
     float BlinkStartTime;
     float AccumulatedSingleBlinkTime;
 };

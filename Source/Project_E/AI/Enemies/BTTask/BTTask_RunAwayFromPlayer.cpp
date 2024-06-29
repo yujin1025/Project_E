@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/Enemies/BTTask_RunAwayFromPlayer.h"
+#include "AI/Enemies/BTTask/BTTask_RunAwayFromPlayer.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "AIController.h"

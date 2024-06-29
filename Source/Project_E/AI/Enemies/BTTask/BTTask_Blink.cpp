@@ -1,13 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/Enemies/BTTask_Blink.h"
+#include "AI/Enemies/BTTask/BTTask_Blink.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/PJEAI.h"
 #include "Project_E/Character/PJECharacterShadowA.h"
 #include "Project_E/AI/PJEAIController.h"
+#include "Project_E/AI/Enemies/Interface/PJEBlinkable.h"
 
 UBTTask_Blink::UBTTask_Blink()
 {
@@ -20,13 +21,13 @@ EBTNodeResult::Type UBTTask_Blink::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 
     APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
 
-    APJECharacterShadowA* OwnerActor = Cast<APJECharacterShadowA>(OwnerController->GetPawn());
+    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
 
     FBTBlinkTaskMemory* TaskMemory = (FBTBlinkTaskMemory*)NodeMemory;
 
     if (TaskMemory != nullptr)
     {
-        TaskMemory->TargetActor = OwnerActor;
+        TaskMemory->Blinkable = Cast<IPJEBlinkable>(OwnerActor);
         TaskMemory->AccumulatedSingleBlinkTime = 0.0f;
         TaskMemory->BlinkStartTime = GetWorld()->GetTimeSeconds();
     }
@@ -57,10 +58,10 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
     TaskMemory->AccumulatedSingleBlinkTime += DeltaSeconds;
 
-    if (TaskMemory->AccumulatedSingleBlinkTime >= TaskMemory->TargetActor->GetSingleBlinkDuration())
+    if (TaskMemory->AccumulatedSingleBlinkTime >= TaskMemory->Blinkable->GetSingleBlinkDuration())
     {
 
-        if (GetWorld()->TimeSeconds - TaskMemory->BlinkStartTime >= TaskMemory->TargetActor->GetBlinkDuration())
+        if (GetWorld()->TimeSeconds - TaskMemory->BlinkStartTime >= TaskMemory->Blinkable->GetBlinkDuration())
         {
             Mesh->SetVisibility(true);
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -68,7 +69,7 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
         }
 
         Mesh->SetVisibility(!Mesh->IsVisible());
-        TaskMemory->AccumulatedSingleBlinkTime -= TaskMemory->TargetActor->GetSingleBlinkDuration();
+        TaskMemory->AccumulatedSingleBlinkTime -= TaskMemory->Blinkable->GetSingleBlinkDuration();
     }
 }
 

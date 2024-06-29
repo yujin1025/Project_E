@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterShadowA.h"
+#include "AI/Enemies/Interface/PJEFieldSpawnable.h"
 #include "PJECharacterShadowB.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadow
+class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadow, public IPJEFieldSpawnable
 {
 	GENERATED_BODY()
 public:
