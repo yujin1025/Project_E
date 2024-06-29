@@ -4,18 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_KeepMoving.generated.h"
+#include "BTTask_RunAwayFromPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API UBTTask_KeepMoving : public UBTTaskNode
+class PROJECT_E_API UBTTask_RunAwayFromPlayer : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
 public:
-	UBTTask_KeepMoving();
+	UBTTask_RunAwayFromPlayer();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+};
+
+
+USTRUCT()
+struct FRunAwayFromPlayerTaskMemory
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY()
+	TObjectPtr<class APJECharacterShadowA> TargetActor;
+	float KeepMovingTime;
+	float RandomDegree;
 };

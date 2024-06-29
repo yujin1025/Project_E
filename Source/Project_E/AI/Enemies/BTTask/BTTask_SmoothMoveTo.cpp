@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/Enemies/BTTask_SmoothMoveTo.h"
+#include "AI/Enemies/BTTask/BTTask_SmoothMoveTo.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -59,7 +59,7 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 
     FVector DirVec = NewLocation - Character->GetActorLocation();
     DirVec.Normalize();
-    AIController->MoveToLocation(Character->GetActorLocation() + DirVec * 100.0f, -1.0f, false, false, false, false, nullptr, true);
+    AIController->MoveToLocation(Character->GetActorLocation() + DirVec * 10.0f, -1.0f, false, false, false, false, nullptr, true);
     BlackboardComp->SetValueAsFloat(BBKEY_PROGRESS, BlackboardComp->GetValueAsFloat(BBKEY_PROGRESS) + DeltaSeconds * 0.4);
 
     if (OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_PROGRESS) >= 0.9)

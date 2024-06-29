@@ -1,12 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/Enemies/BTTask_Teleport.h"
+#include "AI/Enemies/BTTask/BTTask_Teleport.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "GameFramework/Character.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/PJEAI.h"
+#include "Project_E/Character/PJECharacterShadowA.h"
+#include "Project_E/AI/PJEAIController.h"
+#include "Project_E/AI/Enemies/Interface/PJETeleportable.h"
 
 UBTTask_Teleport::UBTTask_Teleport()
 {
@@ -17,21 +20,14 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    AAIController* AICon = OwnerComp.GetAIOwner();
-    if (!AICon)
-    {
-        return EBTNodeResult::Failed;
-    }
+    APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
 
-    APawn* Pawn = AICon->GetPawn();
-    if (!Pawn)
-    {
-        return EBTNodeResult::Failed;
-    }
-
-    FVector CurrentLocation = Pawn->GetActorLocation();
+    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
+    FVector CurrentLocation = OwnerActor->GetActorLocation();
     FNavLocation RandomNavLocation;
-    float Radius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_TELEPORTRANGE);
+
+    IPJETeleportable* Teleportable = Cast<IPJETeleportable>(OwnerActor);
+    float Radius = Teleportable->GetTeleportRange();
 
     UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     if (!NavSys)
@@ -59,8 +55,9 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
         return EBTNodeResult::Failed;
     }
 
-    Pawn->SetActorLocation(RandomNavLocation.Location);
+    OwnerActor->SetActorLocation(RandomNavLocation.Location);
     OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, false);
+    OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, nullptr);
     return EBTNodeResult::Succeeded;
 }
 

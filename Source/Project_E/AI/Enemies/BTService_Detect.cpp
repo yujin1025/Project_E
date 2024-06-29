@@ -7,6 +7,9 @@
 #include "AIController.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "Project_E/Character/PJECharacterShadow.h"
+#include "Project_E/AI/PJEAIController.h"
+#include "Project_E/AI/Enemies/Interface/PJEPlayerDectectable.h"
 
 UBTService_Detect::UBTService_Detect()
 {
@@ -18,13 +21,19 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 {
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-    APawn* AIControllerPawn = OwnerComp.GetAIOwner()->GetPawn();
-    if (AIControllerPawn)
+    APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
+
+    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
+
+    if (OwnerActor)
     {
-        UWorld* World = AIControllerPawn->GetWorld();
+        UWorld* World = OwnerActor->GetWorld();
         TArray<AActor*> OverlappedActors;
-        float DetectionRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_PLAYERDETECTRANGE);
-        FVector AIControllerLocation = AIControllerPawn->GetActorLocation();
+        FVector AIControllerLocation = OwnerActor->GetActorLocation();
+        IPJEPlayerDectectable* PlayerDetectable = Cast<IPJEPlayerDectectable>(OwnerActor);
+
+        float DetectionRadius = PlayerDetectable->GetPlayerDetectRange();
+        
 
         UKismetSystemLibrary::SphereOverlapActors(
             World,
@@ -37,17 +46,21 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         );
 
         bool bIsPlayerNearby = false;
+        AActor* PlayerActor = nullptr;
         for (AActor* Actor : OverlappedActors)
         {
             APawn* Pawn = Cast<APawn>(Actor);
             if (Pawn && Pawn->IsPlayerControlled())
             {
                 bIsPlayerNearby = true;
+                PlayerActor = Actor;
                 break;
             }
         }
 
         OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, bIsPlayerNearby);
+        if (PlayerActor != nullptr)
+            OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, PlayerActor);
     }
 
 }

@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterShadowA.h"
+#include "AI/Enemies/Interface/PJEFieldSpawnable.h"
 #include "PJECharacterShadowB.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadow
+class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadow, public IPJEFieldSpawnable
 {
 	GENERATED_BODY()
 public:
@@ -19,12 +20,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+// Stat Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float AttackSize;
+
 // AI Section
 protected:
 	virtual float GetAIPatrolRadius() override;
 	virtual float GetAIDetectRange() override;
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
-
 	virtual void AttackByAI() override;
 };

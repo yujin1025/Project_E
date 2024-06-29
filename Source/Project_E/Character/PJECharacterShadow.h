@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterMonster.h"
+#include "AI/Enemies/Interface/PJEPlayerDectectable.h"
 #include "PJECharacterShadow.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadow : public APJECharacterMonster
+class PROJECT_E_API APJECharacterShadow : public APJECharacterMonster, public IPJEPlayerDectectable
 {
 	GENERATED_BODY()
 	
@@ -23,10 +24,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float PlayerDetectionRange;
 
-	float AttackSize;
-
 public:
-	float GetPlayerDetectRange();
+	virtual float GetPlayerDetectRange() override;
 
 // Spawn Section
 public:

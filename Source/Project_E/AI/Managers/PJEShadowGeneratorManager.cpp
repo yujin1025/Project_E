@@ -7,7 +7,7 @@
 #include "Character/PJECharacterShadowB.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Net/UnrealNetwork.h"
 
 UPJEShadowGeneratorManager* UPJEShadowGeneratorManager::Instance = nullptr;
 
@@ -56,13 +56,18 @@ void UPJEShadowGeneratorManager::FindAllShadowGenerators()
     }
 }
 
-void UPJEShadowGeneratorManager::AddShadowGenerator(APJEShadowGenerator* NewGenerator)
+void UPJEShadowGeneratorManager::Server_AddShadowGenerator_Implementation(APJEShadowGenerator* NewGenerator)
 {
     ShadowGenerators.Add(NewGenerator);
     UpdateShadowGeneratorsCount();
 }
 
-void UPJEShadowGeneratorManager::RemoveShadowGenerator(APJEShadowGenerator* GeneratorToRemove)
+bool UPJEShadowGeneratorManager::Server_AddShadowGenerator_Validate(APJEShadowGenerator* NewGenerator)
+{
+    return true;
+}
+
+void UPJEShadowGeneratorManager::Server_RemoveShadowGenerator_Implementation(APJEShadowGenerator* GeneratorToRemove)
 {
     if (GeneratorToRemove)
     {
@@ -71,18 +76,12 @@ void UPJEShadowGeneratorManager::RemoveShadowGenerator(APJEShadowGenerator* Gene
     }
 }
 
-void UPJEShadowGeneratorManager::UpdateShadowGeneratorsCount()
+bool UPJEShadowGeneratorManager::Server_RemoveShadowGenerator_Validate(APJEShadowGenerator* GeneratorToRemove)
 {
-    for (APJECharacterShadowA* Character : SpawnedShadowAArr)
-    {
-        if (Character)
-        {
-            Character->SetShadowGeneratorsCount(ShadowGenerators.Num());
-        }
-    }
+    return true;
 }
 
-void UPJEShadowGeneratorManager::AddSpawnedMonster(APJECharacterShadow* SpawnedMonster)
+void UPJEShadowGeneratorManager::Server_AddSpawnedMonster_Implementation(APJECharacterShadow* SpawnedMonster)
 {
     if (SpawnedMonster)
     {
@@ -102,7 +101,12 @@ void UPJEShadowGeneratorManager::AddSpawnedMonster(APJECharacterShadow* SpawnedM
     }
 }
 
-void UPJEShadowGeneratorManager::RemoveSpawnedMonster(APJECharacterShadow* SpawnedMonsterToRemove)
+bool UPJEShadowGeneratorManager::Server_AddSpawnedMonster_Validate(APJECharacterShadow* SpawnedMonster)
+{
+    return true;
+}
+
+void UPJEShadowGeneratorManager::Server_RemoveSpawnedMonster_Implementation(APJECharacterShadow* SpawnedMonsterToRemove)
 {
     if (SpawnedMonsterToRemove)
     {
@@ -122,6 +126,37 @@ void UPJEShadowGeneratorManager::RemoveSpawnedMonster(APJECharacterShadow* Spawn
     }
 }
 
+bool UPJEShadowGeneratorManager::Server_RemoveSpawnedMonster_Validate(APJECharacterShadow* SpawnedMonsterToRemove)
+{
+    return true;
+}
+
+void UPJEShadowGeneratorManager::OnRep_ShadowGenerators()
+{
+    UpdateShadowGeneratorsCount();
+}
+
+void UPJEShadowGeneratorManager::OnRep_SpawnedShadowAArr()
+{
+    UpdateShadowGeneratorsCount();
+}
+
+void UPJEShadowGeneratorManager::OnRep_SpawnedShadowBArr()
+{
+    UpdateShadowGeneratorsCount();
+}
+
+void UPJEShadowGeneratorManager::UpdateShadowGeneratorsCount()
+{
+    for (APJECharacterShadowA* Character : SpawnedShadowAArr)
+    {
+        if (Character)
+        {
+            Character->SetShadowGeneratorsCount(ShadowGenerators.Num());
+        }
+    }
+}
+
 int32 UPJEShadowGeneratorManager::GetShadowGeneratorsCount() const
 {
     return ShadowGenerators.Num();
@@ -130,4 +165,13 @@ int32 UPJEShadowGeneratorManager::GetShadowGeneratorsCount() const
 int32 UPJEShadowGeneratorManager::GetShadowACount() const
 {
     return SpawnedShadowAArr.Num();
+}
+
+void UPJEShadowGeneratorManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(UPJEShadowGeneratorManager, ShadowGenerators);
+    DOREPLIFETIME(UPJEShadowGeneratorManager, SpawnedShadowAArr);
+    DOREPLIFETIME(UPJEShadowGeneratorManager, SpawnedShadowBArr);
 }
