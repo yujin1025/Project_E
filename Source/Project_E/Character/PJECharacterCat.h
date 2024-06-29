@@ -22,14 +22,28 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	class UDataTable* ItemDatabase;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* GrabAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwingAction;
 
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float DashSpeed = 1.5f;
 
+
 protected:
-	void Grab() override; 
+	void Grab();
 	void Swing();
 	void Dash();
+
+private:
+	UPROPERTY()
+	UCatInventoryWidget* CatInventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UCatInventoryWidget> CatInventoryClass;
 };

@@ -104,10 +104,10 @@ protected:
 	UInputAction* DashAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DropAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
-	
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//UInputAction* InventoryAction;
 
 	UPROPERTY(Replicated, EditAnywhere, Category = "Jump")
 	float JumpHeight = 500.0f;
@@ -143,7 +143,7 @@ protected:
 	void DoubleJump();
 	void Dash();
 	void StopDash();
-	virtual void Grab();
+	void DropItem();
 	void OnFalling();
 
 private:

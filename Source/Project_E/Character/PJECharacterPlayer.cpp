@@ -108,6 +108,7 @@ void APJECharacterPlayer::InitInput(UEnhancedInputComponent* EnhancedInputCompon
     EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DoubleJump);
     EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterPlayer::Dash);
     EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::StopDash);
+    EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DropItem);
     EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OnInteractBegin);
     EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::OnInteractEnd);
 }
@@ -287,9 +288,9 @@ void APJECharacterPlayer::Multicast_StopDash_Implementation()
     }
 }
 
-void APJECharacterPlayer::Grab()
-{
 
+void APJECharacterPlayer::DropItem()
+{
 }
 
 void APJECharacterPlayer::OnFalling()

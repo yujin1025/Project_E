@@ -32,7 +32,6 @@ protected:
 	UInputAction* RapidFireAction;
 
 protected:
-	void Grab() override;
 	void Swallow();
 	void Fire();
 	void ResetFire();

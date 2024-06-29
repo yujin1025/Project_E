@@ -53,10 +53,6 @@ void APJECharacterDuck::BeginPlay()
 }
 
 
-void APJECharacterDuck::Grab()
-{
-}
-
 void APJECharacterDuck::Swallow()
 {
     if (Inventory)// && !Inventory->IsFull())
