@@ -16,7 +16,6 @@ class PROJECT_E_API APJERotatingPlatform : public AActor
 	
 public:	
 	APJERotatingPlatform();
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -27,7 +26,7 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
 	TObjectPtr<USceneComponent> Root;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Component|Mesh|DP_Settings")
 	TObjectPtr<UStaticMeshComponent> PlatformMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
 	TObjectPtr<UPJERotateComponent> RotationComponent;

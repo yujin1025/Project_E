@@ -13,13 +13,14 @@ APJERotatingPlatform::APJERotatingPlatform()
 	PlatformMesh->SetupAttachment(RootComponent);
 	
 	RotationComponent = CreateDefaultSubobject<UPJERotateComponent>(TEXT("Rotation Component"));
+	RotationComponent->SetRotateTarget(PlatformMesh);	
+
 }
 
 void APJERotatingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	RotationComponent->SetRotateTarget(PlatformMesh);	
 }
 
 // Called every frame

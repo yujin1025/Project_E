@@ -44,9 +44,12 @@ protected:
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	USceneComponent* SwitchPivot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent* BaseMesh;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Input|DP_Settings", meta = (AllowPrivateAccess = true))
 	TArray<class APJERotatingPlatform*> RotatingPlatforms;
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
@@ -55,9 +58,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
 	UInputAction* InterruptAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, Category = "Input|DP_Settings", meta = (AllowPrivateAccess = true))
 	class APJECamPos* Campos;
 
+	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
+	class UPJERotateComponent* RotateComponent;
+	
 	UPROPERTY(Replicated)
 	ERotateState CurrentRotateState;
 	ERotateState LastRotateState;
