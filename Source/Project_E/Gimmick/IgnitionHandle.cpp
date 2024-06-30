@@ -18,9 +18,15 @@ AIgnitionHandle::AIgnitionHandle()
 
 	InteractType = EInteractType::Control;
 	
+	SwitchPivot = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
+	SwitchPivot->SetupAttachment(Root);
+	
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
 	BaseMesh->SetGenerateOverlapEvents(false);
-	BaseMesh->SetupAttachment(Root);
+	BaseMesh->SetupAttachment(SwitchPivot);
+	
+	RotateComponent = CreateDefaultSubobject<UPJERotateComponent>(TEXT("Rotate Component"));
+	RotateComponent->SetRotateTarget(SwitchPivot);
 }
 
 void AIgnitionHandle::BeginPlay()
@@ -124,11 +130,14 @@ void AIgnitionHandle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 void AIgnitionHandle::NotifyPlatform(ERotateState RotateState, float Speed)
 {
+	RotateComponent->SetRotateState(RotateState);
+	RotateComponent->SetRotationSpeed(Speed);
+	
 	for(auto RotatingPlatform : RotatingPlatforms)
 	{
-		UPJERotateComponent* RotateComponent = RotatingPlatform->GetRotationComponent();
-		RotateComponent->SetRotateState(RotateState);
-		RotateComponent->SetRotationSpeed(Speed);
+		UPJERotateComponent* RotateComp = RotatingPlatform->GetRotationComponent();
+		RotateComp->SetRotateState(RotateState);
+		RotateComp->SetRotationSpeed(Speed);
 	}
 }
 

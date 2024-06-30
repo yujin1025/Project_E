@@ -42,7 +42,7 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultContext;
+	class UInputMappingContext* DefaultContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* IgnitionHandleContext;

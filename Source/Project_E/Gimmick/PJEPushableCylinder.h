@@ -24,12 +24,19 @@ protected:
 
 	virtual void InteractionKeyPressed(APJECharacterPlayer* Character) override;
 
+	UFUNCTION()
+	void OnLook(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void Roll();
+	
+	UFUNCTION()
+	void StopRoll();
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent* Cylinder;
 
-	class UPJERotateComponent* RotateComponent;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input")
 	class UInputAction* LookAction; // Mouse Axis
 
