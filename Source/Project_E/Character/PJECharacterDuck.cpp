@@ -11,6 +11,7 @@
 #include "Projectile/PJEProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../UI/DuckInventoryWidget.h"
+#include "../Items/Item.h"
 
 APJECharacterDuck::APJECharacterDuck()
 {

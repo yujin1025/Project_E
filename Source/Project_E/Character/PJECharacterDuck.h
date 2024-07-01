@@ -6,6 +6,7 @@
 #include "PJECharacterPlayer.h"
 #include "PJECharacterDuck.generated.h"
 
+class UDuckInventoryWidget;
 /**
  *
  */

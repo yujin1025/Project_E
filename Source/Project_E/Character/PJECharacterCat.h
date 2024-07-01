@@ -6,6 +6,7 @@
 #include "PJECharacterPlayer.h"
 #include "PJECharacterCat.generated.h"
 
+class UCatInventoryWidget;
 /**
  *
  */
