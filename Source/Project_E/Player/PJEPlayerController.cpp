@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Gimmick/IgnitionHandle.h"
+#include "../UI/BaseWidget.h"
 #include "Gimmick/PJEPushableCylinder.h"
 
 
@@ -25,6 +26,7 @@ void APJEPlayerController::BeginPlay()
 	PlayerPawn = GetPawn();
 	
 	InitInputPawn();
+	OpenWidget();
 }
 
 void APJEPlayerController::Tick(float DeltaSeconds)
@@ -121,4 +123,13 @@ void APJEPlayerController::InitInputRoll()
 
 void APJEPlayerController::GameOver()
 {
+}
+
+void APJEPlayerController::OpenWidget()
+{
+	InGameWindowWidget = CreateWidget<UBaseWidget>(GetWorld(), InGameWindowWidgetClass);
+	if (InGameWindowWidget != nullptr)
+	{
+		InGameWindowWidget->AddToViewport(1);
+	}
 }

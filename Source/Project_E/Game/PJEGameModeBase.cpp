@@ -2,7 +2,6 @@
 
 
 #include "Game/PJEGameModeBase.h"
-#include "../UI/BaseWidget.h"
 #include <Kismet/GameplayStatics.h>
 #include <Player/PJEPlayerController.h>
 
@@ -14,8 +13,6 @@ APJEGameModeBase::APJEGameModeBase()
 void APJEGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OpenWidget();
 }
 
 void APJEGameModeBase::OnPlayerDead(int PlayerNumber)
@@ -27,14 +24,6 @@ void APJEGameModeBase::OnPlayerDead(int PlayerNumber)
 	}
 }
 
-void APJEGameModeBase::OpenWidget()
-{
-	InGameWindowWidget = CreateWidget<UBaseWidget>(GetWorld(), InGameWindowWidgetClass);
-	if (InGameWindowWidget != nullptr)
-	{
-		InGameWindowWidget->AddToViewport();
-	}
-}
 
 FCharacterStatData* APJEGameModeBase::GetCharacterStat(ECharacterType type)
 {

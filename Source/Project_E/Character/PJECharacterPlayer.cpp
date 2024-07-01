@@ -17,6 +17,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 
+
 APJECharacterPlayer::APJECharacterPlayer()
 {
     bReplicates = true;
@@ -32,6 +33,9 @@ APJECharacterPlayer::APJECharacterPlayer()
 
     InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Trigger"));
     InteractionTrigger->SetupAttachment(RootComponent);
+
+    ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn Point"));
+    ProjectileSpawnPoint->SetupAttachment(RootComponent);
 
     static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/UI/WBP_DieMessage"));
     if (WidgetClass.Succeeded())
@@ -104,6 +108,7 @@ void APJECharacterPlayer::InitInput(UEnhancedInputComponent* EnhancedInputCompon
     EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DoubleJump);
     EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterPlayer::Dash);
     EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::StopDash);
+    EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Started, this, &APJECharacterPlayer::DropItem);
     EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APJECharacterPlayer::OnInteractBegin);
     EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::OnInteractEnd);
 }
@@ -283,9 +288,9 @@ void APJECharacterPlayer::Multicast_StopDash_Implementation()
     }
 }
 
-void APJECharacterPlayer::Grab()
-{
 
+void APJECharacterPlayer::DropItem()
+{
 }
 
 void APJECharacterPlayer::OnFalling()
@@ -338,40 +343,6 @@ void APJECharacterPlayer::OnFalling()
         bIsFalling = false;
     }
 }
-
-
-/*
-void APJECharacterPlayer::OpenInventory()
-{
-    if (InventoryWidgetInstance)
-    {
-        if (bIsInventoryOpen)
-        {
-            InventoryWidgetInstance->RemoveFromViewport();
-            UE_LOG(LogTemp, Warning, TEXT("Inventory closed"));
-        }
-        else
-        {
-            InventoryWidgetInstance->AddToViewport();
-            UE_LOG(LogTemp, Warning, TEXT("Inventory opened"));
-        }
-        bIsInventoryOpen = !bIsInventoryOpen;
-    }
-    else
-    {
-        if (InventoryWidgetClass)
-        {
-            InventoryWidgetInstance = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
-            if (InventoryWidgetInstance)
-            {
-                InventoryWidgetInstance->AddToViewport();
-                UE_LOG(LogTemp, Warning, TEXT("Inventory opened"));
-                bIsInventoryOpen = true;
-            }
-        }
-    }
-}*/
-
 
 
 void APJECharacterPlayer::OnInteractBegin()
@@ -445,7 +416,7 @@ APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
     {
         if(InteractableActor != nullptr)
         {
-            // 더 좋은 방식을 생각해보자.
+            // ??좋�? 방식???�각?�보??
             //OnInteractEnd();
             return nullptr;
         }

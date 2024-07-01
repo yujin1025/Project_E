@@ -49,17 +49,11 @@ FVector2D UCrossHairWidget::GetAimScreenPosition(UImage* AimImage)
 {
     if (!AimImage) return FVector2D::ZeroVector;
 
-    // �θ� ������ Canvas Panel�� ã���ϴ�.
     UCanvasPanel* CanvasPanel = Cast<UCanvasPanel>(AimImage->GetParent());
     if (!CanvasPanel) return FVector2D::ZeroVector;
 
-    // MyImage�� ���� ���� ��ġ�� �����ɴϴ�.
     FVector2D LocalPosition = AimImage->GetCachedGeometry().LocalToAbsolute(FVector2D::ZeroVector);
-
-    // Canvas Panel�� ���� ���� ��ġ�� �����ɴϴ�.
     FVector2D CanvasPosition = CanvasPanel->GetCachedGeometry().LocalToAbsolute(FVector2D::ZeroVector);
-
-    // MyImage�� ȭ�� ���� ��ġ�� ����մϴ�.
     FVector2D ScreenPosition = LocalPosition + CanvasPosition;
 
     return ScreenPosition;

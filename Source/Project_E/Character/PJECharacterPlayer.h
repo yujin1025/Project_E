@@ -13,7 +13,7 @@ class UBoxComponent;
 class UInputMappingContext;
 class UInputAction;
 class UInventory;
-class UInventoryWidget;
+
 
 struct FInputActionValue;
 
@@ -103,10 +103,10 @@ protected:
 	UInputAction* DashAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DropAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
-	
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//UInputAction* InventoryAction;
 
 	UPROPERTY(Replicated, EditAnywhere, Category = "Jump")
 	float JumpHeight = 500.0f;
@@ -142,7 +142,7 @@ protected:
 	void DoubleJump();
 	void Dash();
 	void StopDash();
-	virtual void Grab();
+	virtual void DropItem();
 	void OnFalling();
 
 private:
@@ -151,7 +151,7 @@ private:
 	//void OpenInventory();
 
 	bool bIsInventoryOpen = false; 
-	UInventoryWidget* InventoryWidgetInstance = nullptr;
+
 
  //Item Section
 protected:
@@ -166,11 +166,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int32 HandItemCode = 0;
 
-	UPROPERTY()
-	UInventoryWidget* InventoryWidget;
-private:
-	UPROPERTY(EditAnywhere, Category = UI)
-	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 
 //Interact Section
 protected:
@@ -185,4 +180,8 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AActor> InteractActor = NULL;
 
+//Projectile
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* ProjectileSpawnPoint;
 };

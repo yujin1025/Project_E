@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "PJEPlayerController.generated.h"
 
+class UBaseWidget;
+
 UENUM(BlueprintType)
 enum class EControllerOperation : uint8
 {
@@ -55,4 +57,14 @@ private:
 
 public:
 	FORCEINLINE void SetOperatingActor(AActor* OpActor) { OperatingActor = OpActor; }
+
+//UI
+private:
+	void OpenWidget();
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UBaseWidget> InGameWindowWidgetClass;
+
+	UPROPERTY()
+	UBaseWidget* InGameWindowWidget;
 };

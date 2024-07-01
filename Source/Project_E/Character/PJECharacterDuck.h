@@ -32,10 +32,10 @@ protected:
 	UInputAction* RapidFireAction;
 
 protected:
-	void Grab() override;
 	void Swallow();
-	void Shoot();
-	void ResetShoot();
+	void DropItem() override;
+	void Fire();
+	void ResetFire();
 	void RapidFire(const FInputActionValue& Value);
 	void ResetRapidFire();
 	void ResetSpeed();
@@ -61,4 +61,23 @@ protected:
 	float SwallowedSpeed = 0.7;
 
 	bool bIsSwallowed;
+
+	
+private:
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<class APJEProjectile> ProjectileClass;
+
+	UPROPERTY()
+	UDuckInventoryWidget* WeaponInventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UDuckInventoryWidget> WeaponInventoryClass;
+
+	UPROPERTY()
+	UDuckInventoryWidget* NonWeaponInventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UDuckInventoryWidget> NonWeaponInventoryClass;
+
+	UItem* SwallowedItem = nullptr;
 };
