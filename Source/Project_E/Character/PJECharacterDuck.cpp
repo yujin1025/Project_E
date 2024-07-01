@@ -57,26 +57,25 @@ void APJECharacterDuck::Swallow()
 {
     if (Inventory)// && !Inventory->IsFull())
     {
-        UE_LOG(LogTemp, Warning, TEXT("Swallow 1"));
-        UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
-        if (NewItem)
+        SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
+        if (SwallowedItem)
         {
-            Inventory->AddItem(NewItem, true);
+            Inventory->AddItem(SwallowedItem, true);
 
-            if (Inventory->GetInventoryCount() > 5 || (NewItem->ItemCode == 1 && Inventory->GetInventoryCount() > 3))
+            if (Inventory->GetInventoryCount() > 5 || (SwallowedItem->ItemCode == 1 && Inventory->GetInventoryCount() > 3))
             {
                 GetCharacterMovement()->MaxWalkSpeed *= SwallowedSpeed;
                 bIsSwallowed = true;
             }
 
-            if (NewItem->Type == EItemType::Weapon)
+            if (SwallowedItem->Type == EItemType::Weapon)
             {
                 if (WeaponInventoryWidget)
                 {
                     WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
                 }
             }
-            else if (NewItem->Type == EItemType::NonWeapon)
+            else if (SwallowedItem->Type == EItemType::NonWeapon)
             {
                 if (NonWeaponInventoryWidget)
                 {
@@ -89,9 +88,38 @@ void APJECharacterDuck::Swallow()
             }
         }
     }
-    else
-        UE_LOG(LogTemp, Warning, TEXT("Swallow 2"));
 }
+
+void APJECharacterDuck::DropItem()
+{
+    Super::DropItem();
+
+    if (Inventory)
+    {
+        if (SwallowedItem)
+        {
+            Inventory->RemoveItem(SwallowedItem, true);
+
+            if (SwallowedItem->Type == EItemType::Weapon)
+            {
+                if (WeaponInventoryWidget)
+                {
+                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
+                }
+            }
+            else if (SwallowedItem->Type == EItemType::NonWeapon)
+            {
+                if (NonWeaponInventoryWidget)
+                {
+                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
+                }
+            }
+
+            SwallowedItem = nullptr;
+        }
+    }
+}
+
 
 void APJECharacterDuck::Fire()
 {
@@ -180,3 +208,5 @@ void APJECharacterDuck::Dash()
         }
     }
 }
+
+

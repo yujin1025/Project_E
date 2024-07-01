@@ -33,6 +33,7 @@ protected:
 
 protected:
 	void Swallow();
+	void DropItem() override;
 	void Fire();
 	void ResetFire();
 	void RapidFire(const FInputActionValue& Value);
@@ -77,4 +78,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UDuckInventoryWidget> NonWeaponInventoryClass;
+
+	UItem* SwallowedItem = nullptr;
 };

@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../UI/CatInventoryWidget.h"
+#include "../Items/Inventory.h"
 
 APJECharacterCat::APJECharacterCat()
 {
@@ -26,6 +27,7 @@ void APJECharacterCat::BeginPlay()
 {
     Super::BeginPlay();
 
+    Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
 
     CatInventoryWidget = CreateWidget<UCatInventoryWidget>(GetWorld(), CatInventoryClass);
@@ -38,14 +40,37 @@ void APJECharacterCat::BeginPlay()
 
 void APJECharacterCat::Grab()
 {
-    UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
-    if (CatInventoryWidget)
+    if (Inventory)
     {
-        CatInventoryWidget->UpdateInventory(NewItem);
+        UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
+        if (NewItem)
+        {
+            Inventory->AddItem(NewItem, false);
+
+            if (CatInventoryWidget)
+            {
+                CatInventoryWidget->UpdateInventory(NewItem);
+            }
+        }
     }
-    else
+}
+
+void APJECharacterCat::DropItem()
+{
+    Super::DropItem();
+
+    if (Inventory)
     {
-        UE_LOG(LogTemp, Error, TEXT("InventoryWidget is nullptr"));
+        UItem* CurrentItem = Inventory->GetCatInventoryItem();
+        if (CurrentItem)
+        {
+            Inventory->RemoveItem(CurrentItem, false);
+
+            if (CatInventoryWidget)
+            {
+                CatInventoryWidget->UpdateInventory(nullptr);
+            }
+        }
     }
 }
 
@@ -60,3 +85,5 @@ void APJECharacterCat::Dash()
         GetCharacterMovement()->MaxWalkSpeed *= DashSpeed;
     }
 }
+
+

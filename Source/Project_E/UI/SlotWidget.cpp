@@ -21,6 +21,7 @@ void USlotWidget::SetItem(UItem* Item)
     }
     else
     {
+        ItemImage->SetBrushFromTexture(nullptr);
         ItemImage->SetVisibility(ESlateVisibility::Hidden);
     }
 }

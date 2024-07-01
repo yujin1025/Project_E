@@ -25,6 +25,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	class UDataTable* ItemDatabase;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UInventory* Inventory;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GrabAction;
 
@@ -39,6 +42,7 @@ protected:
 	void Grab();
 	void Swing();
 	void Dash();
+	void DropItem() override;
 
 private:
 	UPROPERTY()

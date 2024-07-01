@@ -143,7 +143,7 @@ protected:
 	void DoubleJump();
 	void Dash();
 	void StopDash();
-	void DropItem();
+	virtual void DropItem();
 	void OnFalling();
 
 private:
