@@ -56,7 +56,7 @@ void APJEInteractiveActor::InteractionKeyPressed(APJECharacterPlayer* Character)
 /* Functions that contain functionality to act when an interaction key is released **/
 void APJEInteractiveActor::InteractionKeyReleased(APJECharacterPlayer* Character)
 {
-	
+	UE_LOG(LogTemp, Log, TEXT("Interaction Key Released"));
 }
 
 /* Break Interacting **/

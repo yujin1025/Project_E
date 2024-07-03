@@ -22,7 +22,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void ReturnPawnInput();
+	void ReturnPawn();
 
 	virtual void InteractionKeyPressed(APJECharacterPlayer* Character) override;
 
@@ -34,7 +34,7 @@ protected:
 	
 	UFUNCTION()
 	void StopRoll();
-
+	
 	void AccelerateCylinder();
 	
 	bool CheckCylinderIsDerailed(); // 차후 만들 예정

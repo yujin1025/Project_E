@@ -167,9 +167,8 @@ FVector APJECharacterPlayer::GetTargetPosition(ECollisionChannel Channel, float 
 void APJECharacterPlayer::SetCamLocationRotation(FVector TargetLocation, FRotator TargetRotation)
 {
     OriginCamLocation = FollowCamera->GetComponentLocation();
-    OriginCamRotation = FollowCamera->GetComponentRotation();
-    
     FollowCamera->SetWorldLocation(TargetLocation);
+    OriginCamRotation = FollowCamera->GetComponentRotation();
     FollowCamera->SetWorldRotation(TargetRotation);
 }
 
@@ -416,7 +415,7 @@ APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
     {
         if(InteractableActor != nullptr)
         {
-            // ??좋�? 방식???�각?�보??
+            // ??좋�? 방식???�각?�보??
             //OnInteractEnd();
             return nullptr;
         }

@@ -62,8 +62,11 @@ protected:
 public:
 	virtual FVector GetTargetPosition(ECollisionChannel Channel, float RayCastDistance);
 
+	FORCEINLINE UCameraComponent* GetCamera() { return FollowCamera; }
+	FORCEINLINE USpringArmComponent* GetCameraBoom() { return CameraBoom; }
 	void SetCamLocationRotation(FVector TargetLocation, FRotator TargetRotation);
 	void BackCamera();
+	
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -136,6 +139,7 @@ protected:
 	FRotator OriginCamRotation;
 	FVector TargetCamLocation;
 	FRotator TargetCamRotation;
+	float OriginSpringArmLength = 150.f;
 
 protected:
 	virtual void Landed(const FHitResult& Hit) override;

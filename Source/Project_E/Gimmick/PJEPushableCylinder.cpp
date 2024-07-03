@@ -1,8 +1,11 @@
 #include "Gimmick/PJEPushableCylinder.h"
 
+#include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "PJELockDoor.h"
+#include "Camera/CameraComponent.h"
 #include "Character/PJECharacterPlayer.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Player/PJEPlayerController.h"
 
 APJEPushableCylinder::APJEPushableCylinder()
@@ -20,6 +23,7 @@ void APJEPushableCylinder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	AccelerateCylinder();
 	// TODO
 	// a. Do acceleration when isAcceleration is true and calculate current speed
 	// b. Scales Actor rotation speed proportional to speed
@@ -33,7 +37,7 @@ void APJEPushableCylinder::BeginPlay()
 	SpawnTransform = this->GetTransform();
 }
 
-void APJEPushableCylinder::ReturnPawnInput()
+void APJEPushableCylinder::ReturnPawn()
 {
 	bIsInteracting = false;
 
@@ -51,13 +55,20 @@ void APJEPushableCylinder::ReturnPawnInput()
 
 void APJEPushableCylinder::InitInput(UEnhancedInputComponent* EnhancedInputComponent)
 {
-	
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::OnLook);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJEPushableCylinder::Roll);
+	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &ThisClass::ReturnPawn);
 }
 
 void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
-	Super::InteractionKeyReleased(Character);
-
+	// TODO
+	// c. Pre Interaction -> Setup Input and Interaction variables
+	// d. Pre Interaction -> Setup Animation
+	
+	Super::InteractionKeyPressed(Character);
+	
+	// Set Forward Vector
 	FVector PawnLocation = Character->GetActorLocation();
 	FVector CylinderLocation = this->GetActorLocation();
 	
@@ -67,26 +78,26 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	float AngleRadian = FQuat(TargetRotation).AngularDistance(FQuat(GetActorRotation()));
 	float AngleDegree = FMath::RadiansToDegrees(AngleRadian);
 
-	//UE_LOG(LogTemp, Warning, TEXT("Between Degree : %f"), AngleDegree);
 	if(AngleDegree > 30.f)
 	{
 		TargetRotation = (-1.f * (GetActorRotation().Vector())).Rotation();
-		UE_LOG(LogTemp, Warning, TEXT("Roll Forward"));
 	}
 	else
 	{
 		TargetRotation = GetActorRotation();
-		UE_LOG(LogTemp, Warning, TEXT("Roll Backward"));
 	}
 
+	// Set Character.. Very Hard 
 	Character->SetActorRotation(TargetRotation);
+	//
+	// UCameraComponent* Camera = Character->GetCamera();
+	USpringArmComponent* CameraBoom = Character->GetCameraBoom();
+	CameraBoom->TargetArmLength = 400.f;
+	//
+	// CameraBoom->SetRelativeRotation(FRotator::ZeroRotator);
+	// Camera->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
 
 	
-	// TODO
-	// a. Get Forward Vector and Manipulate it to Move Vector (Roll Forward? Roll Backward?)
-	// b. if Move Vector is Valid -> Start Interaction
-	// c. Pre Interaction -> Setup Input and Interaction variables
-	// d. Pre Interaction -> Setup Animation
 }
 
 void APJEPushableCylinder::OnLook(const FInputActionValue& Value)
