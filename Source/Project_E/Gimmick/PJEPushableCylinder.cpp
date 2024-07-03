@@ -39,6 +39,8 @@ void APJEPushableCylinder::BeginPlay()
 
 void APJEPushableCylinder::ReturnPawn()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Return Pawn"));
+	
 	bIsInteracting = false;
 
 	UWorld* World = GetWorld();
@@ -56,7 +58,7 @@ void APJEPushableCylinder::ReturnPawn()
 void APJEPushableCylinder::InitInput(UEnhancedInputComponent* EnhancedInputComponent)
 {
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::OnLook);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJEPushableCylinder::Roll);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Ongoing, this, &APJEPushableCylinder::Roll);
 	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &ThisClass::ReturnPawn);
 }
 
@@ -97,6 +99,15 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	// CameraBoom->SetRelativeRotation(FRotator::ZeroRotator);
 	// Camera->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
 
+	// Setup Input
+
+	APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(Character->GetController());
+
+	if(LocalPlayerController)
+	{
+		LocalPlayerController->SetOperatingActor(this);
+		LocalPlayerController->InitInputRoll();
+	}
 	
 }
 
