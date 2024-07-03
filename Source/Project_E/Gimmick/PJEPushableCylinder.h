@@ -35,7 +35,9 @@ protected:
 	UFUNCTION()
 	void StopRoll();
 	
-	void AccelerateCylinder();
+	void AccelerateCylinder(float DeltaTime);
+
+	void MoveCylinder(float DeltaTime);
 	
 	bool CheckCylinderIsDerailed(); // 차후 만들 예정
 
@@ -58,5 +60,14 @@ private:
 	
 	bool bIsAccelerating; // Is cylinder accelerating?
 
+	bool bIsStopped;
+	
 	float MoveSpeed; // Move speed of cylinder
+
+	FRotator MovementDirection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Movement")
+	float Acceleration;
+
+	APJECharacterPlayer* OwnerCharacter;
 };

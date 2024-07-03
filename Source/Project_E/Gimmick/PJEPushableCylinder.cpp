@@ -3,7 +3,6 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "PJELockDoor.h"
-#include "Camera/CameraComponent.h"
 #include "Character/PJECharacterPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/PJEPlayerController.h"
@@ -23,7 +22,7 @@ void APJEPushableCylinder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AccelerateCylinder();
+	AccelerateCylinder(DeltaTime);
 	// TODO
 	// a. Do acceleration when isAcceleration is true and calculate current speed
 	// b. Scales Actor rotation speed proportional to speed
@@ -39,7 +38,6 @@ void APJEPushableCylinder::BeginPlay()
 
 void APJEPushableCylinder::ReturnPawn()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Return Pawn"));
 	
 	bIsInteracting = false;
 
@@ -51,6 +49,7 @@ void APJEPushableCylinder::ReturnPawn()
 		{
 			LocalPlayerController->SetOperatingActor(nullptr);
 			LocalPlayerController->InitInputPawn();
+			Cast<APJECharacterPlayer>(LocalPlayerController->GetPawn())->GetCameraBoom()->TargetArmLength = 150.f;
 		}
 	}
 }
@@ -58,7 +57,8 @@ void APJEPushableCylinder::ReturnPawn()
 void APJEPushableCylinder::InitInput(UEnhancedInputComponent* EnhancedInputComponent)
 {
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::OnLook);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Ongoing, this, &APJEPushableCylinder::Roll);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APJEPushableCylinder::Roll);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APJEPushableCylinder::StopRoll);
 	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &ThisClass::ReturnPawn);
 }
 
@@ -69,6 +69,8 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	// d. Pre Interaction -> Setup Animation
 	
 	Super::InteractionKeyPressed(Character);
+
+	OwnerCharacter = Character;
 	
 	// Set Forward Vector
 	FVector PawnLocation = Character->GetActorLocation();
@@ -76,7 +78,8 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	
 	FRotator TargetRotation = (CylinderLocation - PawnLocation).Rotation();
 	TargetRotation = FRotator(0.f, TargetRotation.Yaw, 0.f);
-
+	MovementDirection = TargetRotation;
+	
 	float AngleRadian = FQuat(TargetRotation).AngularDistance(FQuat(GetActorRotation()));
 	float AngleDegree = FMath::RadiansToDegrees(AngleRadian);
 
@@ -128,26 +131,52 @@ void APJEPushableCylinder::OnLook(const FInputActionValue& Value)
 
 void APJEPushableCylinder::Roll()
 {
-	// TODO
-	// a. set bIsAccelerating = true
-	// b. Do Rotate by calculating the difference between ControlRotation and ActorRotation
+	bIsStopped = false;
+	bIsAccelerating = true;
 }
 
 void APJEPushableCylinder::StopRoll()
 {
-	// TODO
-	// 
+	bIsAccelerating = false;
 }
 
-void APJEPushableCylinder::AccelerateCylinder()
+void APJEPushableCylinder::AccelerateCylinder(float DeltaTime)
 {
+	if(bIsStopped) return;
+	
 	if(bIsAccelerating)
 	{
-		// Accelerating
+		MoveSpeed += Acceleration * DeltaTime;
+		
 	}
 	else
 	{
-		// Decelerating
+		MoveSpeed -= Acceleration * DeltaTime * 2.f;
+		if(MoveSpeed <= 0.f)
+		{
+			MoveSpeed = 0.f;
+			bIsStopped = true;
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("Current Speed is : %f"), MoveSpeed);
+
+	MoveCylinder(DeltaTime);
+	// TODO
+	// a. Move cylinder
+	// b. Calculate turn rate
+	// c. Turn cylinder
+	// d. Turn player
+}
+
+void APJEPushableCylinder::MoveCylinder(float DeltaTime)
+{
+	FVector CurrentLocation = GetActorLocation();
+	FVector NewLocation = CurrentLocation + MovementDirection.Vector() * MoveSpeed * DeltaTime;
+	SetActorLocation(NewLocation);
+
+	if(OwnerCharacter && bIsAccelerating)
+	{
+		OwnerCharacter->AddMovementInput(MovementDirection.Vector(), MoveSpeed*DeltaTime);
 	}
 }
 
