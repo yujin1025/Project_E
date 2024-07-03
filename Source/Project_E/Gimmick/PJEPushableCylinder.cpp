@@ -2,6 +2,7 @@
 
 #include "InputActionValue.h"
 #include "PJELockDoor.h"
+#include "Character/PJECharacterPlayer.h"
 #include "Player/PJEPlayerController.h"
 
 APJEPushableCylinder::APJEPushableCylinder()
@@ -57,6 +58,30 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyReleased(Character);
 
+	FVector PawnLocation = Character->GetActorLocation();
+	FVector CylinderLocation = this->GetActorLocation();
+	
+	FRotator TargetRotation = (CylinderLocation - PawnLocation).Rotation();
+	TargetRotation = FRotator(0.f, TargetRotation.Yaw, 0.f);
+
+	float AngleRadian = FQuat(TargetRotation).AngularDistance(FQuat(GetActorRotation()));
+	float AngleDegree = FMath::RadiansToDegrees(AngleRadian);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Between Degree : %f"), AngleDegree);
+	if(AngleDegree > 30.f)
+	{
+		TargetRotation = (-1.f * (GetActorRotation().Vector())).Rotation();
+		UE_LOG(LogTemp, Warning, TEXT("Roll Forward"));
+	}
+	else
+	{
+		TargetRotation = GetActorRotation();
+		UE_LOG(LogTemp, Warning, TEXT("Roll Backward"));
+	}
+
+	Character->SetActorRotation(TargetRotation);
+
+	
 	// TODO
 	// a. Get Forward Vector and Manipulate it to Move Vector (Roll Forward? Roll Backward?)
 	// b. if Move Vector is Valid -> Start Interaction
@@ -82,7 +107,7 @@ void APJEPushableCylinder::OnLook(const FInputActionValue& Value)
 void APJEPushableCylinder::Roll()
 {
 	// TODO
-	// a. set isAcceleration = true
+	// a. set bIsAccelerating = true
 	// b. Do Rotate by calculating the difference between ControlRotation and ActorRotation
 }
 
@@ -90,5 +115,26 @@ void APJEPushableCylinder::StopRoll()
 {
 	// TODO
 	// 
+}
+
+void APJEPushableCylinder::AccelerateCylinder()
+{
+	if(bIsAccelerating)
+	{
+		// Accelerating
+	}
+	else
+	{
+		// Decelerating
+	}
+}
+
+bool APJEPushableCylinder::CheckCylinderIsDerailed()
+{
+	return false;
+}
+
+void APJEPushableCylinder::RegenerateCylinder()
+{
 }
 

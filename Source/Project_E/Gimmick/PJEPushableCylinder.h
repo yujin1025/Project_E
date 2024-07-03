@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "PJEPushableCylinder.generated.h"
 
+struct FInputActionValue;
+
 UCLASS()
 class PROJECT_E_API APJEPushableCylinder : public APJEInteractiveActor
 {
@@ -33,6 +35,12 @@ protected:
 	UFUNCTION()
 	void StopRoll();
 
+	void AccelerateCylinder();
+	
+	bool CheckCylinderIsDerailed(); // 차후 만들 예정
+
+	void RegenerateCylinder();
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent* Cylinder;
@@ -47,4 +55,8 @@ private:
 	UInputAction* InterruptAction; // E key
 
 	FTransform SpawnTransform;
+	
+	bool bIsAccelerating; // Is cylinder accelerating?
+
+	float MoveSpeed; // Move speed of cylinder
 };
