@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/PJEAIController.h"
+#include "AI/Enemies/Controller/PJEShadowAIController.h"
 #include "PJEShadowAAIController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJEShadowAAIController : public APJEAIController
+class PROJECT_E_API APJEShadowAAIController : public APJEShadowAIController
 {
 	GENERATED_BODY()
 public:
@@ -19,5 +19,5 @@ public:
 protected:
 	virtual void InitBB() override;
 
-
+    
 };
