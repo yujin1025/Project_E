@@ -4,6 +4,8 @@
 #include "PJEProjectile.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "../PJECharacterBase.h"
+#include "../Component/HealthComponent.h"
 
 APJEProjectile::APJEProjectile()
 {
@@ -16,6 +18,9 @@ APJEProjectile::APJEProjectile()
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+
+	CollisionBox->BodyInstance.SetCollisionProfileName("Projectile");
+	CollisionBox->OnComponentHit.AddDynamic(this, &APJEProjectile::OnAttack);
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	ProjectileMesh->SetupAttachment(CollisionBox);
@@ -38,6 +43,21 @@ void APJEProjectile::BeginPlay()
 void APJEProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+void APJEProjectile::OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	APJECharacterBase* DamagedCharacter = Cast<APJECharacterBase>(OtherActor);
+	if (DamagedCharacter)
+	{
+		UHealthComponent* DamagedHealthComponent = DamagedCharacter->FindComponentByClass<UHealthComponent>();
+		if (DamagedHealthComponent == nullptr)
+			return;
+
+		DamagedHealthComponent->ChangeHealth(-10);
+		Destroy();
+	}
 
 }
 

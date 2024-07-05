@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "DuckInventoryWidget.h"
@@ -32,7 +32,8 @@ void UDuckInventoryWidget::UpdateInventory(const TArray<UItem*>& Items, bool bIs
     {
         if (Slots.IsValidIndex(i) && Items.IsValidIndex(i))
         {
-            Slots[i]->SetItem(Items[i]);
+            Slots[i]->SetItem(Items[i]); 
+            UE_LOG(LogTemp, Log, TEXT("Slot %d set with Item %s"), i, *Items[i]->Name);
         }
         else
         {

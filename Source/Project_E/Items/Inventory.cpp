@@ -10,7 +10,7 @@ void UInventory::AddItem(UItem* Item, bool bIsDuck)
 
     if (bIsDuck)
     {
-        if (Item->Type == EItemType::Weapon)
+        if (Item->Type == EItemType::Weapon && DuckWeaponInventory.Num() < 6)
             DuckWeaponInventory.Add(Item);
         else
             DuckNonWeaponInventory.Add(Item);
