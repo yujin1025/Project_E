@@ -23,10 +23,10 @@ void APJEPushableCylinder::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AccelerateCylinder(DeltaTime);
-	// TODO
-	// a. Do acceleration when isAcceleration is true and calculate current speed
-	// b. Scales Actor rotation speed proportional to speed
-	// c. If the cylinder derails from the road, regenerate it at the starting position
+	if(CheckCylinderIsDerailed())
+	{
+		RegenerateCylinder();
+	}
 }
 
 void APJEPushableCylinder::BeginPlay()
@@ -64,12 +64,8 @@ void APJEPushableCylinder::InitInput(UEnhancedInputComponent* EnhancedInputCompo
 
 void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
-	// TODO
-	// c. Pre Interaction -> Setup Input and Interaction variables
-	// d. Pre Interaction -> Setup Animation
-	
 	Super::InteractionKeyPressed(Character);
-
+	
 	OwnerCharacter = Character;
 	
 	// Set Forward Vector
@@ -78,21 +74,26 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	
 	FRotator TargetRotation = (CylinderLocation - PawnLocation).Rotation();
 	TargetRotation = FRotator(0.f, TargetRotation.Yaw, 0.f);
-	MovementDirection = TargetRotation;
-	
+	DistanceBetween = FVector(PawnLocation.X - CylinderLocation.X, PawnLocation.Y - CylinderLocation.Y,
+		PawnLocation.Z - CylinderLocation.Z);
 	float AngleRadian = FQuat(TargetRotation).AngularDistance(FQuat(GetActorRotation()));
 	float AngleDegree = FMath::RadiansToDegrees(AngleRadian);
 
 	if(AngleDegree > 30.f)
 	{
 		TargetRotation = (-1.f * (GetActorRotation().Vector())).Rotation();
+		bIsForward = false;
 	}
 	else
 	{
 		TargetRotation = GetActorRotation();
+		bIsForward = true;
 	}
 
-	// Set Character.. Very Hard 
+	TempRotation = TargetRotation;
+	MovementDirection = TargetRotation;
+	
+	// Set Character.. 
 	Character->SetActorRotation(TargetRotation);
 	//
 	// UCameraComponent* Camera = Character->GetCamera();
@@ -103,9 +104,7 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	// Camera->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
 
 	// Setup Input
-
 	APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(Character->GetController());
-
 	if(LocalPlayerController)
 	{
 		LocalPlayerController->SetOperatingActor(this);
@@ -147,18 +146,20 @@ void APJEPushableCylinder::AccelerateCylinder(float DeltaTime)
 	if(bIsAccelerating)
 	{
 		MoveSpeed += Acceleration * DeltaTime;
-		
+		if(MoveSpeed >= 350.f)
+		{
+			MoveSpeed = 350.f;
+		}
 	}
 	else
 	{
-		MoveSpeed -= Acceleration * DeltaTime * 2.f;
+		MoveSpeed -= Acceleration * DeltaTime * 4.f;
 		if(MoveSpeed <= 0.f)
 		{
 			MoveSpeed = 0.f;
 			bIsStopped = true;
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("Current Speed is : %f"), MoveSpeed);
 
 	MoveCylinder(DeltaTime);
 	// TODO
@@ -170,14 +171,53 @@ void APJEPushableCylinder::AccelerateCylinder(float DeltaTime)
 
 void APJEPushableCylinder::MoveCylinder(float DeltaTime)
 {
+	/** Implementation
+	/ a. Movement only applies to cylinder
+	/ b. Character is ANCHORED to a cylinder
+	/ c. When the cylinder moves, the character moves with it
+	/ d. The size of the DeltaVector determines the speed of the pushing animation
+	**/
+	if(!OwnerCharacter) return;
+	
+	// Move (Cylinder & Character)
 	FVector CurrentLocation = GetActorLocation();
-	FVector NewLocation = CurrentLocation + MovementDirection.Vector() * MoveSpeed * DeltaTime;
-	SetActorLocation(NewLocation);
+	FVector DeltaVector = MovementDirection.Vector() * MoveSpeed * DeltaTime;
+	SetActorLocation(CurrentLocation + DeltaVector);
 
 	if(OwnerCharacter && bIsAccelerating)
 	{
-		OwnerCharacter->AddMovementInput(MovementDirection.Vector(), MoveSpeed*DeltaTime);
+		FVector RotatedRelativeLocation = (MovementDirection - TempRotation).RotateVector(DistanceBetween);
+
+		FVector NewLocationCharacter = GetActorLocation() + RotatedRelativeLocation;
+		OwnerCharacter->SetActorLocation(NewLocationCharacter);
+		OwnerCharacter->SetActorRotation(MovementDirection);
+	} 
+
+	// R*L Turn (Cylinder & Character)
+	if(OwnerCharacter->GetController())
+	{
+		FRotator ControlRotation = OwnerCharacter->GetController()->GetControlRotation();
+		FRotator CurrentForwardRotation = bIsForward ? GetActorRotation() : (-1.f * (GetActorRotation().Vector())).Rotation();
+		FRotator CurrentActorRotation = GetActorRotation();
+		float ControlRotationYaw = ControlRotation.Yaw;
+		
+		float RotationDifference = ControlRotationYaw - CurrentForwardRotation.Yaw;
+		
+		RotationDifference = fmod(RotationDifference, 360.f);
+		if(RotationDifference > 90.f)
+		{
+			RotationDifference -= 180.f;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Control Rotation : %f, Actor Rotation : %f"), ControlRotationYaw, CurrentForwardRotation.Yaw);
+		UE_LOG(LogTemp, Warning, TEXT("Rotation Differ : %f"), RotationDifference);
+
+		MovementDirection.Yaw += RotationDifference * 0.5f * DeltaTime;
+		CurrentActorRotation.Yaw = MovementDirection.Yaw;
+		SetActorRotation(CurrentActorRotation);
 	}
+
+	// Rotate (Cylinder)
 }
 
 bool APJEPushableCylinder::CheckCylinderIsDerailed()

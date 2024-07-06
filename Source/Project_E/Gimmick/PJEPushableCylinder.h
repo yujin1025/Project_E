@@ -61,10 +61,15 @@ private:
 	bool bIsAccelerating; // Is cylinder accelerating?
 
 	bool bIsStopped;
+
+	bool bIsForward;
 	
 	float MoveSpeed; // Move speed of cylinder
 
 	FRotator MovementDirection;
+
+	FRotator TempRotation;
+	FVector DistanceBetween;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Movement")
 	float Acceleration;
