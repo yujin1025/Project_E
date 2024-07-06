@@ -50,7 +50,7 @@ void APJEInteractiveActor::BeginPlay()
 /* Functions that contain functionality to act when an interaction key is pressed **/
 void APJEInteractiveActor::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
-	
+	UE_LOG(LogTemp, Log, TEXT("Interaction Key Pressed"));
 }
 
 /* Functions that contain functionality to act when an interaction key is released **/
