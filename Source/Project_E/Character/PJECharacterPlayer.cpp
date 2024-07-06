@@ -350,7 +350,6 @@ void APJECharacterPlayer::OnInteractBegin()
     {
         if(InteractableActor)
         {
-            InteractableActor->SetOwner(this);
             InteractableActor->InteractionKeyPressed(this);
         }
     }
@@ -364,7 +363,6 @@ void APJECharacterPlayer::ServerOnInteractBegin_Implementation()
 {
     if(InteractableActor)
     {
-        InteractableActor->SetOwner(this);
         InteractableActor->InteractionKeyPressed(this);
     }
 }
@@ -417,6 +415,7 @@ APJEInteractiveActor* APJECharacterPlayer::GetClosestActor()
     {
         if(InteractableActor != nullptr)
         {
+            // ??좋�? 방식???�각?�보??
             //OnInteractEnd();
             return nullptr;
         }
