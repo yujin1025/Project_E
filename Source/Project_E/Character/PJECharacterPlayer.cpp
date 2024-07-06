@@ -355,6 +355,7 @@ void APJECharacterPlayer::OnInteractBegin()
     }
     else
     {
+        InteractableActor->SetOwner(this);
         ServerOnInteractBegin();   
     }
 }
@@ -363,6 +364,7 @@ void APJECharacterPlayer::ServerOnInteractBegin_Implementation()
 {
     if(InteractableActor)
     {
+        InteractableActor->SetOwner(this);
         InteractableActor->InteractionKeyPressed(this);
     }
 }

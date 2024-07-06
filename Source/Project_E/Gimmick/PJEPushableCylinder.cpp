@@ -5,6 +5,7 @@
 #include "PJELockDoor.h"
 #include "Character/PJECharacterPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "Player/PJEPlayerController.h"
 
 APJEPushableCylinder::APJEPushableCylinder()
@@ -62,9 +63,22 @@ void APJEPushableCylinder::InitInput(UEnhancedInputComponent* EnhancedInputCompo
 	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &ThisClass::ReturnPawn);
 }
 
-void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
+void APJEPushableCylinder::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, bIsForward);
+	DOREPLIFETIME(ThisClass, bIsAccelerating);
+	DOREPLIFETIME(ThisClass, bIsStopped);
+	DOREPLIFETIME(ThisClass, MoveSpeed);
+	DOREPLIFETIME(ThisClass, OwnerCharacter);
+}
+
+
+void APJEPushableCylinder::InteractionKeyPressed_Implementation(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyPressed(Character);
+	Server_Interaction(Character);
 	
 	OwnerCharacter = Character;
 	
@@ -73,13 +87,14 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	FVector CylinderLocation = this->GetActorLocation();
 	
 	FRotator TargetRotation = (CylinderLocation - PawnLocation).Rotation();
+	UE_LOG(LogTemp, Warning, TEXT("Movement Direction : %s"), *TargetRotation.ToString());
 	TargetRotation = FRotator(0.f, TargetRotation.Yaw, 0.f);
 	DistanceBetween = FVector(PawnLocation.X - CylinderLocation.X, PawnLocation.Y - CylinderLocation.Y,
 		PawnLocation.Z - CylinderLocation.Z);
 	float AngleRadian = FQuat(TargetRotation).AngularDistance(FQuat(GetActorRotation()));
 	float AngleDegree = FMath::RadiansToDegrees(AngleRadian);
-
-	if(AngleDegree > 30.f)
+	
+	if(AngleDegree > 90.f)
 	{
 		TargetRotation = (-1.f * (GetActorRotation().Vector())).Rotation();
 		bIsForward = false;
@@ -95,13 +110,8 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 	
 	// Set Character.. 
 	Character->SetActorRotation(TargetRotation);
-	//
-	// UCameraComponent* Camera = Character->GetCamera();
 	USpringArmComponent* CameraBoom = Character->GetCameraBoom();
 	CameraBoom->TargetArmLength = 400.f;
-	//
-	// CameraBoom->SetRelativeRotation(FRotator::ZeroRotator);
-	// Camera->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
 
 	// Setup Input
 	APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(Character->GetController());
@@ -111,6 +121,16 @@ void APJEPushableCylinder::InteractionKeyPressed(APJECharacterPlayer* Character)
 		LocalPlayerController->InitInputRoll();
 	}
 	
+}
+
+void APJEPushableCylinder::Server_Interaction_Implementation(APJECharacterPlayer* Character)
+{
+	NetMulticast_Interaction(Character);	
+}
+
+void APJEPushableCylinder::NetMulticast_Interaction_Implementation(APJECharacterPlayer* Character)
+{
+	SetOwner(OwnerCharacter);
 }
 
 void APJEPushableCylinder::OnLook(const FInputActionValue& Value)
@@ -162,14 +182,19 @@ void APJEPushableCylinder::AccelerateCylinder(float DeltaTime)
 	}
 
 	MoveCylinder(DeltaTime);
-	// TODO
-	// a. Move cylinder
-	// b. Calculate turn rate
-	// c. Turn cylinder
-	// d. Turn player
 }
 
 void APJEPushableCylinder::MoveCylinder(float DeltaTime)
+{
+	Server_MoveCylinder(DeltaTime);
+}
+
+void APJEPushableCylinder::Server_MoveCylinder_Implementation(float DeltaTime)
+{
+	NetMulticast_MoveCylinder(DeltaTime);
+}
+
+void APJEPushableCylinder::NetMulticast_MoveCylinder_Implementation(float DeltaTime)
 {
 	/** Implementation
 	/ a. Movement only applies to cylinder
@@ -177,8 +202,18 @@ void APJEPushableCylinder::MoveCylinder(float DeltaTime)
 	/ c. When the cylinder moves, the character moves with it
 	/ d. The size of the DeltaVector determines the speed of the pushing animation
 	**/
-	if(!OwnerCharacter) return;
-	
+	if(!OwnerCharacter)
+	{
+		if(HasAuthority())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Server no OwnerCharacter"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Client no OwnerCharacter"));
+		}
+		return;
+	}
 	// Move (Cylinder & Character)
 	FVector CurrentLocation = GetActorLocation();
 	FVector DeltaVector = MovementDirection.Vector() * MoveSpeed * DeltaTime;
@@ -209,17 +244,19 @@ void APJEPushableCylinder::MoveCylinder(float DeltaTime)
 			RotationDifference -= 180.f;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("Control Rotation : %f, Actor Rotation : %f"), ControlRotationYaw, CurrentForwardRotation.Yaw);
-		UE_LOG(LogTemp, Warning, TEXT("Rotation Differ : %f"), RotationDifference);
-
 		MovementDirection.Yaw += RotationDifference * 0.5f * DeltaTime;
 		CurrentActorRotation.Yaw = MovementDirection.Yaw;
 		SetActorRotation(CurrentActorRotation);
 	}
-
-	// 어디선가 Delta 2번 제곱한것같은데?
 	
 	// Rotate (Cylinder)
+	float Radius = 100.f;
+	float Pi = 3.14f;
+	// Roll이라고 치자
+	float DeltaAngle = DeltaVector.Size() / (2 * Radius * Pi) * 360;
+	UE_LOG(LogTemp, Warning, TEXT("Forward : %d"), bIsForward);
+	DeltaAngle = bIsForward ? -1.f * DeltaAngle : DeltaAngle;
+	Cylinder->AddLocalRotation(FRotator(0.f, DeltaAngle, 0.f));
 }
 
 bool APJEPushableCylinder::CheckCylinderIsDerailed()
