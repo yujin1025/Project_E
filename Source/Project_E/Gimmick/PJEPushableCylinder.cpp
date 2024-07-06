@@ -13,7 +13,7 @@ APJEPushableCylinder::APJEPushableCylinder()
 	PrimaryActorTick.bCanEverTick = true;
 
 	InteractType = EInteractType::Control;
-	
+
 	Cylinder = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cylinder"));
 	Cylinder->SetGenerateOverlapEvents(false);
 	Cylinder->SetupAttachment(Root);
@@ -252,19 +252,16 @@ void APJEPushableCylinder::Server_MoveCylinder_Implementation(float DeltaTime)
 		{
 			RotationDifference -= 180.f;
 		}
-		
+
+		UE_LOG(LogTemp, Warning, TEXT("Control Rotation : %f, Actor Rotation : %f"), ControlRotationYaw, CurrentForwardRotation.Yaw);
+		UE_LOG(LogTemp, Warning, TEXT("Rotation Differ : %f"), RotationDifference);
+
 		MovementDirection.Yaw += RotationDifference * 0.5f * DeltaTime;
 		CurrentActorRotation.Yaw = MovementDirection.Yaw;
 		SetActorRotation(CurrentActorRotation);
 	}
 
 	// Rotate (Cylinder)
-	float Radius = 100.f;
-	float Pi = 3.14f;
-	// Roll이라고 치자
-	float DeltaAngle = DeltaVector.Size() / (2 * Radius * Pi) * 360;
-	DeltaAngle = bIsForward ? -1.f * DeltaAngle : DeltaAngle;
-	Cylinder->AddLocalRotation(FRotator(0.f, DeltaAngle, 0.f));
 }
 
 void APJEPushableCylinder::NetMulticast_MoveCylinder_Implementation(float DeltaTime)
