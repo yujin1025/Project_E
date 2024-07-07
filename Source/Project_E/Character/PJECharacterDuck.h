@@ -38,10 +38,11 @@ protected:
 	void Fire();
 	void ResetFire();
 	void RapidFire(const FInputActionValue& Value);
+	void SpawnRapidFireProjectile();
 	void ResetRapidFire();
-	void ResetSpeed();
+	void ApplySpeedReduction();
 	void Dash();
-	//void ShootProjectile(const FVector& StartLocation, const FVector& LaunchVelocity);
+	void LogInventory();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
@@ -56,14 +57,20 @@ protected:
 	bool bCanRapidFire;
 
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float DashSpeed = 1.2f;
+	float DefaultWalkSpeed = 3.55f;
 
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float SwallowedSpeed = 0.7;
+	float DashMultiplier = 1.2f;
+
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float SwallowedMultiplier = 0.7f;
 
 	bool bIsSwallowed;
 
-	
+	int32 MagicBallCount;
+	FTimerHandle RapidFireTimerHandle;
+	int32 RapidFireCount;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<class APJEProjectile> ProjectileClass;

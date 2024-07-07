@@ -27,6 +27,4 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UUniformGridPanel* InventoryGrid;
-
-	static const int32 MaxWeaponSlots = 6;
 };

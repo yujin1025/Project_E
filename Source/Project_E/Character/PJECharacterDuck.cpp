@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "PJECharacterDuck.h"
@@ -18,24 +18,24 @@ APJECharacterDuck::APJECharacterDuck()
     bCanShoot = true;
     bCanRapidFire = true;
     bIsSwallowed = false;
+    MagicBallCount = 0;
 }
 
 void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) 
+    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
     {
         EnhancedInputComponent->BindAction(SwallowAction, ETriggerEvent::Started, this, &APJECharacterDuck::Swallow);
         EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &APJECharacterDuck::Fire);
         EnhancedInputComponent->BindAction(RapidFireAction, ETriggerEvent::Triggered, this, &APJECharacterDuck::RapidFire);
     }
-
 }
 
 void APJECharacterDuck::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
     Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
@@ -63,11 +63,11 @@ void APJECharacterDuck::Swallow()
         {
             Inventory->AddItem(SwallowedItem, true);
 
-            if (Inventory->GetInventoryCount() > 5 || (SwallowedItem->ItemCode == 1 && Inventory->GetInventoryCount() > 3))
-            {
-                GetCharacterMovement()->MaxWalkSpeed *= SwallowedSpeed;
-                bIsSwallowed = true;
-            }
+            if (SwallowedItem->ItemCode == 1)
+                MagicBallCount++;
+
+            ApplySpeedReduction();
+            LogInventory();
 
             if (SwallowedItem->Type == EItemType::Weapon)
             {
@@ -101,6 +101,15 @@ void APJECharacterDuck::DropItem()
         {
             Inventory->RemoveItem(SwallowedItem, true);
 
+            if (SwallowedItem->ItemCode == 1)
+            {
+                MagicBallCount--;
+                if (MagicBallCount < 0)
+                    MagicBallCount = 0;
+            }
+            ApplySpeedReduction();
+            LogInventory();
+
             if (SwallowedItem->Type == EItemType::Weapon)
             {
                 if (WeaponInventoryWidget)
@@ -124,23 +133,42 @@ void APJECharacterDuck::DropItem()
 
 void APJECharacterDuck::Fire()
 {
-    FVector Location = ProjectileSpawnPoint->GetComponentLocation();
-    FRotator Rotation = FollowCamera->GetComponentRotation();
-
-    APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
-
     UE_LOG(LogTemp, Warning, TEXT("Shoot"));
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
+        FVector Location = ProjectileSpawnPoint->GetComponentLocation();
+        FRotator Rotation = FollowCamera->GetComponentRotation();
+
+        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
+
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
         {
             UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
 
-            if (RemovedItem->ItemCode == 1 && Inventory->GetInventoryCount() <= 5)
-                ResetSpeed();
-            else if (Inventory->GetInventoryCount() <= 3)
-                ResetSpeed();
+            if (RemovedItem->ItemCode == 1)
+            {
+                MagicBallCount--;
+                if (MagicBallCount < 0)
+                    MagicBallCount = 0;
+            }
+            ApplySpeedReduction();
+            LogInventory();
+
+            if (SwallowedItem->Type == EItemType::Weapon)
+            {
+                if (WeaponInventoryWidget)
+                {
+                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
+                }
+            }
+            else if (SwallowedItem->Type == EItemType::NonWeapon)
+            {
+                if (NonWeaponInventoryWidget)
+                {
+                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
+                }
+            }
         }
 
         //if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, outVelocity, startLoc, targetLoc, GetWorld()->GetGravityZ(), arcValue))
@@ -158,29 +186,67 @@ void APJECharacterDuck::ResetFire()
 void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 {
     UE_LOG(LogTemp, Warning, TEXT("RapidFire"));
+
     if (bCanRapidFire && Inventory->GetWeaponCount() > 2)
     {
-        bool bHasMagicBall = false;
+        float FireInterval = 0.3f;
+        RapidFireCount = 0;
 
-        for (int32 i = 0; i < 3; ++i)
+        // 타이머 핸들 초기화
+        GetWorldTimerManager().SetTimer(RapidFireTimerHandle, this, &APJECharacterDuck::SpawnRapidFireProjectile, FireInterval, true, 0.0f);
+
+        // 발사 가능 상태 재설정 타이머 설정
+        bCanRapidFire = false;
+        GetWorldTimerManager().SetTimer(RapidFireDelayTimer, this, &APJECharacterDuck::ResetRapidFire, 1.0f, false);
+    }
+}
+
+void APJECharacterDuck::SpawnRapidFireProjectile()
+{
+    if (RapidFireCount < 3 && Inventory->GetWeaponCount() > 0)
+    {
+        FVector Location = ProjectileSpawnPoint->GetComponentLocation();
+        FRotator Rotation = FollowCamera->GetComponentRotation();
+
+        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
+
+        UItem* RemovedItem = Inventory->RemoveLastItem(true);
+        if (RemovedItem)
         {
-            UItem* RemovedItem = Inventory->RemoveLastItem(true);
-            if (RemovedItem)
-            {
-                UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+            UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
 
-                if (RemovedItem->ItemCode == 1)
-                    bHasMagicBall = true;
+            if (RemovedItem->ItemCode == 1)
+            {
+                MagicBallCount--;
+                if (MagicBallCount < 0)
+                    MagicBallCount = 0;
+            }
+            ApplySpeedReduction();
+            LogInventory();
+
+            if (SwallowedItem->Type == EItemType::Weapon)
+            {
+                if (WeaponInventoryWidget)
+                {
+                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
+                }
+            }
+            else if (SwallowedItem->Type == EItemType::NonWeapon)
+            {
+                if (NonWeaponInventoryWidget)
+                {
+                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
+                }
             }
         }
 
-        if (bHasMagicBall && Inventory->GetInventoryCount() <= 5)
-            ResetSpeed();
-        else if (Inventory->GetInventoryCount() <= 3)
-            ResetSpeed();
+        RapidFireCount++;
 
-        bCanRapidFire = false;
-        GetWorld()->GetTimerManager().SetTimer(RapidFireDelayTimer, this, &APJECharacterDuck::ResetRapidFire, 1.0f, false);
+        // 모든 발사체를 발사한 경우 타이머 해제
+        if (RapidFireCount >= 3)
+        {
+            GetWorldTimerManager().ClearTimer(RapidFireTimerHandle);
+        }
     }
 }
 
@@ -189,25 +255,65 @@ void APJECharacterDuck::ResetRapidFire()
     bCanRapidFire = true;
 }
 
-void APJECharacterDuck::ResetSpeed()
+void APJECharacterDuck::ApplySpeedReduction()
 {
-    GetCharacterMovement()->MaxWalkSpeed /= SwallowedSpeed;
-    bIsSwallowed = false;
+    if (MagicBallCount > 0 && Inventory->GetInventoryCount() > 3)
+    {
+        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * SwallowedMultiplier;
+        bIsSwallowed = true;
+    }
+    else if (Inventory->GetInventoryCount() > 5)
+    {
+        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * SwallowedMultiplier;
+        bIsSwallowed = true;
+    }
+    else
+    {
+        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
+        bIsSwallowed = false;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Current Speed: %f"), GetCharacterMovement()->MaxWalkSpeed);
 }
+
 
 void APJECharacterDuck::Dash()
 {
     if (bIsWalking)
     {
-        if (bIsSwallowed) 
+        if (MagicBallCount > 0)
         {
-            GetCharacterMovement()->MaxWalkSpeed *= (DashSpeed * SwallowedSpeed);
+            GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * DashMultiplier * SwallowedMultiplier;
         }
-        else 
+        else
         {
-            GetCharacterMovement()->MaxWalkSpeed *= DashSpeed;
+            GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * DashMultiplier;
         }
     }
 }
 
+//나중에 다 확인하고 지우기
+void APJECharacterDuck::LogInventory()
+{
+    if (Inventory)
+    {
+        if (Inventory->DuckWeaponInventory.Num() > 0)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Current Duck Weapon Inventory:"));
+            for (UItem* Item : Inventory->DuckWeaponInventory)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
+            }
+        }
+
+        if (Inventory->DuckNonWeaponInventory.Num() > 0)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Current Duck Non-Weapon Inventory:"));
+            for (UItem* Item : Inventory->DuckNonWeaponInventory)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
+            }
+        }
+    }
+}
 
