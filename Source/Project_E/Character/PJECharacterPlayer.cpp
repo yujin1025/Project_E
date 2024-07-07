@@ -23,7 +23,7 @@ APJECharacterPlayer::APJECharacterPlayer()
     bReplicates = true;
     
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-    CameraBoom->SetupAttachment(GetMesh());
+    CameraBoom->SetupAttachment(RootComponent);
     CameraBoom->TargetArmLength = 600.0f;
     CameraBoom->bUsePawnControlRotation = true;
 
