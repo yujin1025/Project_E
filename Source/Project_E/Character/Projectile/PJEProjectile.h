@@ -35,4 +35,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float Speed = 1300.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float GravityScale = 1.0f;
 };

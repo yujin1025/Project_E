@@ -71,6 +71,10 @@ protected:
 	FTimerHandle RapidFireTimerHandle;
 	int32 RapidFireCount;
 
+	// 카메라 위치로부터의 총구 오프셋입니다.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	FVector MuzzleOffset;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<class APJEProjectile> ProjectileClass;
@@ -88,4 +92,5 @@ private:
 	TSubclassOf<UDuckInventoryWidget> NonWeaponInventoryClass;
 
 	UItem* SwallowedItem = nullptr;
+
 };

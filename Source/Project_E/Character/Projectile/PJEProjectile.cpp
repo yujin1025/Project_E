@@ -26,9 +26,9 @@ APJEProjectile::APJEProjectile()
 	ProjectileMesh->SetupAttachment(CollisionBox);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
-	ProjectileMovementComponent->MaxSpeed = 1160.f;
-	ProjectileMovementComponent->InitialSpeed = 1160.f;
-	ProjectileMovementComponent->ProjectileGravityScale = 4.0f; //38.445 % 9.8
+	ProjectileMovementComponent->InitialSpeed = Speed;
+	ProjectileMovementComponent->MaxSpeed = Speed;
+	ProjectileMovementComponent->ProjectileGravityScale = GravityScale; //38.445 % 9.8
 	ProjectileMovementComponent->bShouldBounce = false; 
 }
 
@@ -43,6 +43,11 @@ void APJEProjectile::BeginPlay()
 void APJEProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	FVector CurrentLocation = GetActorLocation();
+
+	// 디버그 스피어 그리기
+	DrawDebugSphere(GetWorld(), CurrentLocation, 10.0f, 12, FColor::Green, false, -1.0f, 0, 1.0f);
 
 }
 

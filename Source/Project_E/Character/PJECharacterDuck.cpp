@@ -136,10 +136,17 @@ void APJECharacterDuck::Fire()
     UE_LOG(LogTemp, Warning, TEXT("Shoot"));
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
-        FVector Location = ProjectileSpawnPoint->GetComponentLocation();
-        FRotator Rotation = FollowCamera->GetComponentRotation();
+        FVector CameraLocation;
+        FRotator CameraRotation;
+        GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
+        MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
+
+        FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
+        FRotator MuzzleRotation = CameraRotation;
+        MuzzleRotation.Pitch += 30.0f;
+
+        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
 
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
@@ -205,10 +212,17 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
 {
     if (RapidFireCount < 3 && Inventory->GetWeaponCount() > 0)
     {
-        FVector Location = ProjectileSpawnPoint->GetComponentLocation();
-        FRotator Rotation = FollowCamera->GetComponentRotation();
+        FVector CameraLocation;
+        FRotator CameraRotation;
+        GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, Location, Rotation);
+        MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
+
+        FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
+        FRotator MuzzleRotation = CameraRotation;
+        MuzzleRotation.Pitch += 30.0f;
+
+        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
 
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
