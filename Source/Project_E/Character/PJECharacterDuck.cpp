@@ -68,25 +68,7 @@ void APJECharacterDuck::Swallow()
 
             ApplySpeedReduction();
             LogInventory();
-
-            if (SwallowedItem->Type == EItemType::Weapon)
-            {
-                if (WeaponInventoryWidget)
-                {
-                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
-                }
-            }
-            else if (SwallowedItem->Type == EItemType::NonWeapon)
-            {
-                if (NonWeaponInventoryWidget)
-                {
-                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
-                }
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("InventoryWidget is nullptr"));
-            }
+            UpdateInventoryWidget(SwallowedItem->Type);
         }
     }
 }
@@ -109,21 +91,7 @@ void APJECharacterDuck::DropItem()
             }
             ApplySpeedReduction();
             LogInventory();
-
-            if (SwallowedItem->Type == EItemType::Weapon)
-            {
-                if (WeaponInventoryWidget)
-                {
-                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
-                }
-            }
-            else if (SwallowedItem->Type == EItemType::NonWeapon)
-            {
-                if (NonWeaponInventoryWidget)
-                {
-                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
-                }
-            }
+            UpdateInventoryWidget(SwallowedItem->Type);
 
             SwallowedItem = nullptr;
         }
@@ -136,6 +104,11 @@ void APJECharacterDuck::Fire()
     UE_LOG(LogTemp, Warning, TEXT("Shoot"));
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
+        if (FireMontage)
+        {
+            PlayAnimMontage(FireMontage);
+        }
+
         FVector CameraLocation;
         FRotator CameraRotation;
         GetActorEyesViewPoint(CameraLocation, CameraRotation);
@@ -161,21 +134,7 @@ void APJECharacterDuck::Fire()
             }
             ApplySpeedReduction();
             LogInventory();
-
-            if (SwallowedItem->Type == EItemType::Weapon)
-            {
-                if (WeaponInventoryWidget)
-                {
-                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
-                }
-            }
-            else if (SwallowedItem->Type == EItemType::NonWeapon)
-            {
-                if (NonWeaponInventoryWidget)
-                {
-                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
-                }
-            }
+            UpdateInventoryWidget(RemovedItem->Type);
         }
 
         //if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, outVelocity, startLoc, targetLoc, GetWorld()->GetGravityZ(), arcValue))
@@ -212,6 +171,11 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
 {
     if (RapidFireCount < 3 && Inventory->GetWeaponCount() > 0)
     {
+        if (RapidFireMontage)
+        {
+            PlayAnimMontage(RapidFireMontage);
+        }
+
         FVector CameraLocation;
         FRotator CameraRotation;
         GetActorEyesViewPoint(CameraLocation, CameraRotation);
@@ -237,21 +201,7 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
             }
             ApplySpeedReduction();
             LogInventory();
-
-            if (SwallowedItem->Type == EItemType::Weapon)
-            {
-                if (WeaponInventoryWidget)
-                {
-                    WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
-                }
-            }
-            else if (SwallowedItem->Type == EItemType::NonWeapon)
-            {
-                if (NonWeaponInventoryWidget)
-                {
-                    NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
-                }
-            }
+            UpdateInventoryWidget(RemovedItem->Type);
         }
 
         RapidFireCount++;
@@ -328,6 +278,18 @@ void APJECharacterDuck::LogInventory()
                 UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
             }
         }
+    }
+}
+
+void APJECharacterDuck::UpdateInventoryWidget(EItemType ItemType)
+{
+    if (ItemType == EItemType::Weapon && WeaponInventoryWidget)
+    {
+        WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
+    }
+    else if (ItemType == EItemType::NonWeapon && NonWeaponInventoryWidget)
+    {
+        NonWeaponInventoryWidget->UpdateInventory(Inventory->DuckNonWeaponInventory, false);
     }
 }
 

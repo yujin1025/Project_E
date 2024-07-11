@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "PJECharacterBase.h"
@@ -70,6 +70,8 @@ void APJECharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 델리게이트 핸들러 등록
+	OnAttackEnd.AddDynamic(this, &APJECharacterBase::OnAttackEndHandler);
 }
 
 void APJECharacterBase::SetDead()
@@ -143,5 +145,10 @@ FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float Ra
 {
 	IsFoundTarget = false;
 	return FVector::ZeroVector;
+}
+
+void APJECharacterBase::OnAttackEndHandler()
+{
+	bIsAttacking = false;
 }
 

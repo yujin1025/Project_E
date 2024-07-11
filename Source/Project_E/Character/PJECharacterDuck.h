@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include "PJECharacterDuck.generated.h"
 
 class UDuckInventoryWidget;
+class UAnimMontage;
 /**
  *
  */
@@ -43,6 +44,7 @@ protected:
 	void ApplySpeedReduction();
 	void Dash();
 	void LogInventory();
+	void UpdateInventoryWidget(EItemType ItemType);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
@@ -71,7 +73,7 @@ protected:
 	FTimerHandle RapidFireTimerHandle;
 	int32 RapidFireCount;
 
-	// Ä«¸Ş¶ó À§Ä¡·ÎºÎÅÍÀÇ ÃÑ±¸ ¿ÀÇÁ¼ÂÀÔ´Ï´Ù.
+	// ì¹´ë©”ë¼ ìœ„ì¹˜ë¡œë¶€í„°ì˜ ì´êµ¬ ì˜¤í”„ì…‹
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector MuzzleOffset;
 
@@ -93,4 +95,12 @@ private:
 
 	UItem* SwallowedItem = nullptr;
 
+	/**
+	* Animation montages
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* FireMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* RapidFireMontage;
 };

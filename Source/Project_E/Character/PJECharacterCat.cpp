@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../UI/CatInventoryWidget.h"
 #include "../Items/Inventory.h"
+#include "Animation/AnimMontage.h"
 
 APJECharacterCat::APJECharacterCat()
 {
@@ -76,6 +77,14 @@ void APJECharacterCat::DropItem()
 
 void APJECharacterCat::Swing()
 {
+    if (bIsAttacking)
+        return;
+
+    if (SwingMontage)
+    {
+        bIsAttacking = true;
+        PlayAnimMontage(SwingMontage);
+    }
 }
 
 void APJECharacterCat::Dash()

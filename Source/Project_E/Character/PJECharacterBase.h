@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,6 +8,8 @@
 
 class UHealthComponent;
 class UHitDeadComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackEndDelegate);
 
 UCLASS()
 class PROJECT_E_API APJECharacterBase : public ACharacter
@@ -44,7 +46,7 @@ public:
 
 
 public:
-	bool IsPlayer(); //�÷��̾����� ����
+	bool IsPlayer(); //플레이어인지 여부
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Id, meta = (AllowPrivateAccess = "true"))
 	int CharacterId;
@@ -64,4 +66,13 @@ protected:
 
 public:
 	virtual FVector GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget);
+
+	bool bIsAttacking = false;
+
+	// 공격 애니메이션 끝났을 때 호출되는 델리게이트
+	FOnAttackEndDelegate OnAttackEnd;
+
+	// 델리게이트 핸들러 함수
+	UFUNCTION()
+	void OnAttackEndHandler();
 };
