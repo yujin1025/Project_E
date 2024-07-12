@@ -18,6 +18,7 @@ class PROJECT_E_API APJECharacterDuck : public APJECharacterPlayer
 
 public:
 	APJECharacterDuck();
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
@@ -33,6 +34,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RapidFireAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AimAction;
+
 protected:
 	void Swallow();
 	void DropItem() override;
@@ -45,6 +49,10 @@ protected:
 	void Dash();
 	void LogInventory();
 	void UpdateInventoryWidget(EItemType ItemType);
+
+	void EnterAimingMode();
+	void ExitAimingMode();
+	void CalculateProjectilePath();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
@@ -67,15 +75,20 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float SwallowedMultiplier = 0.7f;
 
-	bool bIsSwallowed;
+	
+	FVector MuzzleLocation;
+	FRotator MuzzleRotation;
+
+	// 카메라 위치로부터의 총구 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	FVector MuzzleOffset;
 
 	int32 MagicBallCount;
 	FTimerHandle RapidFireTimerHandle;
 	int32 RapidFireCount;
 
-	// 카메라 위치로부터의 총구 오프셋
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector MuzzleOffset;
+	bool bIsAiming;
+	bool bIsSwallowed;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
