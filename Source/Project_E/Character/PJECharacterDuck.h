@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include "PJECharacterDuck.generated.h"
 
 class UDuckInventoryWidget;
+class UAnimMontage;
 /**
  *
  */
@@ -17,6 +18,7 @@ class PROJECT_E_API APJECharacterDuck : public APJECharacterPlayer
 
 public:
 	APJECharacterDuck();
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
@@ -32,6 +34,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RapidFireAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AimAction;
+
 protected:
 	void Swallow();
 	void DropItem() override;
@@ -43,6 +48,11 @@ protected:
 	void ApplySpeedReduction();
 	void Dash();
 	void LogInventory();
+	void UpdateInventoryWidget(EItemType ItemType);
+
+	void EnterAimingMode();
+	void ExitAimingMode();
+	void CalculateProjectilePath();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
@@ -65,15 +75,20 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float SwallowedMultiplier = 0.7f;
 
-	bool bIsSwallowed;
+	
+	FVector MuzzleLocation;
+	FRotator MuzzleRotation;
+
+	// Ïπ¥Î©îÎùº ÏúÑÏπòÎ°úÎ∂ÄÌÑ∞Ïùò Ï¥ùÍµ¨ Ïò§ÌîÑÏÖã
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	FVector MuzzleOffset;
 
 	int32 MagicBallCount;
 	FTimerHandle RapidFireTimerHandle;
 	int32 RapidFireCount;
 
-	// ƒ´∏ﬁ∂Û ¿ßƒ°∑Œ∫Œ≈Õ¿« √—±∏ ø¿«¡º¬¿‘¥œ¥Ÿ.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector MuzzleOffset;
+	bool bIsAiming;
+	bool bIsSwallowed;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
@@ -93,4 +108,12 @@ private:
 
 	UItem* SwallowedItem = nullptr;
 
+	/**
+	* Animation montages
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* FireMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* RapidFireMontage;
 };

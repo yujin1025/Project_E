@@ -7,6 +7,7 @@
 #include "PJECharacterCat.generated.h"
 
 class UCatInventoryWidget;
+class UAnimMontage;
 /**
  *
  */
@@ -51,4 +52,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UCatInventoryWidget> CatInventoryClass;
+
+	/**
+	* Animation montages
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* SwingMontage;
+
 };
