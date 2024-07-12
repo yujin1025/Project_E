@@ -24,6 +24,7 @@ protected:
 	virtual bool Initialize() override;
 	virtual void NativeDestruct() override;
 
+	// MultiplayerSessionSubsystem에 있는 Custom Delegate의 Callback함수
 	UFUNCTION()
 	void OnCreateSession(bool bWasSuccessful);
 	void OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionSearchResults, bool bWasSuccessful);
@@ -32,4 +33,14 @@ protected:
 	void OnDestroySession(bool bWasSuccessful);
 	UFUNCTION()
 	void OnStartSession(bool bWasSuccessful);
+
+private:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* PlayButton;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* QuitButton;
+
+	void MenuTearDown();
+
+	
 };

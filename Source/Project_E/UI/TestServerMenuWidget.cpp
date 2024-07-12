@@ -42,3 +42,7 @@ void UTestServerMenuWidget::OnDestroySession(bool bWasSuccessful)
 void UTestServerMenuWidget::OnStartSession(bool bWasSuccessful)
 {
 }
+
+void UTestServerMenuWidget::MenuTearDown()
+{
+}
