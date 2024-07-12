@@ -14,7 +14,7 @@ bool UTestServerMenuWidget::Initialize()
 		return false;
 	}
 
-	
+	return true;
 }
 
 void UTestServerMenuWidget::NativeDestruct()
