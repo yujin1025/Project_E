@@ -21,19 +21,6 @@ EBTNodeResult::Type UBTTask_SpawnField::ExecuteTask(UBehaviorTreeComponent& Owne
     AActor* OwnerActor = OwnerComp.GetOwner();
     if (OwnerActor)
     {
-        APawn* OwnerPawn = Cast<APawn>(OwnerActor);
-        if (OwnerPawn)
-        {
-            UCharacterMovementComponent* MovementComponent = Cast<UCharacterMovementComponent>(OwnerPawn->GetMovementComponent());
-            if (MovementComponent)
-            {
-                // 이동을 멈추기 위한 설정
-                MovementComponent->StopMovementImmediately();
-                MovementComponent->Velocity = FVector::ZeroVector; // 속도 설정
-                MovementComponent->SetMovementMode(MOVE_None); // 이동 모드 설정
-            }
-        }
-
         FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
         TaskMemory->TimeElapsed = 0.0f;
         TaskMemory->FieldMesh = nullptr;
@@ -131,8 +118,6 @@ void UBTTask_SpawnField::DestroyField(UBehaviorTreeComponent& OwnerComp, uint8* 
     {
         TaskMemory->FieldMesh->DestroyComponent();
     }
-
-    OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, false);
     FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 }
 

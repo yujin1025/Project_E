@@ -44,6 +44,11 @@ float APJECharacterShadowA::GetTeleportRange()
 	return TeleportRange * 100.0f;
 }
 
+float APJECharacterShadowA::GetRunAwaySpeed()
+{
+	return RunAwaySpeed * 100;
+}
+
 void APJECharacterShadowA::BeginPlay()
 {
 	Super::BeginPlay();

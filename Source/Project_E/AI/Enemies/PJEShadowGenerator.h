@@ -26,10 +26,14 @@ public:
 
 
     UFUNCTION(Server, Reliable, WithValidation)
-    void Server_SpawnMonsterAtRandomLocation(TSubclassOf<class APJECharacterShadow> MonsterClass, bool bAddToManager = true);
+    void Server_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
+    bool Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
+    void Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
 
     UFUNCTION(NetMulticast, Reliable)
-    void Multicast_SpawnMonsterAtRandomLocation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
+    void Multicast_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
+    bool Multicast_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
+    void Multicast_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
 
 protected:
     FTimerHandle SpawnTimerHandle;
