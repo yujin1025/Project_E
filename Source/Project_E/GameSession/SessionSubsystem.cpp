@@ -34,7 +34,6 @@ void USessionSubsystem::CreateSession(int32 NumPublicConnections, FString MatchT
 		LastMatchType = MatchType;
 
 		DestroySession();
-		//SessionInterface->DestroySession(NAME_GameSession);
 	}
 	
 	// Store the delegate in a FDelegateHandle so we can later remove from the delegate list

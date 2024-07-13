@@ -10,12 +10,16 @@
  * 
  */
 UCLASS()
-class MULTIPLAYERSESSIONS_API ALobbyGameMode : public AGameModeBase
+class PROJECT_E_API ALobbyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-
 public:
-	virtual void PostLogin(APlayerController* NewPlayer) override;
-	virtual void Logout(AController* Exiting) override;
+	ALobbyGameMode();
+
+	TArray<APlayerController> PCs;
 	
+protected:
+	virtual void BeginPlay() override;
+	
+	TArray<FString> PlayerNames;
 };

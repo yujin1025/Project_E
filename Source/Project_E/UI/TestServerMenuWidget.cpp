@@ -3,8 +3,55 @@
 
 #include "UI/TestServerMenuWidget.h"
 
-void UTestServerMenuWidget::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FString LobbyPath)
+#include "OnlineSessionSettings.h"
+#include "OnlineSubsystem.h"
+#include "Components/Button.h"
+#include "GameSession/SessionSubsystem.h"
+
+UTestServerMenuWidget::UTestServerMenuWidget(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
+	static ConstructorHelpers::FClassFinder<UUserWidget> LobbyWidgetAsset(TEXT("UserWidget '/Game/UI/WBP_Lobby.WBP_Lobby_C'"));
+	if(LobbyWidgetAsset.Succeeded())
+	{
+		LobbyWidgetClass = LobbyWidgetAsset.Class;
+	}
+}
+
+void UTestServerMenuWidget::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch)
+{
+	NumPublicConnections = NumberOfPublicConnections;
+	MatchType = TypeOfMatch;
+	AddToViewport();
+	SetVisibility(ESlateVisibility::Visible);
+	bIsFocusable = true;
+
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if(PlayerController)
+		{
+			FInputModeUIOnly InputModeData;
+			InputModeData.SetWidgetToFocus(TakeWidget());
+			InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PlayerController->SetInputMode(InputModeData);
+			PlayerController->SetShowMouseCursor(true);
+		}
+	}
+
+	UGameInstance* GameInstance = GetGameInstance();
+	if(GameInstance)
+	{
+		SessionSubsystem = GameInstance->GetSubsystem<USessionSubsystem>();
+		if(SessionSubsystem)
+		{
+			SessionSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this, &ThisClass::OnCreateSession);
+			SessionSubsystem->MultiplayerOnFindSessionsComplete.AddUObject(this, &ThisClass::OnFindSession);
+			SessionSubsystem->MultiplayerOnJoinSessionComplete.AddUObject(this, &ThisClass::OnJoinSession);
+			SessionSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &ThisClass::OnDestroySession);
+		}
+	}
 }
 
 bool UTestServerMenuWidget::Initialize()
@@ -14,35 +61,127 @@ bool UTestServerMenuWidget::Initialize()
 		return false;
 	}
 
+	if(PlayButton)
+	{
+		PlayButton->OnClicked.AddDynamic(this, &ThisClass::PlayButtonClicked);
+	}
+	if(JoinButton)
+	{
+		JoinButton->OnClicked.AddDynamic(this, &ThisClass::JoinButtonClicked);
+	}
+	if(QuitButton)
+	{
+		QuitButton->OnClicked.AddDynamic(this, &ThisClass::QuitButtonClicked);
+	}
+	
 	return true;
 }
 
 void UTestServerMenuWidget::NativeDestruct()
 {
+	MenuTearDown();
 	Super::NativeDestruct();
 }
 
 void UTestServerMenuWidget::OnCreateSession(bool bWasSuccessful)
 {
+	if(bWasSuccessful)
+	{
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Success to create session")));
+		MenuTearDown();
+		UWorld* World = GetWorld();
+		if(World && LobbyWidgetClass)
+		{
+			UUserWidget* LobbyWidget = CreateWidget<UUserWidget>(World, LobbyWidgetClass);
+			LobbyWidget->AddToViewport();
+		}
+	}
+	else
+	{
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Failed to create session")));
+	}
 }
 
-void UTestServerMenuWidget::OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionSearchResults,
-	bool bWasSuccessful)
+void UTestServerMenuWidget::OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionResult, bool bWasSuccessful)
 {
+	if(!SessionSubsystem) return;
+
+	for(auto Result : SessionResult)
+	{
+		FString SettingValue;
+		Result.Session.SessionSettings.Get(FName("MatchType"), SettingValue);
+		if(SettingValue == MatchType)
+		{
+			SessionSubsystem->JoinSession(Result);
+			return;
+		}
+	}
 }
 
 void UTestServerMenuWidget::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 {
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if(OnlineSubsystem)
+	{
+		IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+		if(SessionInterface.IsValid())
+		{
+			FString Address;
+			SessionInterface->GetResolvedConnectString(NAME_GameSession ,Address);
+
+			APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
+			if(PlayerController)
+			{
+				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Address : %s"), *Address));
+				PlayerController->ClientTravel(Address, TRAVEL_Absolute);
+
+				MenuTearDown();
+				UWorld* World = GetWorld();
+				if(World && LobbyWidgetClass)
+				{
+					UUserWidget* LobbyWidget = CreateWidget<UUserWidget>(World, LobbyWidgetClass);
+					LobbyWidget->AddToViewport();
+				}
+			}
+		}
+	}
+
+	if(Result != EOnJoinSessionCompleteResult::Success)
+	{
+		JoinButton->SetIsEnabled(true);
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Failed to join session")));
+	}
 }
 
 void UTestServerMenuWidget::OnDestroySession(bool bWasSuccessful)
 {
 }
 
-void UTestServerMenuWidget::OnStartSession(bool bWasSuccessful)
+void UTestServerMenuWidget::PlayButtonClicked()
+{
+	PlayButton->SetIsEnabled(false);
+
+	if(SessionSubsystem)
+	{
+		SessionSubsystem->CreateSession(NumPublicConnections, MatchType);
+	}
+}
+
+void UTestServerMenuWidget::JoinButtonClicked()
+{
+	JoinButton->SetIsEnabled(false);
+
+	if(SessionSubsystem)
+	{
+		SessionSubsystem->FindSession(100);
+	}
+}
+
+void UTestServerMenuWidget::QuitButtonClicked()
 {
 }
 
 void UTestServerMenuWidget::MenuTearDown()
 {
+	RemoveFromParent();
 }
