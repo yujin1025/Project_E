@@ -25,14 +25,20 @@ EBTNodeResult::Type UBTTask_RunAwayFromPlayer::ExecuteTask(UBehaviorTreeComponen
 
     APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
 
-    APJECharacterShadowA* OwnerActor = Cast<APJECharacterShadowA>(OwnerController->GetPawn());
+    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
 
     FRunAwayFromPlayerTaskMemory* TaskMemory = (FRunAwayFromPlayerTaskMemory*)NodeMemory;
 
-    TaskMemory->TargetActor = OwnerActor;
+    APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
+    ACharacter* ControllingCharacter = Cast<ACharacter>(ControllingPawn);
+
+    TaskMemory->RunAwayable = Cast<IPJERunAwayable>(OwnerActor);
     TaskMemory->KeepMovingTime = GetWorld()->TimeSeconds;
     float RandomAngle = FMath::RandRange(-30.0f, 30.0f);
     TaskMemory->RandomDegree = RandomAngle;
+    TaskMemory->LastMaxMoveSpeed = ControllingCharacter->GetCharacterMovement()->MaxWalkSpeed;
+
+    ControllingCharacter->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->RunAwayable->GetRunAwaySpeed();
     return EBTNodeResult::InProgress;
 }
 
@@ -60,12 +66,13 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 
     float CurrentTime = GetWorld()->TimeSeconds;
     float KeepMovingTime = TaskMemory->KeepMovingTime;
-    float MaxKeepMovingTime = TaskMemory->TargetActor->GetMaxKeepMovingTime();
+    float MaxKeepMovingTime = TaskMemory->RunAwayable->GetMaxKeepMovingTime();
 
     if (CurrentTime - KeepMovingTime >= MaxKeepMovingTime)
     {
         UE_LOG(LogTemp, Warning, TEXT("MaxKeepMovingTime reached: Stopping movement"));
         AICon->StopMovement();
+        ControlledPawn->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         return;
     }

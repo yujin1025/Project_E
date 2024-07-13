@@ -41,6 +41,7 @@ void APJEShadowAIController::OnRep_SubPatrolPos()
     }
 }
 
+
 void APJEShadowAIController::Server_SetRandomDestPos_Implementation(const FVector& OriPos)
 {
     APawn* ControllingPawn = GetPawn();

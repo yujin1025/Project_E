@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/PJEAI.h"
 #include "AI/Enemies/Controller/PJEShadowAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "NavigationSystem.h"
 
 UBTTask_SmoothMoveTo::UBTTask_SmoothMoveTo()
@@ -17,7 +18,8 @@ UBTTask_SmoothMoveTo::UBTTask_SmoothMoveTo()
 
 EBTNodeResult::Type UBTTask_SmoothMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-
+    APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
+    ACharacter* ControllingCharacter = Cast<ACharacter>(ControllingPawn);
     return EBTNodeResult::InProgress;
 }
 
@@ -61,7 +63,7 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     FVector DirVec = NewLocation - Character->GetActorLocation();
     DirVec.Normalize();
     AIController->MoveToLocation(Character->GetActorLocation() + DirVec * 10.0f, -1.0f, false, false, false, false, nullptr, true);
-    BlackboardComp->SetValueAsFloat(BBKEY_PROGRESS, BlackboardComp->GetValueAsFloat(BBKEY_PROGRESS) + DeltaSeconds * 0.4);
+    BlackboardComp->SetValueAsFloat(BBKEY_PROGRESS, BlackboardComp->GetValueAsFloat(BBKEY_PROGRESS) + DeltaSeconds * 0.6);
 
     if (OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_PROGRESS) >= 0.9)
     {
