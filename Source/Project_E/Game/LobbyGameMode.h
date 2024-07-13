@@ -16,10 +16,13 @@ class PROJECT_E_API ALobbyGameMode : public AGameModeBase
 public:
 	ALobbyGameMode();
 
-	TArray<APlayerController> PCs;
+	virtual void Tick(float DeltaSeconds) override;
 	
+	TArray<APlayerController> PCs;
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 	
 	TArray<FString> PlayerNames;
 };

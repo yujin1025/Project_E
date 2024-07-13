@@ -6,7 +6,9 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "Components/Button.h"
+#include "Components/SplineComponent.h"
 #include "GameSession/SessionSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 UTestServerMenuWidget::UTestServerMenuWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -89,11 +91,12 @@ void UTestServerMenuWidget::OnCreateSession(bool bWasSuccessful)
 	{
 		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Success to create session")));
 		MenuTearDown();
+		
 		UWorld* World = GetWorld();
-		if(World && LobbyWidgetClass)
+		if(World)
 		{
-			UUserWidget* LobbyWidget = CreateWidget<UUserWidget>(World, LobbyWidgetClass);
-			LobbyWidget->AddToViewport();
+			FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
+			World->ServerTravel(CurrentLevelName + TEXT("?listen"));
 		}
 	}
 	else
@@ -106,6 +109,8 @@ void UTestServerMenuWidget::OnFindSession(const TArray<FOnlineSessionSearchResul
 {
 	if(!SessionSubsystem) return;
 
+	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Session Num : %d"), SessionResult.Num()));
+	
 	for(auto Result : SessionResult)
 	{
 		FString SettingValue;
@@ -115,6 +120,11 @@ void UTestServerMenuWidget::OnFindSession(const TArray<FOnlineSessionSearchResul
 			SessionSubsystem->JoinSession(Result);
 			return;
 		}
+	}
+
+	if(!bWasSuccessful || SessionResult.Num() == 0)
+	{
+		JoinButton->SetIsEnabled(true);
 	}
 }
 
@@ -134,14 +144,6 @@ void UTestServerMenuWidget::OnJoinSession(EOnJoinSessionCompleteResult::Type Res
 			{
 				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Address : %s"), *Address));
 				PlayerController->ClientTravel(Address, TRAVEL_Absolute);
-
-				MenuTearDown();
-				UWorld* World = GetWorld();
-				if(World && LobbyWidgetClass)
-				{
-					UUserWidget* LobbyWidget = CreateWidget<UUserWidget>(World, LobbyWidgetClass);
-					LobbyWidget->AddToViewport();
-				}
 			}
 		}
 	}
