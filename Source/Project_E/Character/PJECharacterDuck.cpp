@@ -327,7 +327,7 @@ void APJECharacterDuck::CalculateProjectilePath()
     MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
     MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
     MuzzleRotation = CameraRotation;
-    MuzzleRotation.Pitch += 30.0f;
+    MuzzleRotation.Pitch += 23.0f;
 
     // 예측 궤도 계산
     FPredictProjectilePathParams PredictParams(1.0f, MuzzleLocation, MuzzleRotation.Vector() * 1000.f, 10.f, ECC_Visibility, this);
