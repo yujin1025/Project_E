@@ -2,7 +2,7 @@
 
 
 #include "PJEProjectile.h"
-#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../PJECharacterBase.h"
 #include "../Component/HealthComponent.h"
@@ -11,13 +11,13 @@ APJEProjectile::APJEProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
-	SetRootComponent(CollisionBox);
-	CollisionBox->BodyInstance.SetCollisionProfileName(TEXT("PJEProjectile"));
-	CollisionBox->OnComponentHit.AddDynamic(this, &APJEProjectile::OnAttack);
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionBox"));
+	SetRootComponent(CollisionComponent);
+	CollisionComponent->BodyInstance.SetCollisionProfileName(TEXT("PJEProjectile"));
+	CollisionComponent->OnComponentHit.AddDynamic(this, &APJEProjectile::OnAttack);
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
-	ProjectileMesh->SetupAttachment(CollisionBox);
+	ProjectileMesh->SetupAttachment(CollisionComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	ProjectileMovementComponent->InitialSpeed = Speed;
@@ -25,6 +25,8 @@ APJEProjectile::APJEProjectile()
 	ProjectileMovementComponent->ProjectileGravityScale = GravityScale; 
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Bounciness = 0.3f;
+
+	//InitialLifeSpan = 10.0f; 
 }
 
 
