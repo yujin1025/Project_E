@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/PJECharacterPlayer.h"
+#include "PJECharacterPlayer.h"
 #include "PJECharacterCat.generated.h"
 
+class UCatInventoryWidget;
+class UAnimMontage;
 /**
  *
  */
@@ -22,30 +24,39 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void Landed(const FHitResult& Hit) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	class UDataTable* ItemDatabase;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UInventory* Inventory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
+	UInputAction* GrabAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* DashAction;
+	UInputAction* SwingAction;
 
-	UPROPERTY(EditAnywhere, Category = "Jump")
-	float JumpHeight = 500.0f; 
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float DashSpeed = 1.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	bool bFirstJump = true;
 
-	UPROPERTY(EditAnywhere)
-	bool bIsWalking = true;
-
-	int32 JumpCount = 0;
-
-	// Action Section
 protected:
-	void DoubleJump();
-	void Dash();
-	void StopDash();
-	void Attack(); //¿‚±‚
+	void Grab();
 	void Swing();
+	void Dash();
+	void DropItem() override;
+
+private:
+	UPROPERTY()
+	UCatInventoryWidget* CatInventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UCatInventoryWidget> CatInventoryClass;
+
+	/**
+	* Animation montages
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* SwingMontage;
+
 };

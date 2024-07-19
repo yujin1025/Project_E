@@ -5,9 +5,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Player/PJEPlayerController.h"
-#include "../Game/PJEGameModeBase.h"
-
+#include "../UI/CatInventoryWidget.h"
+#include "../Items/Inventory.h"
+#include "Animation/AnimMontage.h"
 
 APJECharacterCat::APJECharacterCat()
 {
@@ -16,58 +16,74 @@ APJECharacterCat::APJECharacterCat()
 void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APJECharacterCat::DoubleJump);
-        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APJECharacterCat::Dash);
-        EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APJECharacterCat::StopDash);
-    }
+     
+     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+         EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &APJECharacterCat::Grab);
+         EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
+     }
 }
+
 
 void APJECharacterCat::BeginPlay()
 {
     Super::BeginPlay();
 
-    auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
-    if (GameMode == nullptr)
-        return;
+    Inventory = NewObject<UInventory>(this);
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
 
-    auto* Data = GameMode->GetCharacterStat(ECharacterType::Cat);
-    if (Data == nullptr)
-        return;
-
-    GetCharacterMovement()->MaxWalkSpeed = Data->MoveSpeed;
-}
-
-void APJECharacterCat::Landed(const FHitResult& Hit)
-{
-    Super::Landed(Hit);
-    bFirstJump = true;
-    JumpCount = 0;
-}
-
-void APJECharacterCat::DoubleJump()
-{
-    if (bFirstJump)
+    CatInventoryWidget = CreateWidget<UCatInventoryWidget>(GetWorld(), CatInventoryClass);
+    if (CatInventoryWidget)
     {
-        bFirstJump = false;
-        JumpCount++;
-        LaunchCharacter(FVector(0.0f, 0.0f, JumpHeight), false, true);
-        return;
+        CatInventoryWidget->AddToViewport();
     }
+}
 
-    else if (!bFirstJump && JumpCount < 2)
+
+void APJECharacterCat::Grab()
+{
+    if (Inventory)
     {
-        UCharacterMovementComponent* PlayerMovement = GetCharacterMovement();
-        if (PlayerMovement)
+        UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
+        if (NewItem)
         {
-            FVector Start = GetActorUpVector();
-            float DefaultJumpHeight = PlayerMovement->JumpZVelocity;
-            FVector End = GetActorLocation() + Start * DefaultJumpHeight;
-            LaunchCharacter(End - GetActorLocation(), false, true);
-            JumpCount++;
+            Inventory->AddItem(NewItem, false);
+
+            if (CatInventoryWidget)
+            {
+                CatInventoryWidget->UpdateInventory(NewItem);
+            }
         }
+    }
+}
+
+void APJECharacterCat::DropItem()
+{
+    Super::DropItem();
+
+    if (Inventory)
+    {
+        UItem* CurrentItem = Inventory->GetCatInventoryItem();
+        if (CurrentItem)
+        {
+            Inventory->RemoveItem(CurrentItem, false);
+
+            if (CatInventoryWidget)
+            {
+                CatInventoryWidget->UpdateInventory(nullptr);
+            }
+        }
+    }
+}
+
+void APJECharacterCat::Swing()
+{
+    if (bIsAttacking)
         return;
+
+    if (SwingMontage)
+    {
+        bIsAttacking = true;
+        PlayAnimMontage(SwingMontage);
     }
 }
 
@@ -75,24 +91,8 @@ void APJECharacterCat::Dash()
 {
     if (bIsWalking)
     {
-        GetCharacterMovement()->MaxWalkSpeed *= 2.0f;
+        GetCharacterMovement()->MaxWalkSpeed *= DashSpeed;
     }
 }
 
-void APJECharacterCat::StopDash()
-{
-    if (bIsWalking)
-    {
-        GetCharacterMovement()->MaxWalkSpeed /= 2.0f;
-    }
-}
 
-void APJECharacterCat::Attack()
-{
-    Super::Attack();
-
-}
-
-void APJECharacterCat::Swing()
-{
-}

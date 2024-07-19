@@ -13,6 +13,7 @@ APJECharacterShadowB::APJECharacterShadowB()
 	MoveSpeed = 1.5f;
 	PlayerDetectionRange = 1.0f;
 	AttackSize = 1.6f;
+	ChaseSpeed = 4.0f;
 }
 
 void APJECharacterShadowB::BeginPlay()
@@ -22,6 +23,8 @@ void APJECharacterShadowB::BeginPlay()
 	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	SetCurrentHP(MaxHp);
+
+	PlayerDetectionRange = 4.0f;
 }
 
 float APJECharacterShadowB::GetAIPatrolRadius()
@@ -42,6 +45,11 @@ float APJECharacterShadowB::GetAIAttackRange()
 float APJECharacterShadowB::GetAITurnSpeed()
 {
 	return 0.0f;
+}
+
+float APJECharacterShadowB::GetChaseSpeed()
+{
+	return ChaseSpeed;
 }
 
 void APJECharacterShadowB::AttackByAI()

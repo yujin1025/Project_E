@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Gimmick/PJEInteractInterface.h"
+#include "Gimmick/PJEInteractiveActor.h"
 #include "ItemBase.generated.h"
 
 class UBoxComponent;
 
 UCLASS()
-class PROJECT_E_API AItemBase : public AActor, public IPJEInteractInterface
+class PROJECT_E_API AItemBase : public APJEInteractiveActor
 {
 	GENERATED_BODY()
 	
@@ -19,9 +19,6 @@ public:
 	AItemBase();
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = Box)
-	TObjectPtr<UBoxComponent> WidgetTrigger;
-
 	UPROPERTY(VisibleAnywhere, Category = Box)
 	TObjectPtr<UStaticMeshComponent> ItemMesh;
 

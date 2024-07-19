@@ -11,20 +11,29 @@ class PROJECT_E_API APJEShadowGenerator : public AActor
 {
     GENERATED_BODY()
 
-public:
+    public:
     APJEShadowGenerator();
     virtual void BeginPlay() override;
     virtual void Destroyed() override;
 
-// Mesh Section
+    // Mesh Section
 protected:
     UPROPERTY(VisibleAnywhere)
     UStaticMeshComponent* CubeMesh;
 
-// Spawn Section
+    // Spawn Section
 public:
-    template <typename ShadowType>
-    void SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass, bool bAddToManager = true);
+
+
+    UFUNCTION(Server, Reliable, WithValidation)
+    void Server_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
+    bool Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
+    void Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
+
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
+    bool Multicast_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
+    void Multicast_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
 
 protected:
     FTimerHandle SpawnTimerHandle;
@@ -37,4 +46,7 @@ protected:
 
     void StartSpawnTimer();
     void SpawnShadowAWithTimer();
+
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

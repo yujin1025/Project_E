@@ -4,13 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterShadow.h"
+#include "AI/Enemies/Interface/PJETeleportable.h"
+#include "AI/Enemies/Interface/PJEBlinkable.h"
+#include "AI/Enemies/Interface/PJERunAwayable.h"
 #include "PJECharacterShadowA.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow
+class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow, public IPJETeleportable, public IPJEBlinkable, public IPJERunAwayable
 {
 	GENERATED_BODY()
 public:
@@ -27,12 +30,15 @@ protected:
 	float SingleBlinkDuration;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float TeleportRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float RunAwaySpeed;
 
 public:
-	float GetMaxKeepMovingTime();
-	float GetBlinkDuration();
-	float GetSingleBlinkDuration();
-	float GetTeleportRange();
+	virtual float GetMaxKeepMovingTime() override;
+	virtual float GetBlinkDuration() override;
+	virtual float GetSingleBlinkDuration() override;
+	virtual float GetTeleportRange() override;
+	virtual float GetRunAwaySpeed() override;
 
 
 protected:

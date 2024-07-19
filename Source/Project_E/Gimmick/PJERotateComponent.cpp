@@ -8,19 +8,20 @@ UPJERotateComponent::UPJERotateComponent()
 
 void UPJERotateComponent::OperateRotation(float DeltaTime)
 {
-	FRotator CurrentRotator = GetOwner()->GetActorRotation();
+	if(!RotateTarget) return;
+	FRotator CurrentRotator = RotateTarget->GetComponentRotation();
 	FRotator NewRotator = CurrentRotator + RotationAngle * DeltaTime * RotationSpeed;
 
 	const FQuat Quat1 = FQuat(NewRotator);
 	const FQuat Quat2 = FQuat(OriginRotation);
 	float AngleRadian = Quat1.AngularDistance(Quat2);
 	float AngleDegree = FMath::RadiansToDegrees(AngleRadian);
-
 	if(AngleDegree > MaxRotateDegree)
 	{
+		bIsMaxRotate = true;
 		return;
 	}
-	GetOwner()->SetActorRotation(NewRotator);
+	RotateTarget->SetWorldRotation(NewRotator);
 }
 
 void UPJERotateComponent::StopRotation()
@@ -30,23 +31,33 @@ void UPJERotateComponent::StopRotation()
 
 void UPJERotateComponent::ResetRotation(float DeltaTime)
 {
-	FRotator CurrentRotator = GetOwner()->GetActorRotation();
+	if(!RotateTarget) return;
+
+	bIsMaxRotate = false;
+	FRotator CurrentRotator = RotateTarget->GetComponentRotation();
 	float Speed = FMath::Abs(RotationSpeed);
 	FRotator NewRotation = FMath::RInterpConstantTo(CurrentRotator, OriginRotation, DeltaTime, Speed);
-	GetOwner()->SetActorRotation(NewRotation);
+	RotateTarget->SetWorldRotation(NewRotation);
 }
 
 void UPJERotateComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	OriginRotation = GetOwner()->GetActorRotation();
+
+	if(RotateTarget)
+	{
+		OriginRotation = RotateTarget->GetComponentRotation();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Rotate Target"));
+	}
 }
 
 void UPJERotateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	switch (RotateState)
 	{
 	case ERotateState::Rotating:

@@ -32,14 +32,14 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	FVector OriginLocation;
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Movement|DP_Settings")
 	FVector MoveOffset;
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	float MoveTime = 4.f;
+	UPROPERTY(EditAnywhere, Category = "Movement|DP_Settings")
+	float MoveSpeed = 4.f;
 	
 	float AfterDisactive = 2.f;
 	// The time from when the character releases the button until the platform moves into place
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, Category = "Movement|DP_Settings")
 	float PlatformDelayTime = 2.f;
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	bool bPlatformActive;

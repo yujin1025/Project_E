@@ -2,7 +2,7 @@
 
 
 #include "Character/PJECharacterShadowA.h"
-#include "AI/Enemies/PJEShadowAAIController.h"
+#include "AI/Enemies/Controller/PJEShadowAAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -42,6 +42,11 @@ float APJECharacterShadowA::GetSingleBlinkDuration()
 float APJECharacterShadowA::GetTeleportRange()
 {
 	return TeleportRange * 100.0f;
+}
+
+float APJECharacterShadowA::GetRunAwaySpeed()
+{
+	return RunAwaySpeed * 100;
 }
 
 void APJECharacterShadowA::BeginPlay()

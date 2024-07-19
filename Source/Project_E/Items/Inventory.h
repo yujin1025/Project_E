@@ -16,16 +16,32 @@ class PROJECT_E_API UInventory : public UObject
 	
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-    TArray<UItem*> WeaponInventory;
+    TArray<UItem*> DuckWeaponInventory;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-    TArray<UItem*> NonWeaponInventory;
+    TArray<UItem*> DuckNonWeaponInventory;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+    UItem* CatInventoryItem;
 
     UFUNCTION(BlueprintCallable, Category = "Inventory")
-    void AddItem(UItem* Item);
+    void AddItem(UItem* Item, bool bIsDuck);
 
     UFUNCTION(BlueprintCallable, Category = "Inventory")
-    void RemoveItem(UItem* Item);
+    void RemoveItem(UItem* Item, bool bIsDuck);
+
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    UItem* RemoveLastItem(bool bIsDuck);
+
+    int32 GetWeaponCount() { return DuckWeaponInventory.Num(); }
+    int32 GetNonWeaponCount() { return DuckNonWeaponInventory.Num(); }
+    int32 GetInventoryCount() const { return DuckWeaponInventory.Num() + DuckNonWeaponInventory.Num(); }
+
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    void SetCatInventoryItem(UItem* Item);
+
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    UItem* GetCatInventoryItem() const;
 
     //UFUNCTION(BlueprintCallable, Category = "Inventory")
     //bool IsFull() const;

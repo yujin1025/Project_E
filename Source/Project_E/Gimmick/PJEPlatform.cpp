@@ -5,6 +5,8 @@
 
 APJEPlatform::APJEPlatform()
 {
+	bReplicates = true;
+	
 	PrimaryActorTick.bCanEverTick = true;
 	
 	PlatformMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button Boarder"));
@@ -20,13 +22,14 @@ void APJEPlatform::BeginPlay()
 
 void APJEPlatform::MovePlatform(float DeltaTime)
 {
+	if(!HasAuthority()) return;
+	
 	FVector CurrentLocation = GetActorLocation();
 	FVector TargetLocation = OriginLocation + MoveOffset;
-	float Speed = FVector::Distance(OriginLocation, TargetLocation) / MoveTime;
 	
 	if(bPlatformActive)
 	{
-		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
+		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, MoveSpeed);
 		SetActorLocation(NewLocation);
 		AfterDisactive = 0.f;
 	}
@@ -38,7 +41,7 @@ void APJEPlatform::MovePlatform(float DeltaTime)
 		// a period of time has passed since the player stopped interacting with button
 		if(AfterDisactive > PlatformDelayTime)
 		{
-			FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, OriginLocation, DeltaTime, Speed);
+			FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, OriginLocation, DeltaTime, MoveSpeed);
 			SetActorLocation(NewLocation);
 		}
 	}

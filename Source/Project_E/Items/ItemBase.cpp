@@ -2,11 +2,7 @@
 
 
 #include "ItemBase.h"
-#include "Item.h"
-#include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Engine/DataTable.h"
-#include "Interface/PJECharacterItemInterface.h"
 
 // Sets default values
 AItemBase::AItemBase()
@@ -17,9 +13,6 @@ AItemBase::AItemBase()
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Item Mesh"));
 	SetRootComponent(ItemMesh);
 	ItemMesh->SetGenerateOverlapEvents(false);
-	
-	WidgetTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Widget Trigger"));
-	WidgetTrigger->SetupAttachment(ItemMesh);
 }
 
 

@@ -1,11 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "PJECharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/DamageEvents.h"
+#include "Component/HitDeadComponent.h"
 #include "../Game/PJEGameModeBase.h"
+#include "Component/HealthComponent.h"
 
 // Sets default values
 APJECharacterBase::APJECharacterBase()
@@ -37,6 +39,7 @@ APJECharacterBase::APJECharacterBase()
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HitDeadComponent = CreateDefaultSubobject<UHitDeadComponent>(TEXT("HitDeadComponent"));
 
 	// TODO : Implement Movement 
 	
@@ -67,6 +70,8 @@ void APJECharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 델리게이트 핸들러 등록
+	OnAttackEnd.AddDynamic(this, &APJECharacterBase::OnAttackEndHandler);
 }
 
 void APJECharacterBase::SetDead()
@@ -115,8 +120,35 @@ void APJECharacterBase::Look(const FVector2D Value)
 	}
 }
 
+void APJECharacterBase::OnHit()
+{
+	if (HitDeadComponent)
+	{
+		HitDeadComponent->PlayHitMontage();
+	}
+}
+
+void APJECharacterBase::OnDie()
+{
+	if (HitDeadComponent)
+	{
+		HitDeadComponent->PlayDeadMontage();
+	}
+}
+
 bool APJECharacterBase::IsPlayer()
 {
 	return Controller->IsPlayerController();
+}
+
+FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget)
+{
+	IsFoundTarget = false;
+	return FVector::ZeroVector;
+}
+
+void APJECharacterBase::OnAttackEndHandler()
+{
+	bIsAttacking = false;
 }
 
