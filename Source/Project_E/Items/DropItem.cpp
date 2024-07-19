@@ -1,8 +1,7 @@
-
-
 #include "Items/DropItem.h"
-
 #include "Character/PJECharacterPlayer.h"
+#include "Character/PJECharacterCat.h"
+#include "Character/PJECharacterDuck.h"
 
 ADropItem::ADropItem()
 {
@@ -24,8 +23,17 @@ void ADropItem::InteractionKeyPressed(APJECharacterPlayer* Character)
 	// 테스트로 일단 상호작용 키 누르면 ItemCode 전달하고 사라지게..
 	if(Character)
 	{
-		Character->GetItem(ItemCode);
+		//Character->GetItem(ItemCode);
 		Character->SetHandItemCode(ItemCode);
+
+		if (APJECharacterDuck* DuckCharacter = Cast<APJECharacterDuck>(Character))
+		{
+			DuckCharacter->Swallow();
+		}
+		else if (APJECharacterCat* CatCharacter = Cast<APJECharacterCat>(Character))
+		{
+			CatCharacter->Grab();
+		}
 	}
 	Destroy();
 }

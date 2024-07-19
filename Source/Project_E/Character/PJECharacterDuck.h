@@ -37,8 +37,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AimAction;
 
-protected:
+public:
 	void Swallow();
+
+protected:
 	void DropItem() override;
 	void Fire();
 	void ResetFire();
@@ -67,7 +69,7 @@ protected:
 	bool bCanRapidFire;
 
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float DefaultWalkSpeed = 3.55f;
+	float DefaultWalkSpeed = 355.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float DashMultiplier = 1.2f;
@@ -89,6 +91,7 @@ protected:
 
 	bool bIsAiming;
 	bool bIsSwallowed;
+	bool bIsInitialized = false;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Combat")

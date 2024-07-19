@@ -32,7 +32,7 @@ void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
     {
-        EnhancedInputComponent->BindAction(SwallowAction, ETriggerEvent::Started, this, &APJECharacterDuck::Swallow);
+        //EnhancedInputComponent->BindAction(SwallowAction, ETriggerEvent::Started, this, &APJECharacterDuck::Swallow);
         EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &APJECharacterDuck::Fire);
         EnhancedInputComponent->BindAction(RapidFireAction, ETriggerEvent::Triggered, this, &APJECharacterDuck::RapidFire);
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APJECharacterDuck::EnterAimingMode);
@@ -44,7 +44,11 @@ void APJECharacterDuck::BeginPlay()
 {
     Super::BeginPlay();
 
+    UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
+
     Inventory = NewObject<UInventory>(this);
+    UE_LOG(LogTemp, Warning, TEXT("Inventory 생성: %s"), *Inventory->GetName());
+
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
 
     WeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), WeaponInventoryClass);
@@ -91,6 +95,9 @@ void APJECharacterDuck::Swallow()
             UpdateInventoryWidget(SwallowedItem->Type);
         }
     }
+
+    int32 WeaponCount = Inventory->GetInventoryCount();
+    UE_LOG(LogTemp, Warning, TEXT("Weapon Count: %d"), WeaponCount);
 }
 
 void APJECharacterDuck::DropItem()
@@ -125,6 +132,9 @@ void APJECharacterDuck::Fire()
 
     if (!bIsAiming)
         return;
+
+    int32 WeaponCount = Inventory->GetInventoryCount();
+    UE_LOG(LogTemp, Warning, TEXT("Weapon Count: %d"), WeaponCount);
 
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {

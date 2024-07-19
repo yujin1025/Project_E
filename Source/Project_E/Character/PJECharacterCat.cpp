@@ -18,7 +18,7 @@ void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     Super::SetupPlayerInputComponent(PlayerInputComponent);
      
      if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-         EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &APJECharacterCat::Grab);
+         //EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &APJECharacterCat::Grab);
          EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
      }
 }
