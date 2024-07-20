@@ -27,7 +27,7 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* CollisionBox;
+	class USphereComponent* CollisionComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UStaticMeshComponent* ProjectileMesh;

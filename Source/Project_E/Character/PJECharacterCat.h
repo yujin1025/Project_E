@@ -39,9 +39,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float DashSpeed = 1.5f;
 
+public:
+	void Grab();
 
 protected:
-	void Grab();
 	void Swing();
 	void Dash();
 	void DropItem() override;

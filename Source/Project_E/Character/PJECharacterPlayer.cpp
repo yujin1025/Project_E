@@ -355,8 +355,11 @@ void APJECharacterPlayer::OnInteractBegin()
     }
     else
     {
-        InteractableActor->SetOwner(this);
-        ServerOnInteractBegin();   
+        if(InteractableActor)
+        {
+            InteractableActor->SetOwner(this);
+            ServerOnInteractBegin();
+        }
     }
 }
 
