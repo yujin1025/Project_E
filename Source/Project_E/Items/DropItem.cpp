@@ -23,7 +23,6 @@ void ADropItem::InteractionKeyPressed(APJECharacterPlayer* Character)
 	// 테스트로 일단 상호작용 키 누르면 ItemCode 전달하고 사라지게..
 	if(Character)
 	{
-		//Character->GetItem(ItemCode);
 		Character->SetHandItemCode(ItemCode);
 
 		if (APJECharacterDuck* DuckCharacter = Cast<APJECharacterDuck>(Character))
