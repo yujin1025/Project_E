@@ -21,7 +21,7 @@ protected:
 	TObjectPtr<UStaticMeshComponent> ItemMesh;
 	
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "Item")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "DP_Settings")
 	int32 ItemCode;
 
 	virtual void InteractionKeyPressed(APJECharacterPlayer* Character) override;

@@ -10,11 +10,15 @@ UCLASS()
 class PROJECT_E_API ALobbySession : public AGameSession
 {
 	GENERATED_BODY()
+public:
+	ALobbySession();
 
-protected:
 	virtual void RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdPtr& UniqueId, bool bWasFromInvite) override;
 	virtual void UnregisterPlayer(const APlayerController* ExitingPlayer) override;
-
+	
+protected:
+	virtual void BeginPlay() override;
+	
 	FDelegateHandle RegisterPlayerDelegateHandle;
 	FDelegateHandle UnregisterPlayerDelegateHandle;
 	

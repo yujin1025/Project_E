@@ -11,7 +11,7 @@ UCLASS()
 class PROJECT_E_API APJEProjectile : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:	
 	APJEProjectile();
 
@@ -23,7 +23,6 @@ public:
 
 	UFUNCTION()
 	void OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 
 private:
 	UPROPERTY(EditAnywhere)
