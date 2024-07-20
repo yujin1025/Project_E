@@ -2,6 +2,8 @@
 
 
 #include "GameSession/SessionSubsystem.h"
+
+#include "LobbySession.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 

@@ -39,14 +39,30 @@ void ALobbyGameMode::BeginPlay()
 }
 
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
-{
+{	
 	Super::PostLogin(NewPlayer);
-
+	
+	ALobbySession* LobbySession = Cast<ALobbySession>(GameSession);
+	if(LobbySession)
+	{
+		LobbySession->RegisterPlayer(NewPlayer, NewPlayer->PlayerState->GetUniqueId().GetUniqueNetId(), false);
+	}
+	
 	APlayerState* PlayerState = NewPlayer->GetPlayerState<APlayerState>();
 	if(PlayerState)
 	{
 		FString PlayerName = PlayerState->GetPlayerName();
 		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Yellow, FString::Printf(TEXT("%s has joined the server"), *PlayerName));
 	}
-	
+}
+
+void ALobbyGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	ALobbySession* LobbySession = Cast<ALobbySession>(GameSession);
+	if(LobbySession)
+	{
+		LobbySession->UnregisterPlayer(Cast<APlayerController>(Exiting));
+	}
 }
