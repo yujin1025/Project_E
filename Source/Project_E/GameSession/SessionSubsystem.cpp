@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MultiplayerSessionSubsystem.h"
+#include "GameSession/SessionSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 
-UMultiplayerSessionSubsystem::UMultiplayerSessionSubsystem():
+USessionSubsystem::USessionSubsystem():
 	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
 	FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete)),
 	JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplete)),
@@ -19,7 +19,7 @@ UMultiplayerSessionSubsystem::UMultiplayerSessionSubsystem():
 	}
 }
 
-void UMultiplayerSessionSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
+void USessionSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
 {
 	if(!SessionInterface.IsValid())
 	{
@@ -34,7 +34,6 @@ void UMultiplayerSessionSubsystem::CreateSession(int32 NumPublicConnections, FSt
 		LastMatchType = MatchType;
 
 		DestroySession();
-		//SessionInterface->DestroySession(NAME_GameSession);
 	}
 	
 	// Store the delegate in a FDelegateHandle so we can later remove from the delegate list
@@ -63,7 +62,7 @@ void UMultiplayerSessionSubsystem::CreateSession(int32 NumPublicConnections, FSt
 	
 }
 
-void UMultiplayerSessionSubsystem::FindSession(int32 MaxSearchResult)
+void USessionSubsystem::FindSession(int32 MaxSearchResult)
 {
 	if(!SessionInterface)
 	{
@@ -85,7 +84,7 @@ void UMultiplayerSessionSubsystem::FindSession(int32 MaxSearchResult)
 	}
 }
 
-void UMultiplayerSessionSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResult)
+void USessionSubsystem::JoinSession(const FOnlineSessionSearchResult& SessionResult)
 {
 	if(!SessionInterface)
 	{
@@ -104,7 +103,7 @@ void UMultiplayerSessionSubsystem::JoinSession(const FOnlineSessionSearchResult&
 	}
 } 
 
-void UMultiplayerSessionSubsystem::DestroySession()
+void USessionSubsystem::DestroySession()
 {
 	if(!SessionInterface)
 	{
@@ -121,11 +120,11 @@ void UMultiplayerSessionSubsystem::DestroySession()
 	}
 }
 
-void UMultiplayerSessionSubsystem::StartSession()
+void USessionSubsystem::StartSession()
 {
 }
 
-void UMultiplayerSessionSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
+void USessionSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if(SessionInterface)
 	{
@@ -135,7 +134,7 @@ void UMultiplayerSessionSubsystem::OnCreateSessionComplete(FName SessionName, bo
 	MultiplayerOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
 
-void UMultiplayerSessionSubsystem::OnFindSessionComplete(bool bWasSuccessful)
+void USessionSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 {
 	if(SessionInterface)
 	{
@@ -152,7 +151,7 @@ void UMultiplayerSessionSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 	
 }
 
-void UMultiplayerSessionSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+void USessionSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
 	if(SessionInterface)
 	{
@@ -162,11 +161,11 @@ void UMultiplayerSessionSubsystem::OnJoinSessionComplete(FName SessionName, EOnJ
 	MultiplayerOnJoinSessionComplete.Broadcast(Result);
 }
 
-void UMultiplayerSessionSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
+void USessionSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 }
 
-void UMultiplayerSessionSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+void USessionSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if(SessionInterface)
 	{
