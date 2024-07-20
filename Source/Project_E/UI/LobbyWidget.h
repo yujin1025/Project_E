@@ -17,6 +17,8 @@ class PROJECT_E_API ULobbyWidget : public UUserWidget
 public:
 	ULobbyWidget(const FObjectInitializer &ObjectInitializer);
 
+	void UpdateStatus();
+
 protected:
 	virtual bool Initialize() override;
 

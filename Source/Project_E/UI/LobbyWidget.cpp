@@ -13,6 +13,11 @@ ULobbyWidget::ULobbyWidget(const FObjectInitializer& ObjectInitializer)
 	
 }
 
+void ULobbyWidget::UpdateStatus()
+{
+	
+}
+
 bool ULobbyWidget::Initialize()
 {
 	if(!Super::Initialize())

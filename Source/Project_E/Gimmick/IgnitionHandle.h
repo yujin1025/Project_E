@@ -27,6 +27,8 @@ protected:
 	
 	void ReturnPawn();
 
+	void OnLook(const FInputActionValue& Value);
+	
 	UFUNCTION(Client, Reliable)
 	virtual void InteractionKeyReleased(APJECharacterPlayer* Character) override;
 
@@ -53,7 +55,10 @@ private:
 	TArray<class APJERotatingPlatform*> RotatingPlatforms;
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
-	class UInputAction* TurnAction;
+	class UInputAction* LookAction;
+	
+	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
+	UInputAction* TurnAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = true))
 	UInputAction* InterruptAction;

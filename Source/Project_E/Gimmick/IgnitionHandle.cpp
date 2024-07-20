@@ -74,7 +74,10 @@ void AIgnitionHandle::InteractionKeyReleased_Implementation(APJECharacterPlayer*
 	{
 		LocalPlayerController->SetOperatingActor(this);
 		LocalPlayerController->InitInputIgnitionHandle();
-		Character->SetCamLocationRotation(Campos->GetArrowLocation(), Campos->GetArrowRotation());
+		if(Campos)
+		{
+			Character->SetCamLocationRotation(Campos->GetArrowLocation(), Campos->GetArrowRotation());
+		}
 	}
 }
 
@@ -107,6 +110,21 @@ void AIgnitionHandle::ReturnPawn()
 	}
 }
 
+void AIgnitionHandle::OnLook(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		APJEPlayerController* LocalPlayerController = Cast<APJEPlayerController>(World->GetFirstPlayerController());
+		if(LocalPlayerController)
+		{
+			LocalPlayerController->GetCharacter()->AddControllerYawInput(LookAxisVector.X);
+			LocalPlayerController->GetCharacter()->AddControllerPitchInput(LookAxisVector.Y);
+		}
+	}
+}
+
 void AIgnitionHandle::ServerInteractionEnd_Implementation()
 {
 	bIsInteracting = false;
@@ -114,6 +132,10 @@ void AIgnitionHandle::ServerInteractionEnd_Implementation()
 
 void AIgnitionHandle::InitInput(UEnhancedInputComponent* EnhancedInputComponent)
 {
+	if(!Campos)
+	{
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AIgnitionHandle::OnLook);
+	}
 	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Started, this, &AIgnitionHandle::DoRotation);
 	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Completed, this, &AIgnitionHandle::StopRotation);
 	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Completed, this, &AIgnitionHandle::ReturnPawn);
