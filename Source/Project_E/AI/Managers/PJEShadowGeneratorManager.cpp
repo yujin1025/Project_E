@@ -22,6 +22,10 @@ UPJEShadowGeneratorManager* UPJEShadowGeneratorManager::GetInstance()
                 ShutdownInstance();
             });
 
+        FWorldDelegates::OnWorldCleanup.AddLambda([](UWorld* World, bool bSessionEnded, bool bCleanupResources)
+            {
+                ShutdownInstance();
+            });
         Instance->FindAllShadowGenerators();
     }
     return Instance;
@@ -35,6 +39,7 @@ void UPJEShadowGeneratorManager::ShutdownInstance()
         Instance = nullptr;
     }
 }
+
 
 void UPJEShadowGeneratorManager::FindAllShadowGenerators()
 {

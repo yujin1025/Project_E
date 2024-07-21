@@ -10,12 +10,33 @@
 
 ALobbySession::ALobbySession()
 {
-	
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ALobbySession::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	NetMulticast_Tick(DeltaSeconds);
+}
+
+void ALobbySession::NetMulticast_Tick_Implementation(float DeltaSeconds)
+{
+	if(GEngine) GEngine->AddOnScreenDebugMessage(6, 10.f, FColor::Orange, FString::Printf(TEXT("Tick : %f"), DeltaSeconds));
 }
 
 void ALobbySession::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if(GetNetMode() == NM_Standalone)
+	{
+		// Not Server
+	}
+	else
+	{
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Orange, FString::Printf(TEXT("Hola")));
+	}
 }
 
 void ALobbySession::RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdPtr& UniqueId, bool bWasFromInvite)
@@ -57,16 +78,6 @@ void ALobbySession::OnRegisterPlayerComplete(FName NameOfSession, const TArray<F
 	bool bWasSuccessful)
 {
 	if(!bWasSuccessful) return;
-	
-	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
-	if(OnlineSubsystem)
-	{
-		IOnlineSessionPtr Session = OnlineSubsystem->GetSessionInterface();
-		if(Session.IsValid())
-		{
-			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Success to Register Player!")));
-		}
-	}
 }
 
 void ALobbySession::UnregisterPlayer(const APlayerController* ExitingPlayer)
@@ -99,9 +110,8 @@ void ALobbySession::UnregisterPlayer(const APlayerController* ExitingPlayer)
 	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("PC's Num : %d"), PCs.Num()));
 }
 
-
 void ALobbySession::OnUnregisterPlayerComplete(FName NameOfSession, const TArray<FUniqueNetIdRef>& PlayerIds,
-	bool bWasSuccessful)
+                                               bool bWasSuccessful)
 {
 
 	if(!bWasSuccessful) return;
@@ -115,4 +125,9 @@ void ALobbySession::OnUnregisterPlayerComplete(FName NameOfSession, const TArray
 			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Success to UnRegister Player!")));
 		}
 	}
+}
+
+void ALobbySession::NetMulticast_UpdatePlayer_Implementation()
+{
+	
 }

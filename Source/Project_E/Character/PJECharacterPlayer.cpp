@@ -53,25 +53,6 @@ void APJECharacterPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 }
 
 
-bool APJECharacterPlayer::GetItem(int32 ItemCode)
-{
-    /*
-    if (Inventory && !Inventory->IsFull())
-    {
-        UDataTable* ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
-
-        UItem* NewItem = UItem::SetItem(ItemDatabase, ItemCode); 
-        if (NewItem)
-        {
-            Inventory->AddItem(NewItem);
-            //InventoryWidget->AddItemToSlot(NewItem);
-            return true;
-        }
-    }*/
-
-    return false;
-}
-
 void APJECharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();

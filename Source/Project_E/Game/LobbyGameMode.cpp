@@ -17,20 +17,6 @@ ALobbyGameMode::ALobbyGameMode()
 void ALobbyGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
-	ENetMode CurrentNetMode = GetNetMode();
-	if(CurrentNetMode == NM_Standalone)
-	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Yellow, FString::Printf(TEXT("Standalone : %f"), DeltaSeconds));
-	}
-	else if(CurrentNetMode == NM_ListenServer)
-	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Yellow, FString::Printf(TEXT("ListenServer")));
-	}
-	else if(CurrentNetMode == NM_Client)
-	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Yellow, FString::Printf(TEXT("Client : %f"), DeltaSeconds));
-	}
 }
 
 void ALobbyGameMode::BeginPlay()
@@ -66,3 +52,4 @@ void ALobbyGameMode::Logout(AController* Exiting)
 		LobbySession->UnregisterPlayer(Cast<APlayerController>(Exiting));
 	}
 }
+

@@ -40,6 +40,13 @@ void UTestServerMenuWidget::MenuSetup(int32 NumberOfPublicConnections, FString T
 			PlayerController->SetInputMode(InputModeData);
 			PlayerController->SetShowMouseCursor(true);
 		}
+		if(World->GetNetMode() != NM_Standalone)
+		{
+			MenuTearDown();
+
+			UUserWidget* LobbyWidget = CreateWidget<UUserWidget>(World, LobbyWidgetClass);
+			LobbyWidget->AddToViewport();
+		}
 	}
 
 	UGameInstance* GameInstance = GetGameInstance();
@@ -62,7 +69,7 @@ bool UTestServerMenuWidget::Initialize()
 	{
 		return false;
 	}
-
+	
 	if(PlayButton)
 	{
 		PlayButton->OnClicked.AddDynamic(this, &ThisClass::PlayButtonClicked);
@@ -90,7 +97,6 @@ void UTestServerMenuWidget::OnCreateSession(bool bWasSuccessful)
 	if(bWasSuccessful)
 	{
 		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Success to create session")));
-		MenuTearDown();
 		
 		UWorld* World = GetWorld();
 		if(World)
@@ -143,7 +149,7 @@ void UTestServerMenuWidget::OnJoinSession(EOnJoinSessionCompleteResult::Type Res
 			if(PlayerController)
 			{
 				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Address : %s"), *Address));
-				PlayerController->ClientTravel(Address, TRAVEL_Absolute);
+				PlayerController->ClientTravel(Address, TRAVEL_Absolute);	
 			}
 		}
 	}

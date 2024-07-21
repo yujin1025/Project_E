@@ -1,4 +1,4 @@
-#include "HealthComponent.h"
+﻿#include "HealthComponent.h"
 #include "../../Game/PJEGameModeBase.h"
 #include "../PJECharacterBase.h"
 #include "../../Game/PJEGameState.h"
@@ -58,18 +58,19 @@ void UHealthComponent::ChangeHealth(float Amount)
 	if (Character->IsPlayer()) 
 	{
 		GameMode->MyPlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
-		UE_LOG(LogTemp, Warning, TEXT("Player Number : (%d) Current Health: %d"), Character->CharacterId, CurrentHealth);
+		UE_LOG(LogTemp, Warning, TEXT("Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth);
 	}
 	else 
 	{
 		GameMode->MyGameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
-		UE_LOG(LogTemp, Warning, TEXT("Non Player Number : (%d) Current Health: %d"), Character->CharacterId, CurrentHealth);
+		UE_LOG(LogTemp, Warning, TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth);
 	}
 
 	if (Amount < 0)
 	{
 		if (CurrentHealth <= 0)
 		{
+			Character->Destroy(); //몬스터 애니메이션 나오면 변경하기
 			//Character->OnDie();
 		}
 		else

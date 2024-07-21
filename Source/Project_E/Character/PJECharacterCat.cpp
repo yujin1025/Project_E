@@ -18,7 +18,6 @@ void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     Super::SetupPlayerInputComponent(PlayerInputComponent);
      
      if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-         //EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &APJECharacterCat::Grab);
          EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
      }
 }
@@ -41,7 +40,7 @@ void APJECharacterCat::BeginPlay()
 
 void APJECharacterCat::Grab()
 {
-    if (Inventory) //inventory만 보면 안되고 droppeditem있는지도 체크해야됨
+    if (Inventory) 
     {
         UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (NewItem)

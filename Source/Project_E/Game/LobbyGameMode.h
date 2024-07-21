@@ -27,4 +27,5 @@ protected:
 	virtual void Logout(AController* Exiting) override;
 	
 	TArray<FString> PlayerNames;
+
 };
