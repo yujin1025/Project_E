@@ -115,7 +115,7 @@ void UPJESystemWidget::OnScreenModeChanged(FString SelectedItem, ESelectInfo::Ty
 void UPJESystemWidget::OnCameraSpeedChanged(float Value)
 {
 	// 카메라 속도 변경 처리
-	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->DefaultFOV = FMath::Lerp(90.0f, 120.0f, Value);
+	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->DefaultFOV = FMath::Lerp(00.0f, 100.0f, Value);
 }
 
 void UPJESystemWidget::OnBrightnessChanged(float Value)
@@ -127,11 +127,9 @@ void UPJESystemWidget::OnBrightnessChanged(float Value)
 		PostProcessVolume->Settings.AutoExposureMethod = EAutoExposureMethod::AEM_Manual;
 		PostProcessVolume->Settings.bOverride_AutoExposureBias = true;
 
-		// AutoExposureBias 값을 -2.0에서 2.0 사이로 보간 (필요에 따라 범위 조정 가능)
 		float ExposureBias = FMath::Lerp(-0.f, 20.0f, Value);
 		PostProcessVolume->Settings.AutoExposureBias = ExposureBias;
 
-		// 로그 출력
 		UE_LOG(LogTemp, Log, TEXT("Brightness Value: %f, Set AutoExposureBias: %f"), Value, ExposureBias);
 	}
 }
