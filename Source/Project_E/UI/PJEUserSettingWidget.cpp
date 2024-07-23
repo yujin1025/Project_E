@@ -61,7 +61,18 @@ void UPJEUserSettingWidget::OnSoundButtonClicked()
 
 void UPJEUserSettingWidget::OnGuideButtonClicked()
 {
-	// 조작 안내 페이지로 전환하는 코드
+	if (DuckGuideWidgetClass)
+	{
+		if (!DuckGuideWidget)
+		{
+			DuckGuideWidget = CreateWidget<UUserWidget>(GetWorld(), DuckGuideWidgetClass);
+		}
+
+		if (DuckGuideWidget)
+		{
+			DuckGuideWidget->AddToViewport();
+		}
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Guide Button Clicked"));
 }
 

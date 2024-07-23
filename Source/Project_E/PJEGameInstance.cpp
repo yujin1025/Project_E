@@ -8,7 +8,7 @@
 void UPJEGameInstance::OnStart()
 {
 	Super::OnStart();
-
+	/*
 	// SettingsMenuClass가 설정되어 있는지 확인
 	if (SettingsMenuClass)
 	{
@@ -28,6 +28,7 @@ void UPJEGameInstance::OnStart()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SettingsMenuClass is not set."));
 	}
+	*/
 }
 
 void UPJEGameInstance::Shutdown()

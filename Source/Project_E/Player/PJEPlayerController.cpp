@@ -44,6 +44,16 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 	}
 }
 
+void APJEPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EnhancedInputComponent->BindAction(ToggleSettingsMenuAction, ETriggerEvent::Triggered, this, &APJEPlayerController::ToggleSettingsMenu);
+	}
+}
+
 
 // Input Switch Function
 
@@ -59,6 +69,7 @@ void APJEPlayerController::InitInputPawn()
 	{
 		Subsystem->ClearAllMappings();
 		Subsystem->AddMappingContext(DefaultContext, 0);
+		Subsystem->AddMappingContext(SettingContext, 1);
 	}
 
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
@@ -68,6 +79,8 @@ void APJEPlayerController::InitInputPawn()
 		APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(PossessedPawn);
 		CharacterPlayer->InitInput(EnhancedInputComponent);
 	}
+
+	EnhancedInputComponent->BindAction(ToggleSettingsMenuAction, ETriggerEvent::Started, this, &APJEPlayerController::ToggleSettingsMenu);
 }
 
 void APJEPlayerController::InitInputIgnitionHandle()
@@ -131,5 +144,37 @@ void APJEPlayerController::OpenWidget()
 	if (InGameWindowWidget != nullptr)
 	{
 		InGameWindowWidget->AddToViewport(1);
+	}
+
+	if (SettingsMenuClass)
+	{
+		SettingsMenu = CreateWidget<UUserWidget>(this, SettingsMenuClass);
+		if (SettingsMenu)
+		{
+			SettingsMenu->AddToViewport();
+			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void APJEPlayerController::ToggleSettingsMenu(const FInputActionValue& Value)
+{
+	if (SettingsMenu)
+	{
+		if (SettingsMenu->IsVisible())
+		{
+			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
+			//FInputModeGameOnly InputMode;
+			//SetInputMode(InputMode);
+			//bShowMouseCursor = false;
+		}
+		else
+		{
+			SettingsMenu->SetVisibility(ESlateVisibility::Visible);
+			//FInputModeUIOnly InputMode;
+			//InputMode.SetWidgetToFocus(SettingsMenu->TakeWidget());
+			//SetInputMode(InputMode);
+			//bShowMouseCursor = true;
+		}
 	}
 }
