@@ -24,8 +24,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "DP_Settings")
 	int32 ItemCode;
 
-	virtual void InteractionKeyPressed(APJECharacterPlayer* Character) override;
 	
 public:	
+	virtual void InteractionKeyPressed(APJECharacterPlayer* Character) override;
+
 	FORCEINLINE void SetItemCode(int32 NewItemCode) { ItemCode = NewItemCode; }
 };

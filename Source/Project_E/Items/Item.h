@@ -46,6 +46,9 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
     UTexture2D* ItemImage;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ACatWeapon> WeaponClass;
+
     FString GetItemName() const { return Name; }
 
     static UItem* SetItem(const UDataTable* ItemDataTable, int32 Code);
@@ -76,4 +79,7 @@ struct FItemData : public FTableRowBase
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     UTexture2D* ItemImage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ACatWeapon> WeaponClass;
 };

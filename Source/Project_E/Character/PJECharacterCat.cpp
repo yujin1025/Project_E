@@ -8,6 +8,7 @@
 #include "../UI/CatInventoryWidget.h"
 #include "../Items/Inventory.h"
 #include "Animation/AnimMontage.h"
+#include "Projectile/CatWeapon.h"
 
 APJECharacterCat::APJECharacterCat()
 {
@@ -28,7 +29,7 @@ void APJECharacterCat::BeginPlay()
     Super::BeginPlay();
 
     Inventory = NewObject<UInventory>(this);
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
 
     CatInventoryWidget = CreateWidget<UCatInventoryWidget>(GetWorld(), CatInventoryClass);
     if (CatInventoryWidget)
@@ -50,6 +51,18 @@ void APJECharacterCat::Grab()
             if (CatInventoryWidget)
             {
                 CatInventoryWidget->UpdateInventory(NewItem);
+            }
+
+            if (NewItem->WeaponClass)
+            {
+                auto SpawnedWeapon = GetWorld()->SpawnActor<ACatWeapon>(NewItem->WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
+                
+                if (SpawnedWeapon)
+                {
+                    FName WeaponSocketName(TEXT("WeaponSocket"));
+                    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+                    SpawnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+                   }
             }
         }
     }

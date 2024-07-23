@@ -65,16 +65,3 @@ UItem* UInventory::GetCatInventoryItem() const
 {
     return CatInventoryItem;
 }
-
-/*
-bool UInventory::IsFull() const
-{
-	const int32 MaxCapacity = 9;
-	int32 NumItems = Items.Num();
-
-	if (NumItems >= MaxCapacity)
-		return true;
-
-	return false;
-}
-*/
