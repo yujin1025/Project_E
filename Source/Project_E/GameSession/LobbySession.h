@@ -17,12 +17,9 @@ public:
 
 	virtual void RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdPtr& UniqueId, bool bWasFromInvite) override;
 	virtual void UnregisterPlayer(const APlayerController* ExitingPlayer) override;
-	virtual void Tick(float DeltaSeconds) override;
-	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticast_Tick(float DeltaSeconds);
 	
 protected:
-	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	FDelegateHandle RegisterPlayerDelegateHandle;
 	FDelegateHandle UnregisterPlayerDelegateHandle;
@@ -30,11 +27,10 @@ protected:
 	void OnRegisterPlayerComplete(FName NameOfSession, const TArray<FUniqueNetIdRef>& PlayerIds, bool bWasSuccessful);
 	void OnUnregisterPlayerComplete(FName NameOfSession	, const TArray<FUniqueNetIdRef>& PlayerIds, bool bWasSuccessful);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticast_UpdatePlayer();
-
 private:
 	TArray<APlayerController*> PCs;
-
 	ULobbyWidget* LobbyWidget;
+
+public:
+	void AddPC(APlayerController* PC) { PCs.Add(PC); }
 };

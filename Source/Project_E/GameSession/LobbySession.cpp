@@ -4,38 +4,24 @@
 #include "GameSession/LobbySession.h"
 
 #include "OnlineSubsystem.h"
-#include "GameFramework/PlayerState.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "Player/LobbyPlayerController.h"
 
 
 ALobbySession::ALobbySession()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 0.4f;
 }
 
 void ALobbySession::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	NetMulticast_Tick(DeltaSeconds);
-}
-
-void ALobbySession::NetMulticast_Tick_Implementation(float DeltaSeconds)
-{
-	if(GEngine) GEngine->AddOnScreenDebugMessage(6, 10.f, FColor::Orange, FString::Printf(TEXT("Tick : %f"), DeltaSeconds));
-}
-
-void ALobbySession::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if(GetNetMode() == NM_Standalone)
+	for(auto PC : PCs)
 	{
-		// Not Server
-	}
-	else
-	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Orange, FString::Printf(TEXT("Hola")));
+		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
+		LobbyPC->UpdateWidget(PCs);
 	}
 }
 
@@ -61,17 +47,8 @@ void ALobbySession::RegisterPlayer(APlayerController* NewPlayer, const FUniqueNe
 					RegisterPlayerDelegateHandle);
 				RegisterPlayerDelegateHandle.Reset();
 			}
-			
-			for(auto PC : PCs)
-			{
-				FString PCName = PC->GetName();
-				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("PC's Name : %s"), *PCName));
-			}
 		}
 	}
-
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("PC's Num : %d"), PCs.Num()));
-
 }
 
 void ALobbySession::OnRegisterPlayerComplete(FName NameOfSession, const TArray<FUniqueNetIdRef>& PlayerIds,
@@ -107,8 +84,8 @@ void ALobbySession::UnregisterPlayer(const APlayerController* ExitingPlayer)
 					FOnUnregisterPlayersCompleteDelegate::CreateUObject(this, &ThisClass::OnUnregisterPlayerComplete));
 		}
 	}
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("PC's Num : %d"), PCs.Num()));
 }
+
 
 void ALobbySession::OnUnregisterPlayerComplete(FName NameOfSession, const TArray<FUniqueNetIdRef>& PlayerIds,
                                                bool bWasSuccessful)
@@ -122,12 +99,7 @@ void ALobbySession::OnUnregisterPlayerComplete(FName NameOfSession, const TArray
 		IOnlineSessionPtr Session = OnlineSubsystem->GetSessionInterface();
 		if(Session.IsValid())
 		{
-			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Success to UnRegister Player!")));
+			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Success to UnRegister Player!")));
 		}
 	}
-}
-
-void ALobbySession::NetMulticast_UpdatePlayer_Implementation()
-{
-	
 }

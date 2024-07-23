@@ -17,7 +17,7 @@ class PROJECT_E_API ULobbyWidget : public UUserWidget
 public:
 	ULobbyWidget(const FObjectInitializer &ObjectInitializer);
 
-	void UpdateStatus();
+	void UpdateName(FString NameOfPlayer0, FString NameOfPlayer1);
 
 protected:
 	virtual bool Initialize() override;
@@ -31,6 +31,8 @@ protected:
 
 	void OnReadFriendsListComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr);
 
+	UFUNCTION()
+	void OnDestroySession(bool bWasSuccessful);
 private:
 	TSubclassOf<UUserWidget> FriendRowWidgetClass;
 	
@@ -45,4 +47,6 @@ private:
 	UTextBlock* Player0Name;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Player1Name;
+
+	class USessionSubsystem* SessionSubsystem;
 };
