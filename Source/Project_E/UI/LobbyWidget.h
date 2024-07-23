@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "LobbyWidget.generated.h"
 
+class UImage;
 class UTextBlock;
 class UButton;
 
@@ -19,6 +20,8 @@ public:
 
 	void UpdateName(FString NameOfPlayer0, FString NameOfPlayer1);
 
+	void ChangeRoleImage();
+
 protected:
 	virtual bool Initialize() override;
 
@@ -30,9 +33,7 @@ protected:
 	void MainButtonClicked();
 
 	void OnReadFriendsListComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr);
-
-	UFUNCTION()
-	void OnDestroySession(bool bWasSuccessful);
+	
 private:
 	TSubclassOf<UUserWidget> FriendRowWidgetClass;
 	
@@ -47,6 +48,12 @@ private:
 	UTextBlock* Player0Name;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Player1Name;
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* Player0Image;
+	UPROPERTY(meta = (BindWidget))
+	UImage* Player1Image;
+	
 
 	class USessionSubsystem* SessionSubsystem;
 };

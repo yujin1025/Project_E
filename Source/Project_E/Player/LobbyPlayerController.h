@@ -23,9 +23,23 @@ public:
 
 	void UpdateWidget(TArray<APlayerController*> PCs);
 
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeButtonClicked();
+	
+	void ChangeRoleImage();
+
+protected:
+	UFUNCTION(Server, Reliable)
+	void Server_InitSetting();
+	
+	void UpdateName(TArray<APlayerController*> PCs);
+	
 	UFUNCTION(Client, Reliable)
 	void Client_UpdateName(const FString& Player0Name, const FString& Player1Name);
 
+	UFUNCTION(Client, Reliable)
+	void Client_ChangeRoleImage();
+	
 private:
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
 	ULobbyWidget* LobbyWidget;

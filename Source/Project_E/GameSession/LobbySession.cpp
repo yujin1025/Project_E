@@ -25,6 +25,19 @@ void ALobbySession::Tick(float DeltaSeconds)
 	}
 }
 
+void ALobbySession::ChangeRole()
+{
+	EPlayerRole TmpRole = PlayerRoles[0];
+	PlayerRoles[0] = PlayerRoles[1];
+	PlayerRoles[1] = TmpRole;
+
+	for(auto PC : PCs)
+	{
+		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
+		LobbyPC->ChangeRoleImage();
+	}
+}
+
 void ALobbySession::RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdPtr& UniqueId, bool bWasFromInvite)
 {
 	Super::RegisterPlayer(NewPlayer, UniqueId, bWasFromInvite);
@@ -67,14 +80,10 @@ void ALobbySession::UnregisterPlayer(const APlayerController* ExitingPlayer)
 		IOnlineSessionPtr Session = OnlineSubsystem->GetSessionInterface();
 		if(Session.IsValid())
 		{
-			// PC에서 ExitingPlayer 제거
-			// UnRegisterDelegateHandle 생성
-			//
 			for(auto PC : PCs)
 			{
 				if(PC == ExitingPlayer)
 				{
-					// 해당하는 PC를 PCs에서 제거
 					PCs.Remove(PC);
 				}
 			}
@@ -85,7 +94,6 @@ void ALobbySession::UnregisterPlayer(const APlayerController* ExitingPlayer)
 		}
 	}
 }
-
 
 void ALobbySession::OnUnregisterPlayerComplete(FName NameOfSession, const TArray<FUniqueNetIdRef>& PlayerIds,
                                                bool bWasSuccessful)

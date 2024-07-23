@@ -4,7 +4,9 @@
 #include "Player/LobbyPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerState.h"
+#include "GameSession/LobbySession.h"
 #include "UI/LobbyWidget.h"
 
 ALobbyPlayerController::ALobbyPlayerController()
@@ -22,15 +24,35 @@ void ALobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(!IsLocalController()) return;
-	
-	UWorld* World = GetWorld();
-	if(World)
+	if(IsLocalController())
 	{
-		if(GetNetMode() != NM_Standalone)
+		UWorld* World = GetWorld();
+		if(World)
 		{
-			LobbyWidget = Cast<ULobbyWidget>(CreateWidget<UUserWidget>(World, LobbyWidgetClass));
-			LobbyWidget->AddToViewport();
+			if(GetNetMode() != NM_Standalone)
+			{
+				LobbyWidget = Cast<ULobbyWidget>(CreateWidget<UUserWidget>(World, LobbyWidgetClass));
+				LobbyWidget->AddToViewport();
+			}
+		}
+		Server_InitSetting();
+	}
+}
+
+void ALobbyPlayerController::Server_InitSetting_Implementation()
+{
+	// Player Role Setting
+	UWorld* World = GetWorld();
+	if(World && World->GetAuthGameMode())
+	{
+		ALobbySession* LobbySession = Cast<ALobbySession>(World->GetAuthGameMode()->GameSession);
+		if(LobbySession)
+		{
+			TArray<EPlayerRole> PlayerRoles = LobbySession->GetPlayerRoles();
+			if(PlayerRoles[0] == EPlayerRole::Duck)
+			{
+				Client_ChangeRoleImage();
+			}
 		}
 	}
 }
@@ -59,6 +81,11 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 
 void ALobbyPlayerController::UpdateWidget(TArray<APlayerController*> PCs)
 {
+	UpdateName(PCs);
+}
+
+void ALobbyPlayerController::UpdateName(TArray<APlayerController*> PCs)
+{
 	TArray<FString> PlayerNames;
 	for(auto PC : PCs)
 	{
@@ -69,17 +96,7 @@ void ALobbyPlayerController::UpdateWidget(TArray<APlayerController*> PCs)
 	FString Player0Name = PlayerNames[0];
 	FString Player1Name = (PlayerNames.Num() < 2) ? FString(TEXT("Waiting...")) : PlayerNames[1];
 	
-	if(PlayerNames.Num() < 2)
-	{
-		if(LobbyWidget)
-		{
-			LobbyWidget->UpdateName(Player0Name, Player1Name);
-		}
-	}
-	else
-	{
-		Client_UpdateName(Player0Name, Player1Name);
-	}
+	Client_UpdateName(Player0Name, Player1Name);
 }
 
 void ALobbyPlayerController::Client_UpdateName_Implementation(const FString& Player0Name, const FString& Player1Name)
@@ -87,5 +104,34 @@ void ALobbyPlayerController::Client_UpdateName_Implementation(const FString& Pla
 	if(LobbyWidget)
 	{
 		LobbyWidget->UpdateName(Player0Name, Player1Name);
+	}
+}
+
+void ALobbyPlayerController::Server_ChangeButtonClicked_Implementation()
+{
+	UWorld* World = GetWorld();
+	if(World && World->GetAuthGameMode())
+	{
+		ALobbySession* LobbySession = Cast<ALobbySession>(World->GetAuthGameMode()->GameSession);
+		if(LobbySession)
+		{
+			LobbySession->ChangeRole();
+		}
+	}
+}
+
+void ALobbyPlayerController::ChangeRoleImage()
+{
+	Client_ChangeRoleImage();
+}
+
+
+void ALobbyPlayerController::Client_ChangeRoleImage_Implementation()
+{
+	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Change Image")));
+
+	if(LobbyWidget)
+	{
+		LobbyWidget->ChangeRoleImage();
 	}
 }
