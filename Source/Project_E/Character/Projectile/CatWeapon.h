@@ -19,8 +19,19 @@ protected:
 
 public:	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-	int32 ItemCode;
+	float DamageAmount = 0.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
 	UStaticMeshComponent* ItemMesh;
+
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* CollisionComponent;
+
+	void SetDamage(float Damage);
+
+	float GetDamageAmount() const { return DamageAmount; }
+
+	UFUNCTION()
+	void OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 };

@@ -39,6 +39,8 @@ protected:
 public:
 	void Grab();
 
+	virtual ACatWeapon* GetEquippedWeapon() const override { return EquippedWeapon; }
+
 protected:
 	void Swing();
 	void Dash();
@@ -51,6 +53,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UCatInventoryWidget> CatInventoryClass;
 
+	ACatWeapon* EquippedWeapon;
 	/**
 	* Animation montages
 	*/

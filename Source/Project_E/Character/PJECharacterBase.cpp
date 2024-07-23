@@ -9,6 +9,7 @@
 #include "../Game/PJEGameModeBase.h"
 #include "Component/HealthComponent.h"
 
+
 // Sets default values
 APJECharacterBase::APJECharacterBase()
 {

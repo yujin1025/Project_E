@@ -59,10 +59,14 @@ void APJECharacterCat::Grab()
                 
                 if (SpawnedWeapon)
                 {
+                    SpawnedWeapon->SetDamage(NewItem->CatDamage);
+
                     FName WeaponSocketName(TEXT("WeaponSocket"));
                     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
                     SpawnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
-                   }
+
+                    EquippedWeapon = SpawnedWeapon;
+                }
             }
         }
     }
@@ -82,6 +86,17 @@ void APJECharacterCat::DropItem()
             if (CatInventoryWidget)
             {
                 CatInventoryWidget->UpdateInventory(nullptr);
+            }
+
+            TArray<AActor*> AttachedActors;
+            GetAttachedActors(AttachedActors);
+            for (AActor* Actor : AttachedActors)
+            {
+                if (ACatWeapon* Weapon = Cast<ACatWeapon>(Actor))
+                {
+                    Weapon->Destroy();
+                    EquippedWeapon = nullptr;
+                }
             }
         }
     }
