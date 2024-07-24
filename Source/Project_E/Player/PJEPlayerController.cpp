@@ -10,6 +10,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Gimmick/IgnitionHandle.h"
 #include "../UI/BaseWidget.h"
+#include "Game/PJEPlayerState.h"
 #include "Gimmick/PJEPushableCylinder.h"
 
 
@@ -42,8 +43,14 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 			PlayerController->Possess(PlayerPawn);
 		}
 	}
-}
 
+	FString PlayerRole;
+	if(PlayerState)
+	{
+		PlayerRole = (Cast<APJEPlayerState>(PlayerState)->GetPlayerRole() == EPlayerRole::Cat) ? TEXT("Cat") : TEXT("Duck");
+	}
+	if(GEngine) GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::Emerald, FString::Printf(TEXT("InGamePlayerController / PlayerRole : %s"), *PlayerRole));
+}
 
 // Input Switch Function
 

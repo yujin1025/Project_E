@@ -8,6 +8,7 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/GameModeBase.h"
 #include "Player/LobbyPlayerController.h"
 
 ULobbyWidget::ULobbyWidget(const FObjectInitializer& ObjectInitializer)
@@ -18,8 +19,11 @@ ULobbyWidget::ULobbyWidget(const FObjectInitializer& ObjectInitializer)
 
 void ULobbyWidget::UpdateName(FString NameOfPlayer0, FString NameOfPlayer1)
 {
-	Player0Name->SetText(FText::FromString(NameOfPlayer0));
-	Player1Name->SetText(FText::FromString(NameOfPlayer1));
+	if(Player0Name && Player1Name)
+	{
+		Player0Name->SetText(FText::FromString(NameOfPlayer0));
+		Player1Name->SetText(FText::FromString(NameOfPlayer1));	
+	}
 }
 
 void ULobbyWidget::ChangeRoleImage()
@@ -46,6 +50,10 @@ bool ULobbyWidget::Initialize()
 	if(StartButton)
 	{
 		StartButton->OnClicked.AddDynamic(this, &ThisClass::StartButtonClicked);
+		if(GetWorld()->GetNetMode() == NM_Client)
+		{
+			StartButton->SetIsEnabled(false);
+		}
 	}
 	if(MainButton)
 	{
@@ -66,9 +74,15 @@ bool ULobbyWidget::Initialize()
 	return true;
 }
 
+void ULobbyWidget::NativeDestruct()
+{
+	MenuTearDown();
+	Super::NativeDestruct();
+}
+
 
 void ULobbyWidget::OnReadFriendsListComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName,
-	const FString& ErrorStr)
+                                             const FString& ErrorStr)
 {
 	if(!bWasSuccessful) return;
 }
@@ -85,6 +99,12 @@ void ULobbyWidget::ChangeButtonClicked()
 
 void ULobbyWidget::StartButtonClicked()
 {
+	UWorld* World = GetWorld();
+	if(World)
+	{
+		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(World->GetFirstPlayerController());
+		LobbyPC->Server_StartButtonClicked();
+	}
 }
 
 void ULobbyWidget::MainButtonClicked()
@@ -97,3 +117,20 @@ void ULobbyWidget::MainButtonClicked()
 		PlayerController->ClientTravel("/Game/ThirdPerson/Maps/ThirdPersonMap", TRAVEL_Absolute);
 	}
 }
+
+void ULobbyWidget::MenuTearDown()
+{
+	RemoveFromParent();
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			FInputModeGameOnly InputModeData;
+			PlayerController->SetInputMode(InputModeData);
+			PlayerController->SetShowMouseCursor(false);
+		}
+	}
+}
+

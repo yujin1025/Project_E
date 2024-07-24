@@ -21,10 +21,13 @@ public:
 	void UpdateName(FString NameOfPlayer0, FString NameOfPlayer1);
 
 	void ChangeRoleImage();
+	
+	void MenuTearDown();
 
 protected:
 	virtual bool Initialize() override;
-
+	virtual void NativeDestruct() override;
+	
 	UFUNCTION()
 	void ChangeButtonClicked();
 	UFUNCTION()

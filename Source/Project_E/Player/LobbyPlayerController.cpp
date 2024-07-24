@@ -77,6 +77,13 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 			break;
 		}
 	}
+
+	FString PlayerRole;
+	if(PlayerState)
+	{
+		PlayerRole = (Cast<APJEPlayerState>(PlayerState)->GetPlayerRole() == EPlayerRole::Cat) ? TEXT("Cat") : TEXT("Duck");
+	}
+	if(GEngine) GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::Emerald, FString::Printf(TEXT("LobbyPlayerController / PlayerRole : %s"), *PlayerRole));
 }
 
 void ALobbyPlayerController::UpdateWidget(TArray<APlayerController*> PCs)
@@ -120,6 +127,41 @@ void ALobbyPlayerController::Server_ChangeButtonClicked_Implementation()
 	}
 }
 
+void ALobbyPlayerController::Server_StartButtonClicked_Implementation()
+{
+	UWorld* World = GetWorld();
+	if(World && World->GetAuthGameMode())
+	{
+		ALobbySession* LobbySession = Cast<ALobbySession>(World->GetAuthGameMode()->GameSession);
+		if(LobbySession)
+		{
+			LobbySession->GameStart();
+		}
+	}
+}
+
+
+void ALobbyPlayerController::GameStart()
+{
+	Client_GameStart();
+}
+
+void ALobbyPlayerController::Client_GameStart_Implementation()
+{
+	LobbyWidget->MenuTearDown();
+	LobbyWidget = nullptr;
+	
+	if(GetNetMode() == NM_ListenServer)
+	{
+		UWorld* World = GetWorld();
+		if(World)
+		{
+			World->GetAuthGameMode()->bUseSeamlessTravel = true;
+			World->ServerTravel("/Game/Maps/MinjiTestMap?listen");
+		}
+	}
+}
+
 void ALobbyPlayerController::ChangeRoleImage()
 {
 	Client_ChangeRoleImage();
@@ -128,8 +170,6 @@ void ALobbyPlayerController::ChangeRoleImage()
 
 void ALobbyPlayerController::Client_ChangeRoleImage_Implementation()
 {
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Change Image")));
-
 	if(LobbyWidget)
 	{
 		LobbyWidget->ChangeRoleImage();

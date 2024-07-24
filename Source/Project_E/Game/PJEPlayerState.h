@@ -29,9 +29,18 @@ public:
 	
 	void OnChangePlayerHealth(int objectId, float Amount);
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
+	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
+	
+	virtual void CopyProperties(APlayerState* PlayerState) override;
+	
 private:
+	UPROPERTY(Replicated)
 	EPlayerRole PlayerRole;
 
 public:
 	FORCEINLINE void SetPlayerRole(EPlayerRole NewPlayerRole) { PlayerRole = NewPlayerRole; }
+	FORCEINLINE EPlayerRole GetPlayerRole() { return PlayerRole; }
 };

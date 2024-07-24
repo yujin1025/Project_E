@@ -16,8 +16,9 @@ class PROJECT_E_API APJEInGameMode : public APJEGameModeBase
 
 public:
 	APJEInGameMode();
-
+	
 protected:
-	void SetDefaultPawnClass();
 	void SetPlayerControllerClass();
+
+	void InitializePlayer();
 };

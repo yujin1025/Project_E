@@ -29,6 +29,8 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	// Switch Input Function
+	void InitializeController();
+	
 	void InitInputPawn();
 	void InitInputIgnitionHandle();
 	void InitInputPush();

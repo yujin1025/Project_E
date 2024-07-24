@@ -13,6 +13,8 @@ ALobbyGameMode::ALobbyGameMode()
 	GameSessionClass = ALobbySession::StaticClass();
 
 	PlayerControllerClass = ALobbyPlayerController::StaticClass();
+
+	PlayerStateClass = APJEPlayerState::StaticClass();
 }
 
 void ALobbyGameMode::BeginPlay()

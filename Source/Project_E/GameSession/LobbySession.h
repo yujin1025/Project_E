@@ -21,6 +21,8 @@ public:
 	virtual void UnregisterPlayer(const APlayerController* ExitingPlayer) override;
 
 	void ChangeRole();
+
+	void GameStart();
 	
 protected:
 	virtual void Tick(float DeltaSeconds) override;

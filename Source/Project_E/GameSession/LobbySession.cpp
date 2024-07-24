@@ -31,12 +31,30 @@ void ALobbySession::ChangeRole()
 	PlayerRoles[0] = PlayerRoles[1];
 	PlayerRoles[1] = TmpRole;
 
-	for(auto PC : PCs)
+	for(int i = 0 ; i < 2; i++)
 	{
+		auto PC = PCs[i];
+		
+		APJEPlayerState* PJEPlayerState = Cast<APJEPlayerState>(PC->PlayerState);
+		PJEPlayerState->SetPlayerRole(PlayerRoles[i]);
+		
 		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
 		LobbyPC->ChangeRoleImage();
 	}
 }
+
+void ALobbySession::GameStart()
+{
+	if(PCs.Num() < 2) return;
+
+	for(int i = 0 ; i < 2; i++)
+	{
+		auto PC = PCs[i];
+		
+		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
+		LobbyPC->GameStart();
+	}
+}	
 
 void ALobbySession::RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdPtr& UniqueId, bool bWasFromInvite)
 {

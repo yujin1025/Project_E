@@ -25,6 +25,11 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_ChangeButtonClicked();
+
+	UFUNCTION(Server, Reliable)
+	void Server_StartButtonClicked();
+
+	void GameStart();
 	
 	void ChangeRoleImage();
 
@@ -39,6 +44,9 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void Client_ChangeRoleImage();
+	
+	UFUNCTION(Client, Reliable)
+	void Client_GameStart();
 	
 private:
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
