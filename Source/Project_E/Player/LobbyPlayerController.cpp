@@ -77,13 +77,6 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 			break;
 		}
 	}
-
-	FString PlayerRole;
-	if(PlayerState)
-	{
-		PlayerRole = (Cast<APJEPlayerState>(PlayerState)->GetPlayerRole() == EPlayerRole::Cat) ? TEXT("Cat") : TEXT("Duck");
-	}
-	if(GEngine) GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::Emerald, FString::Printf(TEXT("LobbyPlayerController / PlayerRole : %s"), *PlayerRole));
 }
 
 void ALobbyPlayerController::UpdateWidget(TArray<APlayerController*> PCs)

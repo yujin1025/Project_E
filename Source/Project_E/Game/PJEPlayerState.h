@@ -32,12 +32,11 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
-	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
 	
-	virtual void CopyProperties(APlayerState* PlayerState) override;
+	virtual void CopyProperties(APlayerState* NewPlayerState) override;
 	
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	EPlayerRole PlayerRole;
 
 public:

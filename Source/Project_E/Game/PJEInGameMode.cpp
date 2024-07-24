@@ -9,6 +9,8 @@
 APJEInGameMode::APJEInGameMode()
 {
 	SetPlayerControllerClass();
+
+	bUseSeamlessTravel = true;
 }
 
 void APJEInGameMode::SetPlayerControllerClass()
@@ -19,5 +21,11 @@ void APJEInGameMode::SetPlayerControllerClass()
 void APJEInGameMode::InitializePlayer()
 {
 	
+}
+
+void APJEInGameMode::PostSeamlessTravel()
+{
+	Super::PostSeamlessTravel();
+	if(GEngine) GEngine->AddOnScreenDebugMessage(7, 10.f, FColor::Emerald, FString::Printf(TEXT("Seamless Travel Complete")));
 }
 

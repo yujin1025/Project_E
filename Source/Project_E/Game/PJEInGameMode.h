@@ -21,4 +21,6 @@ protected:
 	void SetPlayerControllerClass();
 
 	void InitializePlayer();
+	
+	virtual void PostSeamlessTravel() override;
 };

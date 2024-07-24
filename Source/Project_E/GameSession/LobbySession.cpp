@@ -35,9 +35,6 @@ void ALobbySession::ChangeRole()
 	{
 		auto PC = PCs[i];
 		
-		APJEPlayerState* PJEPlayerState = Cast<APJEPlayerState>(PC->PlayerState);
-		PJEPlayerState->SetPlayerRole(PlayerRoles[i]);
-		
 		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
 		LobbyPC->ChangeRoleImage();
 	}
@@ -50,6 +47,9 @@ void ALobbySession::GameStart()
 	for(int i = 0 ; i < 2; i++)
 	{
 		auto PC = PCs[i];
+		
+		APJEPlayerState* PJEPlayerState = Cast<APJEPlayerState>(PC->PlayerState);
+		PJEPlayerState->SetPlayerRole(PlayerRoles[i]);
 		
 		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
 		LobbyPC->GameStart();

@@ -15,6 +15,7 @@ ALobbyGameMode::ALobbyGameMode()
 	PlayerControllerClass = ALobbyPlayerController::StaticClass();
 
 	PlayerStateClass = APJEPlayerState::StaticClass();
+
 }
 
 void ALobbyGameMode::BeginPlay()

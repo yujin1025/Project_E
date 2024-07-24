@@ -27,25 +27,17 @@ void APJEPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(ThisClass, PlayerRole);
 }
 
-void APJEPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
-{
-	Super::SeamlessTravelTo(NewPlayerState);
-
-	APJEPlayerState* PJEPlayerState = Cast<APJEPlayerState>(NewPlayerState);
-	if(PJEPlayerState)
-	{
-		PJEPlayerState->SetPlayerRole(this->PlayerRole);
-	}
-}
-
 void APJEPlayerState::CopyProperties(APlayerState* NewPlayerState)
 {
 	Super::CopyProperties(NewPlayerState);
 
+	FString PlayerRoleString = (this->GetPlayerRole() == EPlayerRole::Cat) ? TEXT("Cat") : TEXT("Duck");
+
+	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Emerald, FString::Printf(TEXT("Replicaate PlayerRole : %s"), *PlayerRoleString));
+	
 	APJEPlayerState* PJEPlayerState = Cast<APJEPlayerState>(NewPlayerState);
 	if(PJEPlayerState)
 	{
 		PJEPlayerState->SetPlayerRole(this->PlayerRole);
 	}
-	
 }

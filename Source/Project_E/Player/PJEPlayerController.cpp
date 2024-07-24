@@ -44,12 +44,15 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 		}
 	}
 
-	FString PlayerRole;
-	if(PlayerState)
+	if(IsLocalController())
 	{
-		PlayerRole = (Cast<APJEPlayerState>(PlayerState)->GetPlayerRole() == EPlayerRole::Cat) ? TEXT("Cat") : TEXT("Duck");
+		FString PlayerRole;
+		if(PlayerState)
+		{
+			PlayerRole = (Cast<APJEPlayerState>(PlayerState)->GetPlayerRole() == EPlayerRole::Cat) ? TEXT("Cat") : TEXT("Duck");
+		}
+		if(GEngine) GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::Emerald, FString::Printf(TEXT("InGamePlayerController / PlayerRole : %s"), *PlayerRole));
 	}
-	if(GEngine) GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::Emerald, FString::Printf(TEXT("InGamePlayerController / PlayerRole : %s"), *PlayerRole));
 }
 
 // Input Switch Function
