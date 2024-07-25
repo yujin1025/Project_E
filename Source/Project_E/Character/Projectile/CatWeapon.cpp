@@ -13,6 +13,8 @@ ACatWeapon::ACatWeapon()
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetupAttachment(RootComponent);
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ACatWeapon::OnAttack);
+
+	SetReplicates(true);
 }
 
 void ACatWeapon::BeginPlay()
