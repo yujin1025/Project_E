@@ -59,6 +59,8 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 
 void APJEPlayerController::InitInputPawn()
 {
+	PlayerPawn = GetPawn();
+	
 	ControllerOperation = EControllerOperation::ECO_Pawn;
 	
 	APawn* PossessedPawn = GetPawn();
