@@ -26,6 +26,8 @@ UItem* UItem::SetItem(const UDataTable* ItemDataTable, int32 Code)
             NewItem->CatDamage = ItemData->CatDamage;
             NewItem->DuckDamage = ItemData->DuckDamage;
             NewItem->ItemImage = ItemData->ItemImage;
+            NewItem->WeaponClass = ItemData->WeaponClass;
+
             UE_LOG(LogTemp, Warning, TEXT("Item loaded successfully: %s"), *NewItem->Name);
             return NewItem;
         }

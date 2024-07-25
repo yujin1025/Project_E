@@ -31,5 +31,5 @@ protected:
 	FVector CenterOffset;
 
 	UPROPERTY(EditAnywhere)
-	int DamageAmount;
+	float DamageAmount;
 };

@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Projectile/CatWeapon.h"
 #include "PJECharacterBase.generated.h"
+
 
 class UHealthComponent;
 class UHitDeadComponent;
@@ -58,6 +60,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character")
 	ECharacterType GetCharacterType() const { return CharacterType; }
+
+	virtual ACatWeapon* GetEquippedWeapon() const { return nullptr; }
 
 protected:
 	// Character type

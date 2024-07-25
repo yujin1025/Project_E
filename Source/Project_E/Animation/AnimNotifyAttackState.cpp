@@ -4,7 +4,7 @@
 #include "AnimNotifyAttackState.h"
 #include "../Character/PJECharacterBase.h"
 #include "../Character/Component/HealthComponent.h"
-
+#include "../Character/Projectile/CatWeapon.h"
 
 //공격 범위 내에 있는 대상을 찾아 데미지를 가함
 void UAnimNotifyAttackState::TryAttack(USkeletalMeshComponent* MeshComp)
@@ -13,8 +13,17 @@ void UAnimNotifyAttackState::TryAttack(USkeletalMeshComponent* MeshComp)
 		return;
 
 	APJECharacterBase* MyCharacter = Cast<APJECharacterBase>(MeshComp->GetOwner());
-	TArray<APJECharacterBase*> TargetCharacters;
+	if (MyCharacter == nullptr)
+		return;
 
+	float WeaponDamageAmount = DamageAmount;
+	AActor* EquippedWeaponActor = MyCharacter->GetEquippedWeapon();
+	if (ACatWeapon* EquippedWeapon = Cast<ACatWeapon>(EquippedWeaponActor))
+	{
+		WeaponDamageAmount = EquippedWeapon->GetDamageAmount();
+	}
+
+	TArray<APJECharacterBase*> TargetCharacters;
 	if (TryGetOverlapTargets(MyCharacter, TargetCharacters))
 	{
 		for (auto* TargetCharacter : TargetCharacters)
@@ -22,7 +31,7 @@ void UAnimNotifyAttackState::TryAttack(USkeletalMeshComponent* MeshComp)
 			UHealthComponent* DamagedHealthComponent = TargetCharacter->FindComponentByClass<UHealthComponent>();
 			if (DamagedHealthComponent)
 			{
-				DamagedHealthComponent->ChangeHealth(-DamageAmount);
+				DamagedHealthComponent->ChangeHealth(-WeaponDamageAmount);
 				CurrentAttackCount++;
 			}
 		}
@@ -60,7 +69,7 @@ bool UAnimNotifyAttackState::TryGetOverlapResult(APJECharacterBase* Owner, TArra
 		Center + CenterOffset,
 		Owner->GetActorQuat(),
 		ECollisionChannel::ECC_Pawn, //나중에 충돌설정 변경하기
-		FCollisionShape::MakeSphere(600.0f),
+		FCollisionShape::MakeSphere(100.0f),
 		CollisionParam);
 
 	return bResult;
