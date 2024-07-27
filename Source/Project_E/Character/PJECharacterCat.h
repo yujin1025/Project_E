@@ -19,8 +19,6 @@ class PROJECT_E_API APJECharacterCat : public APJECharacterPlayer
 public:
 	APJECharacterCat();
 
-	virtual void Tick(float DeltaSeconds) override;
-
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
@@ -41,7 +39,7 @@ protected:
 public:
 	void Grab();
 
-	virtual ACatWeapon* GetEquippedWeapon() const override { return EquippedWeapon; }
+	virtual ACatWeapon* GetEquippedWeapon() const override;
 
 protected:
 	void DoubleJump() override;
@@ -58,6 +56,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UCatInventoryWidget> CatInventoryClass;
 
+	UPROPERTY()
 	ACatWeapon* EquippedWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))

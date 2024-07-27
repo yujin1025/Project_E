@@ -8,7 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "../Game/PJEGameModeBase.h"
 #include "../Items/Inventory.h"
-#include "Projectile/PJEProjectile.h"
+#include "Projectile/DuckProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../UI/DuckInventoryWidget.h"
 #include "../Items/Item.h"
@@ -44,7 +44,7 @@ void APJECharacterDuck::BeginPlay()
     Super::BeginPlay();
     
     Inventory = NewObject<UInventory>(this);
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
 
     WeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), WeaponInventoryClass);
     if (WeaponInventoryWidget)
@@ -133,7 +133,7 @@ void APJECharacterDuck::Fire()
             PlayAnimMontage(FireMontage);
         }
 
-        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
+        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
 
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
@@ -190,7 +190,7 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
             PlayAnimMontage(RapidFireMontage);
         }
 
-        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
+        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
 
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)

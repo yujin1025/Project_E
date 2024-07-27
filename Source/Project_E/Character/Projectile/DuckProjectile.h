@@ -3,17 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "PJEProjectile.generated.h"
+#include "Gimmick/PJEInteractiveActor.h"
+#include "DuckProjectile.generated.h"
 
-class PJECharacterBase;
+/**
+ * 
+ */
 UCLASS()
-class PROJECT_E_API APJEProjectile : public AActor
+class PROJECT_E_API ADuckProjectile : public APJEInteractiveActor
 {
 	GENERATED_BODY()
 
-public:	
-	APJEProjectile();
+public:
+	ADuckProjectile();
 
 protected:
 	virtual void BeginPlay() override;
@@ -23,6 +25,9 @@ public:
 
 	UFUNCTION()
 	void OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	virtual void InteractionKeyPressed(APJECharacterPlayer* Character) override;
+
+	FORCEINLINE void SetItemCode(int32 NewItemCode) { ItemCode = NewItemCode; }
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -35,8 +40,11 @@ private:
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float Speed = 1300.0f;
+	float Speed = 3200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float GravityScale = 1.0f;
+	float GravityScale = 4.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "DP_Settings")
+	int32 ItemCode;
 };
