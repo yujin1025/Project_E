@@ -22,6 +22,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,7 +42,12 @@ protected:
 public:
 	void Grab();
 
+	virtual ACatWeapon* GetEquippedWeapon() const override { return EquippedWeapon; }
+
 protected:
+	void DoubleJump() override;
+	void JumpAttacking();
+	virtual void Landed(const FHitResult& Hit) override;
 	void Swing();
 	void Dash();
 	void DropItem() override;
@@ -53,10 +59,29 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UCatInventoryWidget> CatInventoryClass;
 
-	/**
-	* Animation montages
-	*/
+	ACatWeapon* EquippedWeapon;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* SwingMontage;
 
+	bool bIsJumping = false;
+
+	// Multiplay Section
+	UFUNCTION(Server, Reliable)
+	void Server_DoubleJumpAttack();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Grab();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_GrabWeapon(ACatWeapon* SpawnedWeapon);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Swing();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Swing();
 };

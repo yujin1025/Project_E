@@ -56,8 +56,6 @@ void APJECharacterPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 void APJECharacterPlayer::BeginPlay()
 {
     Super::BeginPlay();
-
-    //Inventory = NewObject<UInventory>(this);
     
     APJEPlayerController* PlayerController = Cast<APJEPlayerController>(Controller);
     if (PlayerController)
