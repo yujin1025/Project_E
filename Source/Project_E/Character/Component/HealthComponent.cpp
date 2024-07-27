@@ -66,6 +66,8 @@ void UHealthComponent::ChangeHealth(float Amount)
 		UE_LOG(LogTemp, Warning, TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth);
 	}
 
+	Server_ChangeHealth(CurrentHealth);
+
 	if (Amount < 0)
 	{
 		if (CurrentHealth <= 0)
@@ -78,5 +80,10 @@ void UHealthComponent::ChangeHealth(float Amount)
 			//Character->OnHit();
 		}
 	}
+}
+
+void UHealthComponent::Server_ChangeHealth_Implementation(float Health)
+{
+	CurrentHealth = Health;
 }
 
