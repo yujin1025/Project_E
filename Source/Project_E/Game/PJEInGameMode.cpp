@@ -9,7 +9,6 @@
 #include "Character/PJECharacterDuck.h"
 #include "GameFramework/PlayerStart.h"
 #include "Player/PJEPlayerController.h"
-#include "Player/PJEPlayerStart.h"
 
 APJEInGameMode::APJEInGameMode()
 {
@@ -68,11 +67,19 @@ void APJEInGameMode::InitializePlayer()
 				}
 
 				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = PlayerController;
+				
 				APJECharacterPlayer* NewCharacter = GetWorld()->SpawnActor<APJECharacterPlayer>(
 					PlayerClass, GameStartTransform.GetLocation(), GameStartTransform.GetRotation().Rotator(), SpawnParams);
 
-				PlayerController->Possess(NewCharacter);
-				//Cast<APJEPlayerController>(PlayerController)->InitInputPawn();
+				if(PlayerController->IsLocalController())
+				{
+					PlayerController->Possess(NewCharacter);
+				}
+				else
+				{
+					
+				}
 			}
 		}
 	}

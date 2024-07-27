@@ -19,6 +19,8 @@ class PROJECT_E_API APJECharacterCat : public APJECharacterPlayer
 public:
 	APJECharacterCat();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:

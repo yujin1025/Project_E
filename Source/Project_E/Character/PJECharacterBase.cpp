@@ -138,7 +138,12 @@ void APJECharacterBase::OnDie()
 
 bool APJECharacterBase::IsPlayer()
 {
-	return Controller->IsPlayerController();
+	if(Controller)
+	{
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Emerald, FString::Printf(TEXT("Player has Controller")));
+		return Controller->IsPlayerController();
+	}
+	return false;
 }
 
 FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget)

@@ -42,7 +42,7 @@ void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void APJECharacterDuck::BeginPlay()
 {
     Super::BeginPlay();
-
+    
     Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
 
@@ -57,11 +57,14 @@ void APJECharacterDuck::BeginPlay()
     {
         NonWeaponInventoryWidget->AddToViewport();
     }
+
 }
 
 void APJECharacterDuck::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    if(GEngine) GEngine->AddOnScreenDebugMessage(12, 17.f, FColor::Red, FString::Printf(TEXT("Duck Live : %f"), DeltaTime));
 
     if (bIsAiming)
     {
