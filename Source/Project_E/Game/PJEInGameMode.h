@@ -26,6 +26,8 @@ protected:
 	void SetPlayerControllerClass();
 
 	void InitializePlayer();
+
+	void PossessController();
 	
 	virtual void PostSeamlessTravel() override;
 
@@ -35,5 +37,10 @@ private:
 	TSubclassOf<APJECharacterCat> CatClass;
 	TSubclassOf<APJECharacterDuck> DuckClass;
 
+	TArray<APawn*> PlayerPawns;
+	
 	FTransform GameStartTransform;
+
+	FTimerHandle InitDelayHandle;
+	FTimerHandle ActorDelayHandle;
 };

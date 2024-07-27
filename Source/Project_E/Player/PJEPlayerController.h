@@ -38,6 +38,9 @@ public:
 
 	void GameOver();
 
+	UFUNCTION(Client, Reliable)
+	void Client_Possess(APawn* NewPawn);
+
 	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
 	
 protected:

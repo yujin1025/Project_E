@@ -63,7 +63,7 @@ void UHealthComponent::ChangeHealth(float Amount)
 	else 
 	{
 		GameMode->MyGameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
-		UE_LOG(LogTemp, Warning, TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth);
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth));
 	}
 
 	if (Amount < 0)

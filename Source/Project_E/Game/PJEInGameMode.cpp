@@ -37,8 +37,8 @@ void APJEInGameMode::BeginPlay()
 			GameStartTransform = PlayerStart->GetTransform();
 		}
 	}
-	
-	InitializePlayer();
+
+	GetWorld()->GetTimerManager().SetTimer(InitDelayHandle, this, &ThisClass::InitializePlayer, 3.0f, false);
 }
 
 void APJEInGameMode::SetPlayerControllerClass()
@@ -72,18 +72,28 @@ void APJEInGameMode::InitializePlayer()
 				APJECharacterPlayer* NewCharacter = GetWorld()->SpawnActor<APJECharacterPlayer>(
 					PlayerClass, GameStartTransform.GetLocation(), GameStartTransform.GetRotation().Rotator(), SpawnParams);
 
-				if(PlayerController->IsLocalController())
-				{
-					PlayerController->Possess(NewCharacter);
-				}
-				else
-				{
-					
-				}
+				PlayerPawns.Add(NewCharacter);
 			}
 		}
 	}
 
+	GetWorld()->GetTimerManager().SetTimer(ActorDelayHandle, this, &ThisClass::PossessController, 2.f, false);
+
+}
+
+void APJEInGameMode::PossessController()
+{
+	int i = 0;
+	for(FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APJEPlayerController* PlayerController = Cast<APJEPlayerController>(Iterator->Get());
+		if(PlayerController)
+		{
+			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d PC Loc"), i));
+			PlayerController->Client_Possess(PlayerPawns[i]);
+			i++;
+		}
+	}
 }
 
 void APJEInGameMode::PostSeamlessTravel()
@@ -91,4 +101,3 @@ void APJEInGameMode::PostSeamlessTravel()
 	Super::PostSeamlessTravel();
 	if(GEngine) GEngine->AddOnScreenDebugMessage(7, 10.f, FColor::Emerald, FString::Printf(TEXT("Seamless Travel Complete")));
 }
-

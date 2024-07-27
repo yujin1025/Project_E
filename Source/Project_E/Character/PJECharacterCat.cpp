@@ -19,6 +19,11 @@ void APJECharacterCat::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
     if(GEngine) GEngine->AddOnScreenDebugMessage(11, 17.f, FColor::Emerald, FString::Printf(TEXT("Cat Live : %f"), DeltaSeconds));
+
+    if (bIsJumping)
+    {
+        JumpAttacking();
+    }
 }
 
 void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -28,16 +33,6 @@ void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
      if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
          EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
      }
-}
-
-void APJECharacterCat::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-
-    if (bIsJumping)
-    {
-        JumpAttacking();
-    }
 }
 
 

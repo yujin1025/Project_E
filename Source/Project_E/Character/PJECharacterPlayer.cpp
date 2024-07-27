@@ -21,6 +21,7 @@
 APJECharacterPlayer::APJECharacterPlayer()
 {
     bReplicates = true;
+    bAlwaysRelevant = true;
     
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
     CameraBoom->SetupAttachment(RootComponent);
