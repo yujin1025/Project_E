@@ -21,6 +21,9 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
+
 protected:
 	virtual void BeginPlay() override;
 
