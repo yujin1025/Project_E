@@ -15,12 +15,6 @@ APJECharacterCat::APJECharacterCat()
 {
 }
 
-void APJECharacterCat::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-    if(GEngine) GEngine->AddOnScreenDebugMessage(11, 17.f, FColor::Emerald, FString::Printf(TEXT("Cat Live : %f"), DeltaSeconds));
-}
-
 void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);

@@ -92,7 +92,7 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	TSubclassOf<class APJEProjectile> ProjectileClass;
+	TSubclassOf<class ADuckProjectile> ProjectileClass;
 
 	UPROPERTY()
 	UDuckInventoryWidget* WeaponInventoryWidget;
