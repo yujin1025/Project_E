@@ -61,6 +61,11 @@ void APJECharacterCat::Grab()
     Server_Grab();
 }
 
+ACatWeapon* APJECharacterCat::GetEquippedWeapon() const
+{
+    return EquippedWeapon;
+}
+
 void APJECharacterCat::Server_Grab_Implementation()
 {
     if (Inventory)
@@ -82,8 +87,8 @@ void APJECharacterCat::Server_Grab_Implementation()
                 if (SpawnedWeapon)
                 {
                     SpawnedWeapon->SetDamage(NewItem->CatDamage);
-
-                    Multicast_GrabWeapon(SpawnedWeapon);
+                    EquippedWeapon = SpawnedWeapon;
+                    Multicast_GrabWeapon(SpawnedWeapon);                
                 }
             }
         }
@@ -97,6 +102,8 @@ void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* SpawnedWe
         FName WeaponSocketName(TEXT("WeaponSocket"));
         FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
         SpawnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+
+        EquippedWeapon = SpawnedWeapon;
     }
 }
 
@@ -147,7 +154,14 @@ void APJECharacterCat::DoubleJump()
 
 void APJECharacterCat::JumpAttacking()
 {
-    Server_DoubleJumpAttack();
+    if (HasAuthority())
+    {
+        Server_DoubleJumpAttack();
+    }
+    else
+    {
+        Server_DoubleJumpAttack_Implementation();
+    }
 }
 
 

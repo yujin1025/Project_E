@@ -12,14 +12,19 @@ ACatWeapon::ACatWeapon()
 
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetupAttachment(RootComponent);
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionComponent->SetNotifyRigidBodyCollision(true);
+	CollisionComponent->SetGenerateOverlapEvents(true);
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ACatWeapon::OnAttack);
 
 	SetReplicates(true);
+	SetReplicateMovement(true);
 }
 
 void ACatWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void ACatWeapon::Tick(float DeltaTime)
