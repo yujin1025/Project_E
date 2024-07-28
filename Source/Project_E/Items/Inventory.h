@@ -42,7 +42,4 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Inventory")
     UItem* GetCatInventoryItem() const;
-
-    //UFUNCTION(BlueprintCallable, Category = "Inventory")
-    //bool IsFull() const;
 };

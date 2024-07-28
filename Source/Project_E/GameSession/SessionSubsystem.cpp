@@ -165,6 +165,7 @@ void USessionSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionC
 
 void USessionSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
 {
+	
 }
 
 void USessionSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)

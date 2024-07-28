@@ -1,19 +1,23 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "PJEGameInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PROJECT_E_API UPJEGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-public:
-	virtual void Shutdown() override;
 	
+public:
+	virtual void OnStart() override;
+	virtual void Shutdown() override;
+
+// Setting Section
+protected:
+	float CarmeraSpeed;
+
+public:
+	void SetCarmeraSpeed(float NewSpeed);
+	float GetCarmeraSpeed() const;
 };

@@ -27,14 +27,20 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void SetupInputComponent() override;
 
 	// Switch Input Function
+	void InitializeController();
+	
 	void InitInputPawn();
 	void InitInputIgnitionHandle();
 	void InitInputPush();
 	void InitInputRoll();
 
 	void GameOver();
+
+	UFUNCTION(Client, Reliable)
+	void Client_Init();
 
 	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
 	
@@ -67,4 +73,19 @@ private:
 
 	UPROPERTY()
 	UBaseWidget* InGameWindowWidget;
+
+	TObjectPtr<UUserWidget> SettingsMenu;
+
+	UFUNCTION()
+	void ToggleSettingsMenu(const FInputActionValue& Value);
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	class UInputMappingContext* SettingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	class UInputAction* ToggleSettingsMenuAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<class UUserWidget> SettingsMenuClass;
 };

@@ -20,20 +20,26 @@ void ADropItem::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyPressed(Character);
 
-	// 테스트로 일단 상호작용 키 누르면 ItemCode 전달하고 사라지게..
 	if(Character)
 	{
-		//Character->GetItem(ItemCode);
-		Character->SetHandItemCode(ItemCode);
-
 		if (APJECharacterDuck* DuckCharacter = Cast<APJECharacterDuck>(Character))
 		{
-			DuckCharacter->Swallow();
+			if (ItemCode != 3)
+			{
+				Character->SetHandItemCode(ItemCode);
+				DuckCharacter->Swallow();
+				Destroy();
+			}
 		}
 		else if (APJECharacterCat* CatCharacter = Cast<APJECharacterCat>(Character))
 		{
-			CatCharacter->Grab();
+			if (ItemCode != 1)
+			{
+				Character->SetHandItemCode(ItemCode);
+				CatCharacter->Grab();
+				Destroy();
+			}
 		}
 	}
-	Destroy();
+	
 }

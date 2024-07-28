@@ -4,6 +4,7 @@
 #include "DuckInventoryWidget.h"
 #include "SlotWidget.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/UniformGridSlot.h"
 
 void UDuckInventoryWidget::NativeConstruct()
 {
@@ -24,7 +25,12 @@ void UDuckInventoryWidget::UpdateInventory(const TArray<UItem*>& Items, bool bIs
         if (NewSlot)
         {
             Slots.Add(NewSlot);
-            InventoryGrid->AddChildToUniformGrid(NewSlot);
+            UUniformGridSlot* GridSlot = InventoryGrid->AddChildToUniformGrid(NewSlot);
+            if (GridSlot)
+            {
+                int32 Column = CurrentSlotCount + i; 
+                GridSlot->SetColumn(Column);
+            }
         }
     }
     

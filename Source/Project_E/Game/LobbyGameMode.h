@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "LobbyGameMode.generated.h"
 
+class ALobbySession;
 /**
  * 
  */
@@ -15,10 +16,7 @@ class PROJECT_E_API ALobbyGameMode : public AGameModeBase
 	GENERATED_BODY()
 public:
 	ALobbyGameMode();
-
-	virtual void Tick(float DeltaSeconds) override;
 	
-	TArray<APlayerController> PCs;
 protected:
 	virtual void BeginPlay() override;
 
@@ -26,5 +24,8 @@ protected:
 
 	virtual void Logout(AController* Exiting) override;
 	
+private:
 	TArray<FString> PlayerNames;
+
+	ALobbySession* LobbySession;
 };

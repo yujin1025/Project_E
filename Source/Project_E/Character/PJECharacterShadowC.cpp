@@ -4,7 +4,6 @@
 #include "Character/PJECharacterShadowC.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
-#include "AI/Managers/PJEShadowGeneratorManager.h"
 
 APJECharacterShadowC::APJECharacterShadowC()
 {
@@ -33,7 +32,6 @@ void APJECharacterShadowC::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	SetCurrentHP(MaxHp);
 

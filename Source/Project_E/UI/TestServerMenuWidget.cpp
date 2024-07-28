@@ -6,7 +6,6 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "Components/Button.h"
-#include "Components/SplineComponent.h"
 #include "GameSession/SessionSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -40,6 +39,10 @@ void UTestServerMenuWidget::MenuSetup(int32 NumberOfPublicConnections, FString T
 			PlayerController->SetInputMode(InputModeData);
 			PlayerController->SetShowMouseCursor(true);
 		}
+		if(World->GetNetMode() != NM_Standalone)
+		{
+			MenuTearDown();
+		}
 	}
 
 	UGameInstance* GameInstance = GetGameInstance();
@@ -62,7 +65,7 @@ bool UTestServerMenuWidget::Initialize()
 	{
 		return false;
 	}
-
+	
 	if(PlayButton)
 	{
 		PlayButton->OnClicked.AddDynamic(this, &ThisClass::PlayButtonClicked);
@@ -89,8 +92,7 @@ void UTestServerMenuWidget::OnCreateSession(bool bWasSuccessful)
 {
 	if(bWasSuccessful)
 	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Success to create session")));
-		MenuTearDown();
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Success to create session")));
 		
 		UWorld* World = GetWorld();
 		if(World)
@@ -101,7 +103,7 @@ void UTestServerMenuWidget::OnCreateSession(bool bWasSuccessful)
 	}
 	else
 	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Failed to create session")));
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Failed to create session")));
 	}
 }
 
@@ -109,8 +111,6 @@ void UTestServerMenuWidget::OnFindSession(const TArray<FOnlineSessionSearchResul
 {
 	if(!SessionSubsystem) return;
 
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Session Num : %d"), SessionResult.Num()));
-	
 	for(auto Result : SessionResult)
 	{
 		FString SettingValue;
@@ -142,8 +142,8 @@ void UTestServerMenuWidget::OnJoinSession(EOnJoinSessionCompleteResult::Type Res
 			APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
 			if(PlayerController)
 			{
-				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Address : %s"), *Address));
-				PlayerController->ClientTravel(Address, TRAVEL_Absolute);
+				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Address : %s"), *Address));
+				PlayerController->ClientTravel(Address, TRAVEL_Absolute);	
 			}
 		}
 	}
@@ -151,7 +151,7 @@ void UTestServerMenuWidget::OnJoinSession(EOnJoinSessionCompleteResult::Type Res
 	if(Result != EOnJoinSessionCompleteResult::Success)
 	{
 		JoinButton->SetIsEnabled(true);
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 600.f, FColor::Yellow, FString::Printf(TEXT("Failed to join session")));
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Failed to join session")));
 	}
 }
 

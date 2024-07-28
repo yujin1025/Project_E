@@ -23,6 +23,9 @@ private:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void ChangeHealth(float Amount);
+
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeHealth(float Amount);
 		
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetCurrentHealth() const { return CurrentHealth; }

@@ -6,6 +6,9 @@
 #include "Game/PJEGameModeBase.h"
 #include "PJEInGameMode.generated.h"
 
+class APJECharacterPlayer;
+class APJECharacterDuck;
+class APJECharacterCat;
 /**
  * 
  */
@@ -16,8 +19,28 @@ class PROJECT_E_API APJEInGameMode : public APJEGameModeBase
 
 public:
 	APJEInGameMode();
-
+	
 protected:
-	void SetDefaultPawnClass();
+	virtual void BeginPlay() override;
+	
 	void SetPlayerControllerClass();
+
+	void InitializePlayer();
+
+	void PossessController();
+	
+	virtual void PostSeamlessTravel() override;
+
+private:
+	TSubclassOf<APJECharacterPlayer> PlayerClass;
+
+	TSubclassOf<APJECharacterCat> CatClass;
+	TSubclassOf<APJECharacterDuck> DuckClass;
+
+	TArray<APawn*> PlayerPawns;
+	
+	FTransform GameStartTransform;
+
+	FTimerHandle InitDelayHandle;
+	FTimerHandle ActorDelayHandle;
 };

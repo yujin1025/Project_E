@@ -98,3 +98,8 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 
     AICon->MoveToLocation(NewLocation, 0.0001f, true, false, false, false, nullptr, true);
 }
+
+uint16 UBTTask_RunAwayFromPlayer::GetInstanceMemorySize() const
+{
+    return sizeof(FRunAwayFromPlayerTaskMemory);;
+}

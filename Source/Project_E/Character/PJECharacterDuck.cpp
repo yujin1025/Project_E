@@ -8,7 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "../Game/PJEGameModeBase.h"
 #include "../Items/Inventory.h"
-#include "Projectile/PJEProjectile.h"
+#include "Projectile/DuckProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../UI/DuckInventoryWidget.h"
 #include "../Items/Item.h"
@@ -32,7 +32,6 @@ void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
     {
-        //EnhancedInputComponent->BindAction(SwallowAction, ETriggerEvent::Started, this, &APJECharacterDuck::Swallow);
         EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &APJECharacterDuck::Fire);
         EnhancedInputComponent->BindAction(RapidFireAction, ETriggerEvent::Triggered, this, &APJECharacterDuck::RapidFire);
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APJECharacterDuck::EnterAimingMode);
@@ -43,13 +42,9 @@ void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void APJECharacterDuck::BeginPlay()
 {
     Super::BeginPlay();
-
-    UE_LOG(LogTemp, Warning, TEXT("BeginPlay"));
-
+    
     Inventory = NewObject<UInventory>(this);
-    UE_LOG(LogTemp, Warning, TEXT("Inventory 생성: %s"), *Inventory->GetName());
-
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/itemData.itemData"));
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
 
     WeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), WeaponInventoryClass);
     if (WeaponInventoryWidget)
@@ -62,11 +57,14 @@ void APJECharacterDuck::BeginPlay()
     {
         NonWeaponInventoryWidget->AddToViewport();
     }
+
 }
 
 void APJECharacterDuck::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    if(GEngine) GEngine->AddOnScreenDebugMessage(12, 17.f, FColor::Red, FString::Printf(TEXT("Duck Live : %f"), DeltaTime));
 
     if (bIsAiming)
     {
@@ -80,7 +78,7 @@ void APJECharacterDuck::Tick(float DeltaTime)
 
 void APJECharacterDuck::Swallow()
 {
-    if (Inventory)// && !Inventory->IsFull())
+    if (Inventory)
     {
         SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (SwallowedItem)
@@ -95,9 +93,6 @@ void APJECharacterDuck::Swallow()
             UpdateInventoryWidget(SwallowedItem->Type);
         }
     }
-
-    int32 WeaponCount = Inventory->GetInventoryCount();
-    UE_LOG(LogTemp, Warning, TEXT("Weapon Count: %d"), WeaponCount);
 }
 
 void APJECharacterDuck::DropItem()
@@ -128,13 +123,8 @@ void APJECharacterDuck::DropItem()
 
 void APJECharacterDuck::Fire()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Shoot"));
-
     if (!bIsAiming)
         return;
-
-    int32 WeaponCount = Inventory->GetInventoryCount();
-    UE_LOG(LogTemp, Warning, TEXT("Weapon Count: %d"), WeaponCount);
 
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
@@ -143,7 +133,7 @@ void APJECharacterDuck::Fire()
             PlayAnimMontage(FireMontage);
         }
 
-        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
+        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
 
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
@@ -174,8 +164,6 @@ void APJECharacterDuck::ResetFire()
 
 void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 {
-    UE_LOG(LogTemp, Warning, TEXT("RapidFire"));
-
     if (!bIsAiming)
         return;
 
@@ -202,7 +190,7 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
             PlayAnimMontage(RapidFireMontage);
         }
 
-        APJEProjectile* Projectile = GetWorld()->SpawnActor<APJEProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
+        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
 
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)

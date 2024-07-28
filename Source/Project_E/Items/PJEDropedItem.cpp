@@ -28,7 +28,6 @@ void APJEDropedItem::InteractionKeyReleased(APJECharacterPlayer* Character)
 
 	if(Character)
 	{
-		Character->GetItem(ItemCode);
 		Character->SetHandItemCode(ItemCode);
 	}
 	Destroy();

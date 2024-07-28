@@ -10,6 +10,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Gimmick/IgnitionHandle.h"
 #include "../UI/BaseWidget.h"
+#include "Game/PJEPlayerState.h"
 #include "Gimmick/PJEPushableCylinder.h"
 
 
@@ -42,13 +43,34 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 			PlayerController->Possess(PlayerPawn);
 		}
 	}
+
+	if(IsLocalController())
+	{
+		FString PlayerRole;
+		if(PlayerState)
+		{
+			PlayerRole = (Cast<APJEPlayerState>(PlayerState)->GetPlayerRole() == EPlayerRole::Cat) ? TEXT("Cat") : TEXT("Duck");
+		}
+		if(GEngine) GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::Emerald, FString::Printf(TEXT("InGamePlayerController / PlayerRole : %s"), *PlayerRole));
+	}
 }
 
+void APJEPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EnhancedInputComponent->BindAction(ToggleSettingsMenuAction, ETriggerEvent::Triggered, this, &APJEPlayerController::ToggleSettingsMenu);
+	}
+}
 
 // Input Switch Function
 
 void APJEPlayerController::InitInputPawn()
 {
+	PlayerPawn = GetPawn();
+	
 	ControllerOperation = EControllerOperation::ECO_Pawn;
 	
 	APawn* PossessedPawn = GetPawn();
@@ -59,6 +81,7 @@ void APJEPlayerController::InitInputPawn()
 	{
 		Subsystem->ClearAllMappings();
 		Subsystem->AddMappingContext(DefaultContext, 0);
+		Subsystem->AddMappingContext(SettingContext, 1);
 	}
 
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
@@ -68,6 +91,8 @@ void APJEPlayerController::InitInputPawn()
 		APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(PossessedPawn);
 		CharacterPlayer->InitInput(EnhancedInputComponent);
 	}
+
+	EnhancedInputComponent->BindAction(ToggleSettingsMenuAction, ETriggerEvent::Started, this, &APJEPlayerController::ToggleSettingsMenu);
 }
 
 void APJEPlayerController::InitInputIgnitionHandle()
@@ -125,11 +150,51 @@ void APJEPlayerController::GameOver()
 {
 }
 
+void APJEPlayerController::Client_Init_Implementation()
+{
+	InitInputPawn();
+
+	PlayerPawn = GetPawn();
+}
+
+
 void APJEPlayerController::OpenWidget()
 {
 	InGameWindowWidget = CreateWidget<UBaseWidget>(GetWorld(), InGameWindowWidgetClass);
 	if (InGameWindowWidget != nullptr)
 	{
 		InGameWindowWidget->AddToViewport(1);
+	}
+
+	if (SettingsMenuClass)
+	{
+		SettingsMenu = CreateWidget<UUserWidget>(this, SettingsMenuClass);
+		if (SettingsMenu)
+		{
+			SettingsMenu->AddToViewport();
+			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void APJEPlayerController::ToggleSettingsMenu(const FInputActionValue& Value)
+{
+	if (SettingsMenu)
+	{
+		if (SettingsMenu->IsVisible())
+		{
+			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
+			//FInputModeGameOnly InputMode;
+			//SetInputMode(InputMode);
+			//bShowMouseCursor = false;
+		}
+		else
+		{
+			SettingsMenu->SetVisibility(ESlateVisibility::Visible);
+			//FInputModeUIOnly InputMode;
+			//InputMode.SetWidgetToFocus(SettingsMenu->TakeWidget());
+			//SetInputMode(InputMode);
+			//bShowMouseCursor = true;
+		}
 	}
 }

@@ -14,7 +14,6 @@ class UInputMappingContext;
 class UInputAction;
 class UInventory;
 
-
 struct FInputActionValue;
 
 UCLASS()
@@ -24,8 +23,7 @@ class PROJECT_E_API APJECharacterPlayer : public APJECharacterBase/*, public IAB
 
 public:
 	APJECharacterPlayer();
-	
-	bool GetItem(int32 ItemCode);
+
 	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
 	// INLINE Function for test.. to be Deleted
 	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
@@ -143,7 +141,7 @@ protected:
 
 protected:
 	virtual void Landed(const FHitResult& Hit) override;
-	void DoubleJump();
+	virtual void DoubleJump();
 	void Dash();
 	void StopDash();
 	virtual void DropItem();
@@ -152,18 +150,10 @@ protected:
 private:
 	void OnMove(const FInputActionValue& Value);	
 	void OnLook(const FInputActionValue& Value);
-	//void OpenInventory();
-
-	bool bIsInventoryOpen = false; 
 
 
  //Item Section
 protected:
-	//virtual void TakeItem(UItem* Item) override;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-	//UInventory* Inventory;
-
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float PopupDistance;
 
