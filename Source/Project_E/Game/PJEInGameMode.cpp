@@ -90,7 +90,8 @@ void APJEInGameMode::PossessController()
 		if(PlayerController)
 		{
 			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d PC Loc"), i));
-			PlayerController->Client_Possess(PlayerPawns[i]);
+			PlayerController->Possess(PlayerPawns[i]);
+			PlayerController->Client_Init();
 			i++;
 		}
 	}

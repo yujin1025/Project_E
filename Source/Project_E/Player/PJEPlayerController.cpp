@@ -137,28 +137,11 @@ void APJEPlayerController::GameOver()
 {
 }
 
-void APJEPlayerController::Client_Possess_Implementation(APawn* NewPawn)
+void APJEPlayerController::Client_Init_Implementation()
 {
-	if(NewPawn)
-	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("PawnName : %s"), *NewPawn->GetName()));
-		bCanPossessWithoutAuthority = true;
-		// 문제 : Authority가 없음... HasAuthority가 false를 반환한다!
-		Possess(NewPawn);
-		InitInputPawn();
-		if(GetPawn())
-		{
-			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Possess Success")));
-		}
-		else
-		{
-			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Possess Failed")));
-		}
-	}
-	else
-	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Replicated Pawn is NULL")));
-	}
+	InitInputPawn();
+
+	PlayerPawn = GetPawn();
 }
 
 

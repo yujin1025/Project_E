@@ -39,7 +39,7 @@ public:
 	void GameOver();
 
 	UFUNCTION(Client, Reliable)
-	void Client_Possess(APawn* NewPawn);
+	void Client_Init();
 
 	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
 	
