@@ -9,7 +9,7 @@ class PROJECT_E_API UPJESystemWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	virtual void NativeConstruct() override;
 
 protected:
@@ -50,5 +50,9 @@ protected:
 	void OnBackButtonClicked();
 
 private:
-	class APostProcessVolume* PostProcessVolume;
+	UPROPERTY()
+	TObjectPtr<class APostProcessVolume> PostProcessVolume;
+
+	UPROPERTY()
+	TObjectPtr<class UPJEGameInstance> GameInstance;
 };

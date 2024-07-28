@@ -8,15 +8,16 @@ UCLASS()
 class PROJECT_E_API UPJEGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-
-	public:
+	
+public:
 	virtual void OnStart() override;
 	virtual void Shutdown() override;
 
+// Setting Section
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<class UUserWidget> SettingsMenuClass;
+	float CarmeraSpeed;
 
-private:
-	UUserWidget* SettingsMenu;
+public:
+	void SetCarmeraSpeed(float NewSpeed);
+	float GetCarmeraSpeed() const;
 };

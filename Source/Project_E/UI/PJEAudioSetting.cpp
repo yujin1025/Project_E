@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/PJEAudioSetting.h"
 #include "Components/Slider.h"
 #include "Components/ComboBoxString.h"
 #include "Components/Button.h"
+#include "Sound/SoundClass.h"
+#include "Kismet/GameplayStatics.h"
 
 void UPJEAudioSetting::NativeConstruct()
 {
@@ -40,14 +39,28 @@ void UPJEAudioSetting::NativeConstruct()
 		VoiceChatVolumeSlider->OnValueChanged.AddDynamic(this, &UPJEAudioSetting::OnVoiceChatVolumeChanged);
 	}
 
+	if (MasterVolumeSlider) MasterVolumeSlider->SetValue(0.5f);
+	if (BGMVolumeSlider) BGMVolumeSlider->SetValue(0.5f);
+	if (EnvironmentVolumeSlider) EnvironmentVolumeSlider->SetValue(0.5f);
+	if (SFXVolumeSlider) SFXVolumeSlider->SetValue(0.5f);
+	if (NarrationVolumeSlider) NarrationVolumeSlider->SetValue(0.5f);
+	if (VoiceChatVolumeSlider) VoiceChatVolumeSlider->SetValue(0.5f);
+
 	if (SpeakerComboBox)
 	{
 		SpeakerComboBox->OnSelectionChanged.AddDynamic(this, &UPJEAudioSetting::OnSpeakerSelectionChanged);
+		SpeakerComboBox->AddOption(TEXT("Default"));
+		SpeakerComboBox->AddOption(TEXT("Speaker"));
+		SpeakerComboBox->AddOption(TEXT("Headphones"));
+		SpeakerComboBox->SetSelectedIndex(0);
 	}
 
 	if (MicModeComboBox)
 	{
 		MicModeComboBox->OnSelectionChanged.AddDynamic(this, &UPJEAudioSetting::OnMicModeSelectionChanged);
+		MicModeComboBox->AddOption(TEXT("Voice Detection"));
+		MicModeComboBox->AddOption(TEXT("Push to Talk"));
+		MicModeComboBox->SetSelectedIndex(0);
 	}
 
 	if (ResetButton)
@@ -63,59 +76,71 @@ void UPJEAudioSetting::NativeConstruct()
 
 void UPJEAudioSetting::OnMasterVolumeChanged(float Value)
 {
-	// Master Volume 변경 로직
+	SetVolume(MasterSoundClass, Value);
 }
 
 void UPJEAudioSetting::OnBGMVolumeChanged(float Value)
 {
-	// BGM Volume 변경 로직
+	SetVolume(BGMSoundClass, Value);
 }
 
 void UPJEAudioSetting::OnEnvironmentVolumeChanged(float Value)
 {
-	// Environment Volume 변경 로직
+	SetVolume(EnvironmentSoundClass, Value);
 }
 
 void UPJEAudioSetting::OnSFXVolumeChanged(float Value)
 {
-	// SFX Volume 변경 로직
+	SetVolume(SFXSoundClass, Value);
 }
 
 void UPJEAudioSetting::OnNarrationVolumeChanged(float Value)
 {
-	// Narration Volume 변경 로직
+	SetVolume(NarrationSoundClass, Value);
 }
 
 void UPJEAudioSetting::OnVoiceChatVolumeChanged(float Value)
 {
-	// Voice Chat Volume 변경 로직
+	SetVolume(VoiceChatSoundClass, Value);
 }
 
 void UPJEAudioSetting::OnSpeakerSelectionChanged(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
-	// Speaker 선택 변경 로직
+	// Speaker selection logic
 }
 
 void UPJEAudioSetting::OnMicModeSelectionChanged(FString SelectedItem, ESelectInfo::Type SelectionType)
 {
-	// Mic Mode 선택 변경 로직
+	// Mic mode selection logic
 }
 
 void UPJEAudioSetting::OnResetButtonClicked()
 {
-	// 모든 설정을 기본값으로 리셋
 	if (MasterVolumeSlider) MasterVolumeSlider->SetValue(0.5f);
 	if (BGMVolumeSlider) BGMVolumeSlider->SetValue(0.5f);
 	if (EnvironmentVolumeSlider) EnvironmentVolumeSlider->SetValue(0.5f);
 	if (SFXVolumeSlider) SFXVolumeSlider->SetValue(0.5f);
 	if (NarrationVolumeSlider) NarrationVolumeSlider->SetValue(0.5f);
 	if (VoiceChatVolumeSlider) VoiceChatVolumeSlider->SetValue(0.5f);
-	if (SpeakerComboBox) SpeakerComboBox->SetSelectedIndex(0); // 기본값으로 설정
-	if (MicModeComboBox) MicModeComboBox->SetSelectedIndex(0); // 기본값으로 설정
+	if (SpeakerComboBox) SpeakerComboBox->SetSelectedIndex(0);
+	if (MicModeComboBox) MicModeComboBox->SetSelectedIndex(0);
 }
 
 void UPJEAudioSetting::OnBackButtonClicked()
 {
-	// 이전 메뉴로 돌아가기
+	// Return to previous menu
 	this->RemoveFromParent();
+}
+
+void UPJEAudioSetting::SetVolume(USoundClass* SoundClass, float Value)
+{
+	if (SoundClass)
+	{
+		SoundClass->Properties.Volume = Value;
+		UE_LOG(LogTemp, Log, TEXT("%s volume set to %f"), *SoundClass->GetName(), Value);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SoundClass is null!"));
+	}
 }

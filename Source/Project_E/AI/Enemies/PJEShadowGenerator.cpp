@@ -10,7 +10,8 @@
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Pawn.h"
-#include "AI/Managers/PJEShadowGeneratorManager.h"
+#include "AI/Enemies/PJEShadowArea.h"
+
 // Sets default values
 APJEShadowGenerator::APJEShadowGenerator()
 {
@@ -30,7 +31,7 @@ void APJEShadowGenerator::BeginPlay()
     }
 }
 
-void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager)
+void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation)
 {
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
@@ -52,6 +53,12 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
             FVector BoundsExtent = SpawnedMonster->GetComponentsBoundingBox().GetExtent();
             SpawnLocation.Z += BoundsExtent.Z; // 몬스터가 지면 위에 위치하도록 Z 축을 조정
             SpawnedMonster->SetActorLocation(SpawnLocation);
+            if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
+            {
+                APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
+                ShadowA->ShadowArea = ShadowArea;
+                ShadowArea->ShadowAArr.Add(ShadowA);
+            }
         }
         else
         {
@@ -66,27 +73,15 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
 }
 
 
-bool APJEShadowGenerator::Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager)
+bool APJEShadowGenerator::Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation)
 {
     return true;
-}
-
-bool APJEShadowGenerator::Multicast_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager)
-{
-    return true;
-}
-
-void APJEShadowGenerator::Multicast_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager)
-{
-    
 }
 
 void APJEShadowGenerator::Destroyed()
 {
-    if (HasAuthority())
-    {
-        UPJEShadowGeneratorManager::GetInstance()->Server_RemoveShadowGenerator(this);
-    }
+    ShadowArea->ShadowGeneratorArr.Remove(this);
+    ShadowArea->SetBackgroundVolume(ShadowArea->ShadowGeneratorArr.Num());
     Super::Destroyed();
 }
 
@@ -97,13 +92,15 @@ void APJEShadowGenerator::StartSpawnTimer()
 
 void APJEShadowGenerator::SpawnShadowAWithTimer()
 {
-    if (UPJEShadowGeneratorManager::GetInstance()->GetShadowACount() < 5)
+    FVector SpecificLocation = FVector(100.0f, 200.0f, 300.0f);
+    for (int32 i = 0; i < 1; i++)
     {
-        FVector SpecificLocation = FVector(100.0f, 200.0f, 300.0f);
-        for (int32 i = 0; i < 1; i++)
+        Server_SpawnMonster(ShadowBClass, SpecificLocation);
+        Server_SpawnMonster(ShadowAClass, SpecificLocation);
+
+        if (ShadowArea && ShadowArea->GetIsPlayerInArea())
         {
-            Server_SpawnMonster(ShadowBClass, SpecificLocation, true);
-            Server_SpawnMonster(ShadowAClass, SpecificLocation, true);
+            ShadowArea->PlayShadowASound();
         }
     }
 }

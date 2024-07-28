@@ -7,6 +7,7 @@
 #include "GameFramework/GameUserSettings.h"
 #include "Engine/PostProcessVolume.h"
 #include "EngineUtils.h" 
+#include "PJEGameInstance.h"
 
 void UPJESystemWidget::NativeConstruct()
 {
@@ -115,7 +116,9 @@ void UPJESystemWidget::OnScreenModeChanged(FString SelectedItem, ESelectInfo::Ty
 void UPJESystemWidget::OnCameraSpeedChanged(float Value)
 {
 	// 카메라 속도 변경 처리
-	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->DefaultFOV = FMath::Lerp(00.0f, 100.0f, Value);
+	GameInstance = Cast<UPJEGameInstance>(GetGameInstance());
+
+	GameInstance->SetCarmeraSpeed(Value);
 }
 
 void UPJESystemWidget::OnBrightnessChanged(float Value)

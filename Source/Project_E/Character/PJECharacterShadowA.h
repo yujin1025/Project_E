@@ -7,6 +7,7 @@
 #include "AI/Enemies/Interface/PJETeleportable.h"
 #include "AI/Enemies/Interface/PJEBlinkable.h"
 #include "AI/Enemies/Interface/PJERunAwayable.h"
+#include "Sound/SoundCue.h"
 #include "PJECharacterShadowA.generated.h"
 
 /**
@@ -18,7 +19,7 @@ class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow, public IP
 	GENERATED_BODY()
 public:
 	APJECharacterShadowA();
-
+	virtual void Destroyed() override;
 
 // Stat Section
 protected:
@@ -54,5 +55,24 @@ protected:
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 	virtual void AttackByAI() override;
 
+// Sound Section
+public:
+	UPROPERTY()
+	TObjectPtr<class APJEShadowArea> ShadowArea;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundCue> LaughSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<class USoundAttenuation> LaughAttenuation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	TObjectPtr<class UAudioComponent> LaughAudioComponent;
+
+public:
+	void PlaySound();
+	void StopSound();
+
+	void SetLaughVolume(float Value);
 };

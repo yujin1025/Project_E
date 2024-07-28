@@ -9,7 +9,7 @@ class PROJECT_E_API UPJEAudioSetting : public UUserWidget
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	virtual void NativeConstruct() override;
 
 protected:
@@ -43,6 +43,24 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BackButton;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	class USoundClass* MasterSoundClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	class USoundClass* BGMSoundClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	class USoundClass* EnvironmentSoundClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	class USoundClass* SFXSoundClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	class USoundClass* NarrationSoundClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	class USoundClass* VoiceChatSoundClass;
+
 private:
 	UFUNCTION()
 	void OnMasterVolumeChanged(float Value);
@@ -73,4 +91,7 @@ private:
 
 	UFUNCTION()
 	void OnBackButtonClicked();
+
+
+	void SetVolume(USoundClass* SoundClass, float Value);
 };

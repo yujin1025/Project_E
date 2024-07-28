@@ -52,11 +52,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> SystemSettingsWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> AudioSettingWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> DuckGuideWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> CatGuideWidgetClass;
 
 	UUserWidget* SystemSettingsWidget;
+
+	UUserWidget* AudioSettingWidget;
 
 	UUserWidget* DuckGuideWidget;
 	UUserWidget* CatGuideWidget;

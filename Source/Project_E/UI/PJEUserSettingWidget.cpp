@@ -3,6 +3,7 @@
 
 #include "UI/PJEUserSettingWidget.h"
 #include "Components/Button.h"
+#include "Character/PJECharacterCat.h"
 
 void UPJEUserSettingWidget::NativeConstruct()
 {
@@ -55,24 +56,55 @@ void UPJEUserSettingWidget::OnSystemButtonClicked()
 
 void UPJEUserSettingWidget::OnSoundButtonClicked()
 {
+	if (AudioSettingWidgetClass)
+	{
+		if (!AudioSettingWidget)
+		{
+			AudioSettingWidget = CreateWidget<UUserWidget>(GetWorld(), AudioSettingWidgetClass);
+		}
+
+		if (AudioSettingWidget)
+		{
+			AudioSettingWidget->AddToViewport();
+		}
+	}
 	// 음향 설정 페이지로 전환하는 코드
 	UE_LOG(LogTemp, Warning, TEXT("Sound Button Clicked"));
 }
 
 void UPJEUserSettingWidget::OnGuideButtonClicked()
 {
-	if (DuckGuideWidgetClass)
+	if (Cast<APJECharacterCat>(GetWorld()->GetFirstPlayerController()->GetPawn()) != NULL)
 	{
-		if (!DuckGuideWidget)
+		if (CatGuideWidgetClass)
 		{
-			DuckGuideWidget = CreateWidget<UUserWidget>(GetWorld(), DuckGuideWidgetClass);
-		}
+			if (!CatGuideWidget)
+			{
+				CatGuideWidget = CreateWidget<UUserWidget>(GetWorld(), CatGuideWidgetClass);
+			}
 
-		if (DuckGuideWidget)
-		{
-			DuckGuideWidget->AddToViewport();
+			if (CatGuideWidget)
+			{
+				CatGuideWidget->AddToViewport();
+			}
 		}
 	}
+	else
+	{
+		if (DuckGuideWidgetClass)
+		{
+			if (!DuckGuideWidget)
+			{
+				DuckGuideWidget = CreateWidget<UUserWidget>(GetWorld(), DuckGuideWidgetClass);
+			}
+
+			if (DuckGuideWidget)
+			{
+				DuckGuideWidget->AddToViewport();
+			}
+		}
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("Guide Button Clicked"));
 }
 

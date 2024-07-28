@@ -14,4 +14,13 @@ class PROJECT_E_API UPJECatControlGuideWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void NativeConstruct() override;
+
+protected:
+	UFUNCTION()
+	void OnBackButtonClicked();
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BackButton;
 };

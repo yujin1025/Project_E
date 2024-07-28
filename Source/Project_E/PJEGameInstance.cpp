@@ -2,7 +2,6 @@
 
 
 #include "PJEGameInstance.h"
-#include "AI/Managers/PJEShadowGeneratorManager.h"
 #include "Blueprint/UserWidget.h"
 
 void UPJEGameInstance::OnStart()
@@ -41,4 +40,14 @@ void UPJEGameInstance::Shutdown()
 		SettingsMenu = nullptr;
 	}
 	*/
+}
+
+void UPJEGameInstance::SetCarmeraSpeed(float NewSpeed)
+{
+	CarmeraSpeed = NewSpeed;
+}
+
+float UPJEGameInstance::GetCarmeraSpeed() const
+{
+	return CarmeraSpeed;
 }
