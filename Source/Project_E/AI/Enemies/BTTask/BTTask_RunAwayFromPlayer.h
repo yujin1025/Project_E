@@ -18,6 +18,7 @@ public:
 	UBTTask_RunAwayFromPlayer();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+	virtual uint16 GetInstanceMemorySize() const override;
 };
 
 

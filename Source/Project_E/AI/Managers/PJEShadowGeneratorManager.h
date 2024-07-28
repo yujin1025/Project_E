@@ -14,7 +14,7 @@ class PROJECT_E_API UPJEShadowGeneratorManager : public UObject
 {
     GENERATED_BODY()
 
-    public:
+public:
     static UPJEShadowGeneratorManager* GetInstance();
     static void ShutdownInstance();
 

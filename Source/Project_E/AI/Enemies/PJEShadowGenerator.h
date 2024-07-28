@@ -16,6 +16,12 @@ class PROJECT_E_API APJEShadowGenerator : public AActor
     virtual void BeginPlay() override;
     virtual void Destroyed() override;
 
+
+    // Area Section
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Area")
+    TObjectPtr<class APJEShadowArea> ShadowArea;
+
     // Mesh Section
 protected:
     UPROPERTY(VisibleAnywhere)
@@ -23,17 +29,10 @@ protected:
 
     // Spawn Section
 public:
-
-
     UFUNCTION(Server, Reliable, WithValidation)
-    void Server_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
-    bool Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
-    void Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation, bool bAddToManager = true);
-
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
-    bool Multicast_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
-    void Multicast_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& SpawnLocation, bool bAddToManager);
+    void Server_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation);
+    bool Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation);
+    void Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation);
 
 protected:
     FTimerHandle SpawnTimerHandle;
@@ -46,7 +45,6 @@ protected:
 
     void StartSpawnTimer();
     void SpawnShadowAWithTimer();
-
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

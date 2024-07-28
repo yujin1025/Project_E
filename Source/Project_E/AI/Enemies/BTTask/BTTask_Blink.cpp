@@ -73,3 +73,8 @@ void UBTTask_Blink::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
     }
 }
 
+uint16 UBTTask_Blink::GetInstanceMemorySize() const
+{
+    return sizeof(FBTBlinkTaskMemory);
+}
+
