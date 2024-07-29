@@ -30,13 +30,11 @@ void UBTTask_ChasePlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
         return;
     }
 
-    // Get the target actor from the blackboard
     AActor* TargetActor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_PLAYERACTOR));
     if (!TargetActor)
     {
         return;
     }
 
-    // Move to the target actor's location
     AICon->MoveToLocation(TargetActor->GetActorLocation(), 0.0001f, true, false, false, false, nullptr, true);
 }

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="1ef914cf-c9b4-4cbb-9dcd-6316bb87d4c4" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/Content/BP_PJEGameInstance.uasset" afterDir="false" />

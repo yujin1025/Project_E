@@ -63,6 +63,21 @@ float APJECharacterShadowA::GetRunAwaySpeed()
 	return RunAwaySpeed * 100;
 }
 
+float APJECharacterShadowA::GetPlayerDetectRange()
+{
+	return PlayerDetectionRange * 100.0f;
+}
+
+float APJECharacterShadowA::GetDetectMaxYDifference()
+{
+	return MaxYDifference;
+}
+
+float APJECharacterShadowA::GetDetectMinYDifference()
+{
+	return MinYDifference;
+}
+
 void APJECharacterShadowA::BeginPlay()
 {
 	Super::BeginPlay();

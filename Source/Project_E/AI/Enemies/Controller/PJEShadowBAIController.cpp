@@ -16,5 +16,5 @@ void APJEShadowBAIController::InitBB()
 {
 	Super::InitBB();
 	APJECharacterShadowB* OwnCharacter = Cast<APJECharacterShadowB>(GetPawn());
-	Blackboard->SetValueAsFloat("PlayerDetectRange", OwnCharacter->GetPlayerDetectRange());
+	Blackboard->SetValueAsFloat(TEXT("PlayerDetectRange"), OwnCharacter->GetPlayerDetectRange());
 }

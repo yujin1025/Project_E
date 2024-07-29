@@ -12,7 +12,7 @@
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadow, public IPJEFieldSpawnable, public IPJEChasable
+class PROJECT_E_API APJECharacterShadowB : public APJECharacterShadow, public IPJEFieldSpawnable, public IPJEChasable, public IPJEPlayerDectectable
 {
 	GENERATED_BODY()
 public:
@@ -25,9 +25,20 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float AttackSize;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float ChaseSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float PlayerDetectionRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxYDifference;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MinYDifference;
+
+public:
+	virtual float GetChaseSpeed() override;
+	virtual float GetPlayerDetectRange() override;
+	virtual float GetDetectMaxYDifference() override;
+	virtual float GetDetectMinYDifference() override;
 
 // AI Section
 protected:
@@ -35,6 +46,10 @@ protected:
 	virtual float GetAIDetectRange() override;
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
-	virtual float GetChaseSpeed() override;
+
 	virtual void AttackByAI() override;
+
+// Battle Section
+protected:
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

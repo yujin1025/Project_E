@@ -11,21 +11,13 @@
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadow : public APJECharacterMonster, public IPJEPlayerDectectable
+class PROJECT_E_API APJECharacterShadow : public APJECharacterMonster
 {
 	GENERATED_BODY()
 	
 public:
 	APJECharacterShadow();
 	virtual void BeginPlay() override;
-
-// Stat Section
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float PlayerDetectionRange;
-
-public:
-	virtual float GetPlayerDetectRange() override;
 
 // Spawn Section
 public:

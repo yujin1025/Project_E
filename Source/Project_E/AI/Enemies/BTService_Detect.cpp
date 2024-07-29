@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "AI/Enemies/BTService_Detect.h"
 #include "AI/PJEAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -13,8 +12,8 @@
 
 UBTService_Detect::UBTService_Detect()
 {
-	NodeName = TEXT("Detect");
-	Interval = 1.0f;
+    NodeName = TEXT("Detect");
+    Interval = 1.0f;
 }
 
 void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -29,15 +28,14 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     {
         UWorld* World = OwnerActor->GetWorld();
         TArray<AActor*> OverlappedActors;
-        FVector AIControllerLocation = OwnerActor->GetActorLocation();
+        FVector OwnerLocation = OwnerActor->GetActorLocation(); // 조종하는 액터의 위치
         IPJEPlayerDectectable* PlayerDetectable = Cast<IPJEPlayerDectectable>(OwnerActor);
 
         float DetectionRadius = PlayerDetectable->GetPlayerDetectRange();
-        
 
         UKismetSystemLibrary::SphereOverlapActors(
             World,
-            AIControllerLocation,
+            OwnerLocation,
             DetectionRadius,
             TArray<TEnumAsByte<EObjectTypeQuery>>{UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn)},
             APawn::StaticClass(),
@@ -52,15 +50,23 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
             APawn* Pawn = Cast<APawn>(Actor);
             if (Pawn && Pawn->IsPlayerControlled())
             {
-                bIsPlayerNearby = true;
-                PlayerActor = Actor;
-                break;
+                FVector PlayerLocation = Pawn->GetActorLocation();
+                float YDifference = PlayerLocation.Y - OwnerLocation.Y;
+
+                // 플레이어의 Y 좌표가 OwnerActor의 Y 좌표보다 너무 아래 또는 너무 위에 있지 않을 경우에만 감지
+                if (YDifference >= PlayerDetectable->GetDetectMinYDifference() && YDifference <= PlayerDetectable->GetDetectMaxYDifference())
+                {
+                    bIsPlayerNearby = true;
+                    PlayerActor = Actor;
+                    break;
+                }
             }
         }
 
         OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, bIsPlayerNearby);
         if (PlayerActor != nullptr)
+        {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, PlayerActor);
+        }
     }
-
 }
