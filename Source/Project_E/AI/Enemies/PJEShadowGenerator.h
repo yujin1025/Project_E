@@ -29,6 +29,9 @@ protected:
 
     // Spawn Section
 public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+    FVector SpawnPos;
+
     UFUNCTION(Server, Reliable, WithValidation)
     void Server_SpawnMonster(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation);
     bool Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation);

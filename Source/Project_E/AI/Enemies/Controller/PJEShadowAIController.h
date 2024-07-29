@@ -34,8 +34,8 @@ public:
     APJEShadowAIController();
 
     UFUNCTION(Server, Reliable, WithValidation)
-    void Server_SetRandomDestPos(const FVector& OriPos);
+    void Server_SetRandomDestPos(const FVector& DestPos);
 
-    virtual void Server_SetRandomDestPos_Implementation(const FVector& OriPos);
-    virtual bool Server_SetRandomDestPos_Validate(const FVector& OriPos);
+    virtual void Server_SetRandomDestPos_Implementation(const FVector& DestPos);
+    virtual bool Server_SetRandomDestPos_Validate(const FVector& DestPos);
 };
