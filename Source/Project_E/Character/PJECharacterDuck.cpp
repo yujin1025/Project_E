@@ -339,7 +339,7 @@ void APJECharacterDuck::CalculateProjectilePath()
     {
         for (FPredictProjectilePathPointData PointData : PredictResult.PathData)
         {
-            DrawDebugSphere(GetWorld(), PointData.Location, 5.f, 8, FColor::Green, false, 0.5f);
+            DrawDebugSphere(GetWorld(), PointData.Location, 5.f, 8, FColor::Green, false, 0.0f);
         }
     }
 }

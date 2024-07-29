@@ -4,6 +4,7 @@
 #include "Gimmick/PJELockDoor.h"
 
 #include "PJEMovingComponent.h"
+#include "Net/UnrealNetwork.h"
 
 APJELockDoor::APJELockDoor()
 {
@@ -11,6 +12,14 @@ APJELockDoor::APJELockDoor()
 	DoorMesh->SetupAttachment(RootComponent);
 	
 	MovingComponent = CreateDefaultSubobject<UPJEMovingComponent>(TEXT("Moving Component"));
+	MovingComponent->SetIsReplicated(true);
+}
+
+void APJELockDoor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, bIsKeyInserted);
 }
 
 void APJELockDoor::BeginPlay()
@@ -19,26 +28,39 @@ void APJELockDoor::BeginPlay()
 	Super::BeginPlay();
 }
 
+// First Interaction - Insert the Key
+// Second Interaction - Open the Door
 void APJELockDoor::InteractionKeyReleased(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyReleased(Character);
-	
-	int32 CharacterHandItemcode = 0;
-	//Character에 접근하여 손에 들고 있는 Item의 Code를 얻어낸다
-	bIsInteracting = CheckValidKey(CharacterHandItemcode);
-	if(bIsInteracting)
+
+	if(!bIsKeyInserted)
 	{
-		MovingComponent->SetMovementState(EMovementState::Moving);
+		int32 CharacterHandItemCode = 0;
+		if(CheckValidKey(CharacterHandItemCode))
+		{
+			bIsKeyInserted = true;
+			// Destroy Character Item
+		}
 	}
+	else
+	{
+		NetMulticast_OpenDoor();
+	}
+	
+}
+
+void APJELockDoor::NetMulticast_OpenDoor_Implementation()
+{
+	MovingComponent->SetMovementState(EMovementState::Moving);
+	DisableInteraction();
 }
 
 bool APJELockDoor::CheckValidKey(int32 Itemcode)
 {
 	if(Itemcode == UnlockKeycode)
 	{
-		DisableInteraction();
 		return true;
-		// 상호작용 불가능하게 코드 추가하기
 	}
 	return false;
 }
