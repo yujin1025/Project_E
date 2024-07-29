@@ -42,7 +42,7 @@ void APJEShadowAIController::OnRep_SubPatrolPos()
 }
 
 
-void APJEShadowAIController::Server_SetRandomDestPos_Implementation(const FVector& OriPos)
+void APJEShadowAIController::Server_SetRandomDestPos_Implementation(const FVector& DestPos)
 {
     APawn* ControllingPawn = GetPawn();
     if (nullptr == ControllingPawn)
@@ -61,7 +61,7 @@ void APJEShadowAIController::Server_SetRandomDestPos_Implementation(const FVecto
 
     if (SubPatrolPos == FVector(0, 0, 0))
     {
-        if (NavSystem->GetRandomPointInNavigableRadius(OriPos, 1000.0f, SubPatrolPosLoc))
+        if (NavSystem->GetRandomPointInNavigableRadius(DestPos, 1000.0f, SubPatrolPosLoc))
         {
             SubPatrolPos = SubPatrolPosLoc.Location;
         }
@@ -71,7 +71,7 @@ void APJEShadowAIController::Server_SetRandomDestPos_Implementation(const FVecto
         SubPatrolPos = NextPatrolPos;
     }
 
-    if (NavSystem->GetRandomPointInNavigableRadius(OriPos, 2000.0f, NextPatrolPosLoc))
+    if (NavSystem->GetRandomPointInNavigableRadius(DestPos, 2000.0f, NextPatrolPosLoc))
     {
         NextPatrolPos = NextPatrolPosLoc.Location;
     }

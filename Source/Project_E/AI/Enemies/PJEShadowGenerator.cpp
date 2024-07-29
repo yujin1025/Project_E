@@ -80,8 +80,11 @@ bool APJEShadowGenerator::Server_SpawnMonster_Validate(TSubclassOf<class APJECha
 
 void APJEShadowGenerator::Destroyed()
 {
-    ShadowArea->ShadowGeneratorArr.Remove(this);
-    ShadowArea->SetBackgroundVolume(ShadowArea->ShadowGeneratorArr.Num());
+    if (ShadowArea)
+    {
+        ShadowArea->ShadowGeneratorArr.Remove(this);
+        ShadowArea->SetBackgroundVolume(ShadowArea->ShadowGeneratorArr.Num());
+    }
     Super::Destroyed();
 }
 
@@ -92,11 +95,10 @@ void APJEShadowGenerator::StartSpawnTimer()
 
 void APJEShadowGenerator::SpawnShadowAWithTimer()
 {
-    FVector SpecificLocation = FVector(100.0f, 200.0f, 300.0f);
     for (int32 i = 0; i < 1; i++)
     {
-        Server_SpawnMonster(ShadowBClass, SpecificLocation);
-        Server_SpawnMonster(ShadowAClass, SpecificLocation);
+        Server_SpawnMonster(ShadowBClass, SpawnPos);
+        Server_SpawnMonster(ShadowAClass, SpawnPos);
 
         if (ShadowArea && ShadowArea->GetIsPlayerInArea())
         {
