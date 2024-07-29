@@ -68,10 +68,10 @@ bool UAnimNotifyAttackState::TryGetOverlapResult(APJECharacterBase* Owner, TArra
 		OverlapResults,
 		Center + CenterOffset,
 		Owner->GetActorQuat(),
-		ECollisionChannel::ECC_Pawn, //나중에 충돌설정 변경하기
+		ECollisionChannel::ECC_GameTraceChannel6,
 		FCollisionShape::MakeSphere(100.0f),
 		CollisionParam);
-
+	
 	return bResult;
 }
 
