@@ -6,6 +6,7 @@ UPJEMovingComponent::UPJEMovingComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
+	MovementState = EMovementState::Interrupt;
 }
 
 
@@ -26,11 +27,14 @@ void UPJEMovingComponent::BeginPlay()
 
 void UPJEMovingComponent::OperateMove(float DeltaTime)
 {
+	
 	FVector CurrentLocation = MovementTarget->GetComponentLocation();
 	FVector TargetLocation = OriginLocation + MovementOffset;
 	FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, MovementSpeed);
 	MovementTarget->SetWorldLocation(NewLocation);
-
+	
+	if(GEngine) GEngine->AddOnScreenDebugMessage(90, 10.f, FColor::Emerald, FString::Printf(TEXT("Current Location : %s"), *CurrentLocation.ToString()));
+	
 	if(FVector::Distance(CurrentLocation, TargetLocation) < 1.f)
 	{
 		bIsArrived = true;
@@ -54,6 +58,7 @@ void UPJEMovingComponent::ResetMove(float DeltaTime)
 void UPJEMovingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
 
 	switch(MovementState)
 	{
