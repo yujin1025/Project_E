@@ -53,6 +53,23 @@ void APJEPlayerController::Tick(float DeltaSeconds)
 		}
 		if(GEngine) GEngine->AddOnScreenDebugMessage(5, 1.f, FColor::Emerald, FString::Printf(TEXT("InGamePlayerController / PlayerRole : %s"), *PlayerRole));
 	}
+
+	if(IsLocalController())
+	{
+		ENetMode NetMode = GetNetMode();
+		switch (NetMode)
+		{
+		case NM_Standalone:
+			if(GEngine) GEngine->AddOnScreenDebugMessage(4, 1.f, FColor::Black, FString::Printf(TEXT("NetMode : Standalone")));
+			break;
+		case NM_ListenServer:
+			if(GEngine) GEngine->AddOnScreenDebugMessage(4, 1.f, FColor::Black, FString::Printf(TEXT("NetMode : ListenServer")));
+			break;
+		case NM_Client:
+			if(GEngine) GEngine->AddOnScreenDebugMessage(4, 1.f, FColor::Black, FString::Printf(TEXT("NetMode : Client")));
+			break;
+		}
+	}
 }
 
 // Input Switch Function
