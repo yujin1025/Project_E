@@ -4,13 +4,15 @@
 #include "Character/PJECharacterShadowC.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "AI/PJEAIController.h"
+#include "AI/PJEAI.h"
 
 APJECharacterShadowC::APJECharacterShadowC()
 {
 	MonsterRank = EMonsterRank::Boss;
 	MaxHp = 200;
 	MoveSpeed = 4.7f;
-	PlayerDetectionRange = 1.0f;
 }
 
 float APJECharacterShadowC::GetBlinkDuration()
@@ -34,8 +36,6 @@ void APJECharacterShadowC::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	SetCurrentHP(MaxHp);
-
-	PlayerDetectionRange = 4.0f;
 }
 
 float APJECharacterShadowC::GetAIPatrolRadius()
@@ -61,4 +61,20 @@ float APJECharacterShadowC::GetAITurnSpeed()
 void APJECharacterShadowC::AttackByAI()
 {
 	//TODO :Implement this function
+}
+
+float APJECharacterShadowC::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+		if (BlackboardComp)
+		{
+			BlackboardComp->SetValueAsBool(BBKEY_ISFIRSTATTACKED, true);
+		}
+	}
+	return 0.0f;
 }

@@ -14,12 +14,15 @@
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow, public IPJETeleportable, public IPJEBlinkable, public IPJERunAwayable
+class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow, public IPJETeleportable, public IPJEBlinkable, public IPJERunAwayable, public IPJEPlayerDectectable
 {
 	GENERATED_BODY()
 public:
 	APJECharacterShadowA();
 	virtual void Destroyed() override;
+
+protected:
+	virtual void BeginPlay() override;
 
 // Stat Section
 protected:
@@ -33,6 +36,12 @@ protected:
 	float TeleportRange;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float RunAwaySpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float PlayerDetectionRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxYDifference;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MinYDifference;
 
 public:
 	virtual float GetMaxKeepMovingTime() override;
@@ -40,10 +49,9 @@ public:
 	virtual float GetSingleBlinkDuration() override;
 	virtual float GetTeleportRange() override;
 	virtual float GetRunAwaySpeed() override;
-
-
-protected:
-	virtual void BeginPlay() override;
+	virtual float GetPlayerDetectRange() override;
+	virtual float GetDetectMaxYDifference() override;
+	virtual float GetDetectMinYDifference() override;
 
 // AI Section
 protected:

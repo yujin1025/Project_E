@@ -23,4 +23,6 @@ class PROJECT_E_API IPJEPlayerDectectable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual float GetPlayerDetectRange() = 0;
+	virtual float GetDetectMaxYDifference() = 0; // Y 좌표의 최대 허용 차이
+	virtual float GetDetectMinYDifference() = 0; // Y 좌표의 최소 허용 차이
 };

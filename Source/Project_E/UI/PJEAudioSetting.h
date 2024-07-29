@@ -94,4 +94,8 @@ private:
 
 
 	void SetVolume(USoundClass* SoundClass, float Value);
+
+	void SaveSettings();
+	void LoadSettings();
+	void ApplyDefaultSettings();
 };

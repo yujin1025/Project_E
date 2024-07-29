@@ -9,6 +9,7 @@
 #include "AI/PJEAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/PJECharacterPlayer.h"
 
 UBTTask_SpawnField::UBTTask_SpawnField()
 {
@@ -103,7 +104,7 @@ void UBTTask_SpawnField::DealDamage(AActor* DamagedActor, uint8* NodeMemory)
 
     for (AActor* Actor : TaskMemory->OverlappingActors)
     {
-        if (Actor->IsA(ACharacter::StaticClass()))
+        if (Actor->IsA(APJECharacterPlayer::StaticClass()))
         {
             UGameplayStatics::ApplyDamage(Actor, DamagePerSecond, nullptr, DamagedActor, nullptr);
         }
