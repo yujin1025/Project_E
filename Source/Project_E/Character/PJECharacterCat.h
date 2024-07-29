@@ -40,7 +40,7 @@ protected:
 	float DashSpeed = 1.5f;
 
 public:
-	void Grab();
+	bool Grab();
 
 	virtual ACatWeapon* GetEquippedWeapon() const override;
 

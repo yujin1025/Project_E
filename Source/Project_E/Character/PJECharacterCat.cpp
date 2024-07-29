@@ -51,9 +51,16 @@ void APJECharacterCat::BeginPlay()
 }
 
 
-void APJECharacterCat::Grab()
+bool APJECharacterCat::Grab()
 {
+    if (EquippedWeapon != nullptr)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Weapon is already equipped"));
+        return false;
+    }
+
     Server_Grab();
+    return true;
 }
 
 ACatWeapon* APJECharacterCat::GetEquippedWeapon() const
