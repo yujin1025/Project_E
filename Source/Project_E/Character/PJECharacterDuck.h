@@ -117,4 +117,31 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* RapidFireMontage;
+
+
+public:
+	// Multiplay Section
+	UFUNCTION(Server, Reliable)
+	void Server_Swallow();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Swallow();
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropItem();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Fire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Fire();
+
+	UFUNCTION(Server, Reliable)
+	void Server_RapidFire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RapidFire();
 };
