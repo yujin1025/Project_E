@@ -35,10 +35,10 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
 {
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
-    // Áö¸é°úÀÇ Ãæµ¹À» °¨ÁöÇÏ±â À§ÇØ ·¹ÀÌÄ³½ºÆ®¸¦ ¼öÇà
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     FHitResult HitResult;
-    FVector StartLocation = DesiredLocation + FVector(0.0f, 0.0f, 500.0f); // ½ºÆù À§Ä¡ À§¿¡¼­ ½ÃÀÛ
-    FVector EndLocation = DesiredLocation + FVector(0.0f, 0.0f, -500.0f); // ½ºÆù À§Ä¡ ¾Æ·¡·Î ·¹ÀÌÄ³½ºÆ®
+    FVector StartLocation = DesiredLocation + FVector(0.0f, 0.0f, 500.0f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    FVector EndLocation = DesiredLocation + FVector(0.0f, 0.0f, -500.0f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½Æ®
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
@@ -46,18 +46,21 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
     {
         FVector SpawnLocation = HitResult.Location;
 
-        // ¸ó½ºÅÍ¸¦ ½ºÆù
+        // ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½
         APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, SpawnLocation, SpawnRotation);
         if (SpawnedMonster)
         {
             FVector BoundsExtent = SpawnedMonster->GetComponentsBoundingBox().GetExtent();
-            SpawnLocation.Z += BoundsExtent.Z; // ¸ó½ºÅÍ°¡ Áö¸é À§¿¡ À§Ä¡ÇÏµµ·Ï Z ÃàÀ» Á¶Á¤
+            SpawnLocation.Z += BoundsExtent.Z; // ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½Ïµï¿½ï¿½ï¿½ Z ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             SpawnedMonster->SetActorLocation(SpawnLocation);
             if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
             {
                 APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
                 ShadowA->ShadowArea = ShadowArea;
-                ShadowArea->ShadowAArr.Add(ShadowA);
+                if(ShadowArea)
+                {
+                    ShadowArea->ShadowAArr.Add(ShadowA);
+                }
             }
         }
         else
@@ -67,7 +70,7 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
     }
     else
     {
-        // ·¹ÀÌÄ³½ºÆ® ½ÇÆÐ ½Ã
+        // ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
         UE_LOG(LogTemp, Warning, TEXT("Failed to find ground at DesiredLocation."));
     }
 }

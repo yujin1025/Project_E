@@ -29,17 +29,28 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_OpenDoor();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_InsertKey();
+
 	bool CheckValidKey(int32 Itemcode);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
 	TObjectPtr<UStaticMeshComponent> DoorMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
+	TObjectPtr<UStaticMeshComponent> KeyMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UPJEMovingComponent> MovingComponent;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction|DP_Settings")
-	int32 UnlockKeycode = 0;
 
 private:
 	UPROPERTY(Replicated)
 	bool bIsKeyInserted = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "DP_Settings")
+	int32 UnlockKeycode = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "DP_Settings")
+	int32 DoorNum = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "Data")
+	class UDataTable* DoorKeyData;
 };
