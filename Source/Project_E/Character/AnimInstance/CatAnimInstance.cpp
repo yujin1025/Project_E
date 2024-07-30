@@ -39,7 +39,7 @@ void UCatAnimInstance::AnimNotify_Land()
 	{
 		APJECharacterCat* Cat = Cast<APJECharacterCat>(CatCharacter);
 		FVector FootLocation = Cat->GetMesh()->GetSocketLocation(FName("Bottom"));
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), LandEffect, FootLocation, FRotator::ZeroRotator, FVector(3.f));
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), LandEffect, FootLocation);
 	}
 }
 

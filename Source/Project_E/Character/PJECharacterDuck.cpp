@@ -88,10 +88,10 @@ void APJECharacterDuck::Swallow()
         if (SwallowedItem)
         {
             Inventory->AddItem(SwallowedItem, true);
-
+            
             if (SwallowedItem->ItemCode == 1)
                 MagicBallCount++;
-
+            
             ApplySpeedReduction();
             LogInventory();
             UpdateInventoryWidget(SwallowedItem->Type);
