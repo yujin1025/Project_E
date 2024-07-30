@@ -23,6 +23,7 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void InitWidget() override;
 
 protected:
 	virtual void BeginPlay() override;

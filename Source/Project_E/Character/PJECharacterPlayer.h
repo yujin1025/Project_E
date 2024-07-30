@@ -29,6 +29,8 @@ public:
 	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
 	void InitInput(UEnhancedInputComponent* EnhancedInputComponent);
 
+	virtual void InitWidget();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetDead() override;

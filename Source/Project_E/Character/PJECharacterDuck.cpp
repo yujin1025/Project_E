@@ -39,9 +39,9 @@ void APJECharacterDuck::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     }
 }
 
-void APJECharacterDuck::BeginPlay()
+void APJECharacterDuck::InitWidget()
 {
-    Super::BeginPlay();
+    Super::InitWidget();
     
     Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
@@ -57,7 +57,11 @@ void APJECharacterDuck::BeginPlay()
     {
         NonWeaponInventoryWidget->AddToViewport();
     }
+}
 
+void APJECharacterDuck::BeginPlay()
+{
+    Super::BeginPlay();
 }
 
 void APJECharacterDuck::Tick(float DeltaTime)

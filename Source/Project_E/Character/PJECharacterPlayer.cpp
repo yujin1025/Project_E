@@ -93,6 +93,10 @@ void APJECharacterPlayer::InitInput(UEnhancedInputComponent* EnhancedInputCompon
     EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &APJECharacterPlayer::OnInteractEnd);
 }
 
+void APJECharacterPlayer::InitWidget()
+{
+}
+
 void APJECharacterPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);

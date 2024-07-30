@@ -172,6 +172,9 @@ void APJEPlayerController::Client_Init_Implementation()
 	InitInputPawn();
 
 	PlayerPawn = GetPawn();
+
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(GetPawn());
+	CharacterPlayer->InitWidget();
 }
 
 

@@ -18,11 +18,24 @@ APJECharacterCat::APJECharacterCat()
 void APJECharacterCat::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    if(GEngine) GEngine->AddOnScreenDebugMessage(11, 17.f, FColor::Emerald, FString::Printf(TEXT("Cat Live : %f"), DeltaSeconds));
 
     if (bIsJumping)
     {
         JumpAttacking();
+    }
+}
+
+void APJECharacterCat::InitWidget()
+{
+    Super::InitWidget();
+    
+    Inventory = NewObject<UInventory>(this);
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
+
+    CatInventoryWidget = CreateWidget<UCatInventoryWidget>(GetWorld(), CatInventoryClass);
+    if (CatInventoryWidget)
+    {
+        CatInventoryWidget->AddToViewport();
     }
 }
 
@@ -39,15 +52,6 @@ void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void APJECharacterCat::BeginPlay()
 {
     Super::BeginPlay();
-
-    Inventory = NewObject<UInventory>(this);
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
-
-    CatInventoryWidget = CreateWidget<UCatInventoryWidget>(GetWorld(), CatInventoryClass);
-    if (CatInventoryWidget)
-    {
-        CatInventoryWidget->AddToViewport();
-    }
 }
 
 
