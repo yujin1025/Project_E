@@ -39,8 +39,8 @@ public:
     UFUNCTION(Server, Reliable, WithValidation)
     void Server_RemoveSpawnedMonster(class APJECharacterShadow* SpawnedMonsterToRemove);
 
-    FORCEINLINE int32 GetShadowGeneratorsCount() const;
-    FORCEINLINE int32 GetShadowACount() const;
+    FORCEINLINE int32 GetShadowGeneratorsCount() const { return ShadowGenerators.Num(); }
+    FORCEINLINE int32 GetShadowACount() const { return SpawnedShadowAArr.Num(); }
 
 protected:
     UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_ShadowGenerators)

@@ -162,16 +162,6 @@ void UPJEShadowGeneratorManager::UpdateShadowGeneratorsCount()
     }
 }
 
-int32 UPJEShadowGeneratorManager::GetShadowGeneratorsCount() const
-{
-    return ShadowGenerators.Num();
-}
-
-int32 UPJEShadowGeneratorManager::GetShadowACount() const
-{
-    return SpawnedShadowAArr.Num();
-}
-
 void UPJEShadowGeneratorManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
