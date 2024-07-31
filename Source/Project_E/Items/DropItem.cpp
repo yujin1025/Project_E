@@ -37,11 +37,8 @@ void ADropItem::InteractionKeyPressed(APJECharacterPlayer* Character)
 			{
 				Character->SetHandItemCode(ItemCode);
 				if (CatCharacter->Grab())
-				{
-					Destroy(); 
-				}
+					Destroy();
 			}
 		}
 	}
-	
 }

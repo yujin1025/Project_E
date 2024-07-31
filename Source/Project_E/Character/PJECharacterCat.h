@@ -68,6 +68,7 @@ private:
 
 	bool bIsJumping = false;
 
+public:
 	// Multiplay Section
 	UFUNCTION(Server, Reliable)
 	void Server_DoubleJumpAttack();

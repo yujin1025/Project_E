@@ -29,6 +29,11 @@ public:
 
 	FORCEINLINE void SetItemCode(int32 NewItemCode) { ItemCode = NewItemCode; }
 
+protected:
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_GetBall();
+
+
 private:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* CollisionComponent;

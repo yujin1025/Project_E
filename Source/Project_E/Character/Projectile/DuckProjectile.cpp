@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "DuckProjectile.h"
@@ -30,7 +30,8 @@ ADuckProjectile::ADuckProjectile()
 	ProjectileMovementComponent->ProjectileGravityScale = GravityScale;
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Bounciness = 0.3f; 
-	ProjectileMovementComponent->BounceVelocityStopSimulatingThreshold = 500.0f;
+
+	bReplicates = true;
 }
 
 void ADuckProjectile::BeginPlay()
@@ -71,18 +72,36 @@ void ADuckProjectile::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyPressed(Character);
 
+	//현재 서버에서는 잘됨. 클라이언트에서는 로그도 안뜸
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Emerald, FString::Printf(TEXT("Get Projectile")));
+
 	if (Character)
 	{
-		Character->SetHandItemCode(ItemCode);
-
 		if (APJECharacterDuck* DuckCharacter = Cast<APJECharacterDuck>(Character))
 		{
-			DuckCharacter->Swallow();
+			if (ItemCode != 3)
+			{
+				Character->SetHandItemCode(ItemCode);
+				DuckCharacter->Swallow();
+				NetMulticast_GetBall();
+			}
 		}
 		else if (APJECharacterCat* CatCharacter = Cast<APJECharacterCat>(Character))
 		{
-			CatCharacter->Grab();
+			if (ItemCode != 1)
+			{
+				Character->SetHandItemCode(ItemCode);
+				if (CatCharacter->Grab())
+				{
+					NetMulticast_GetBall();
+				}
+			}
 		}
 	}
+}
+
+
+void ADuckProjectile::NetMulticast_GetBall_Implementation()
+{
 	Destroy();
 }
