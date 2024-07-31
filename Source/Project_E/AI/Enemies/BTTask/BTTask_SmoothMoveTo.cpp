@@ -63,24 +63,29 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     FVector DirVec = NewLocation - Character->GetActorLocation();
     DirVec.Normalize();
 
+    FCollisionQueryParams CollisionParams;
+    CollisionParams.AddIgnoredActor(ControllingPawn);
+
     // 충돌 검사
     FVector Start = Character->GetActorLocation();
     FVector End = Start + DirVec * 100.0f;
     FHitResult HitResult;
-    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
 
     // 낭떠러지 검사
     FVector DownStart = Start + DirVec * 100.0f;
     FVector DownEnd = Start + DirVec * 100.0f + FVector(0.0f, 0.0f, -200.0f);
     FHitResult DownHitResult;
-    bool bDownHit = GetWorld()->LineTraceSingleByChannel(DownHitResult, DownStart, DownEnd, ECC_Visibility);
+    bool bDownHit = GetWorld()->LineTraceSingleByChannel(DownHitResult, DownStart, DownEnd, ECC_Visibility, CollisionParams);
 
+    
     if (bHit || !bDownHit)
     {
         // 충돌 또는 낭떠러지 시 태스크 실패로 설정
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
+    
 
     AIController->MoveToLocation(Character->GetActorLocation() + DirVec * 10.0f, -1.0f, false, false, false, false, nullptr, true);
     BlackboardComp->SetValueAsFloat(BBKEY_PROGRESS, BlackboardComp->GetValueAsFloat(BBKEY_PROGRESS) + DeltaSeconds * 0.6);

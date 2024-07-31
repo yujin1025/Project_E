@@ -35,40 +35,19 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
 {
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
-    // 지면과의 충돌을 감지하기 위해 레이캐스트를 수행
-    FHitResult HitResult;
-    FVector StartLocation = DesiredLocation + FVector(0.0f, 0.0f, 500.0f); // 스폰 위치 위에서 시작
-    FVector EndLocation = DesiredLocation + FVector(0.0f, 0.0f, -500.0f); // 스폰 위치 아래로 레이캐스트
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(this);
-
-    if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params))
+    APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, DesiredLocation, SpawnRotation);
+    if (SpawnedMonster)
     {
-        FVector SpawnLocation = HitResult.Location;
-
-        // 몬스터를 스폰
-        APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, SpawnLocation, SpawnRotation);
-        if (SpawnedMonster)
+        if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
         {
-            FVector BoundsExtent = SpawnedMonster->GetComponentsBoundingBox().GetExtent();
-            SpawnLocation.Z += BoundsExtent.Z; // 몬스터가 지면 위에 위치하도록 Z 축을 조정
-            SpawnedMonster->SetActorLocation(SpawnLocation);
-            if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
-            {
-                APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
-                ShadowA->ShadowArea = ShadowArea;
-                ShadowArea->ShadowAArr.Add(ShadowA);
-            }
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Failed to spawn monster at DesiredLocation."));
+            APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
+            ShadowA->ShadowArea = ShadowArea;
+            ShadowArea->ShadowAArr.Add(ShadowA);
         }
     }
     else
     {
-        // 레이캐스트 실패 시
-        UE_LOG(LogTemp, Warning, TEXT("Failed to find ground at DesiredLocation."));
+        UE_LOG(LogTemp, Warning, TEXT("Failed to spawn monster at DesiredLocation."));
     }
 }
 
@@ -98,7 +77,7 @@ void APJEShadowGenerator::SpawnShadowAWithTimer()
     for (int32 i = 0; i < 1; i++)
     {
         Server_SpawnMonster(ShadowBClass, SpawnPos);
-        Server_SpawnMonster(ShadowAClass, SpawnPos);
+        //Server_SpawnMonster(ShadowAClass, SpawnPos);
 
         if (ShadowArea && ShadowArea->GetIsPlayerInArea())
         {

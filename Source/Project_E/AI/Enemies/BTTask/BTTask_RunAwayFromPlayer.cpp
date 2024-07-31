@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "AI/Enemies/BTTask/BTTask_RunAwayFromPlayer.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
@@ -12,6 +10,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "Project_E/Character/PJECharacterShadowA.h"
 #include "Project_E/AI/PJEAIController.h"
+#include "DrawDebugHelpers.h"
 
 UBTTask_RunAwayFromPlayer::UBTTask_RunAwayFromPlayer()
 {
@@ -70,7 +69,6 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 
     if (CurrentTime - KeepMovingTime >= MaxKeepMovingTime)
     {
-        UE_LOG(LogTemp, Warning, TEXT("MaxKeepMovingTime reached: Stopping movement"));
         AICon->StopMovement();
         ControlledPawn->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -90,16 +88,37 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     FVector DirectionToPlayer = PlayerPos - AIPos;
     FVector DirectionAwayFromPlayer = -DirectionToPlayer.GetSafeNormal();
 
-    
     FRotator RandomRotation = FRotator(0, TaskMemory->RandomDegree, 0);
     FVector RandomDirectionAwayFromPlayer = RandomRotation.RotateVector(DirectionAwayFromPlayer);
+    RandomDirectionAwayFromPlayer.Normalize();
 
     FVector NewLocation = AIPos + RandomDirectionAwayFromPlayer * ControlledPawn->GetCharacterMovement()->MaxWalkSpeed * DeltaSeconds * 100.0f;
+
+    FCollisionQueryParams CollisionParams;
+    CollisionParams.AddIgnoredActor(ControlledPawn);
+
+    FVector Start = ControlledPawn->GetActorLocation();
+    FVector End = Start + RandomDirectionAwayFromPlayer * 100.0f;
+    FHitResult HitResult;
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
+
+    FVector DownStart = End;
+    FVector DownEnd = End + FVector(0.0f, 0.0f, -200.0f);
+    FHitResult DownHitResult;
+    bool bDownHit = GetWorld()->LineTraceSingleByChannel(DownHitResult, DownStart, DownEnd, ECC_Visibility, CollisionParams);
+
+    if (bHit || !bDownHit)
+    {  
+        AICon->StopMovement();
+        ControlledPawn->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+        return;
+    }
 
     AICon->MoveToLocation(NewLocation, 0.0001f, true, false, false, false, nullptr, true);
 }
 
 uint16 UBTTask_RunAwayFromPlayer::GetInstanceMemorySize() const
 {
-    return sizeof(FRunAwayFromPlayerTaskMemory);;
+    return sizeof(FRunAwayFromPlayerTaskMemory);
 }
