@@ -27,16 +27,7 @@ void ADropItem::InteractionKeyPressed(APJECharacterPlayer* Character)
 			if (ItemCode != 3)
 			{
 				Character->SetHandItemCode(ItemCode);
-
-				if (HasAuthority())  
-				{
-					DuckCharacter->Swallow();
-				}
-				else
-				{
-					DuckCharacter->Server_Swallow();
-				}
-
+				DuckCharacter->Swallow();
 				Destroy();
 			}
 		}
@@ -45,20 +36,9 @@ void ADropItem::InteractionKeyPressed(APJECharacterPlayer* Character)
 			if (ItemCode != 1)
 			{
 				Character->SetHandItemCode(ItemCode);
-
-				if (HasAuthority()) 
-				{
-					if (CatCharacter->Grab())
-					{
-						Destroy();
-					}
-				}
-				else
-				{
-					CatCharacter->Server_Grab();
-				}
+				if (CatCharacter->Grab())
+					Destroy();
 			}
 		}
 	}
-	
 }

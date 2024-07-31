@@ -62,6 +62,8 @@ void APJECharacterDuck::InitWidget()
 void APJECharacterDuck::BeginPlay()
 {
     Super::BeginPlay();
+
+    SetOwner(GetController());
 }
 
 void APJECharacterDuck::Tick(float DeltaTime)
@@ -82,62 +84,60 @@ void APJECharacterDuck::Tick(float DeltaTime)
 
 void APJECharacterDuck::Swallow()
 {
-    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Swallow function called"));
-
-    Server_Swallow();
+    Client_Swallow();
 }
 
-void APJECharacterDuck::Server_Swallow_Implementation()
+void APJECharacterDuck::Client_Swallow_Implementation()
 {
-    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Server_Swallow_Implementation called"));
-
-    if (HasAuthority())
+    if (Inventory)
     {
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Has authority"));
-
-        if (Inventory)
+        SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
+        if (SwallowedItem)
         {
-            if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("2"));
-            SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
-            if (SwallowedItem)
-            {
-                Inventory->AddItem(SwallowedItem, true);
+            Inventory->AddItem(SwallowedItem, true);
 
-                if (SwallowedItem->ItemCode == 1)
-                    MagicBallCount++;
+            if (SwallowedItem->ItemCode == 1)
+                MagicBallCount++;
 
-                ApplySpeedReduction();
-                LogInventory();
-                UpdateInventoryWidget(SwallowedItem->Type);
-
-                Multicast_Swallow();
-            }
+            ApplySpeedReduction();
+            LogInventory();
+            UpdateInventoryWidget(SwallowedItem->Type);
         }
     }
-    else
-    {
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("No authority"));
-    }
 }
-
-void APJECharacterDuck::Multicast_Swallow_Implementation()
-{
-    if (SwallowedItem)
-    {
-        ApplySpeedReduction();
-        LogInventory();
-        UpdateInventoryWidget(SwallowedItem->Type);
-    }
-}
-
 
 void APJECharacterDuck::DropItem()
 {
     Super::DropItem();
 
-    Server_DropItem();
+    Client_DropItem();
 }
 
+void APJECharacterDuck::Client_DropItem_Implementation()
+{
+    if (Inventory)
+    {
+        if (SwallowedItem)
+        {
+            Inventory->RemoveItem(SwallowedItem, true);
+
+            if (SwallowedItem->ItemCode == 1)
+            {
+                MagicBallCount--;
+                if (MagicBallCount < 0)
+                    MagicBallCount = 0;
+            }
+            ApplySpeedReduction();
+            LogInventory();
+            UpdateInventoryWidget(SwallowedItem->Type);
+
+            SwallowedItem = nullptr;
+        }
+    }
+}
+
+
+/*
 void APJECharacterDuck::Server_DropItem_Implementation()
 {
     if (Inventory)
@@ -174,15 +174,51 @@ void APJECharacterDuck::Multicast_DropItem_Implementation()
         SwallowedItem = nullptr;
     }
 }
-
+*/
 
 
 void APJECharacterDuck::Fire()
 {
-    Server_Fire();
+    Client_Fire();
 
 }
 
+void APJECharacterDuck::Client_Fire_Implementation()
+{
+    if (!bIsAiming)
+        return;
+
+    if (bCanShoot && Inventory->GetWeaponCount() > 0)
+    {
+        if (FireMontage)
+        {
+            PlayAnimMontage(FireMontage);
+        }
+
+        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
+
+        UItem* RemovedItem = Inventory->RemoveLastItem(true);
+        if (RemovedItem)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+
+            if (RemovedItem->ItemCode == 1)
+            {
+                MagicBallCount--;
+                if (MagicBallCount < 0)
+                    MagicBallCount = 0;
+            }
+            ApplySpeedReduction();
+            LogInventory();
+            UpdateInventoryWidget(RemovedItem->Type);
+        }
+
+        bCanShoot = false;
+        GetWorld()->GetTimerManager().SetTimer(ShootDelayTimer, this, &APJECharacterDuck::ResetFire, 0.2f, false);
+    }
+}
+
+/*
 void APJECharacterDuck::Server_Fire_Implementation()
 {
     if (!bIsAiming)
@@ -227,7 +263,7 @@ void APJECharacterDuck::Multicast_Fire_Implementation()
         PlayAnimMontage(FireMontage);
     }
 }
-
+*/
 void APJECharacterDuck::ResetFire()
 {
     bCanShoot = true;
@@ -236,9 +272,31 @@ void APJECharacterDuck::ResetFire()
 
 void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 {
-    Server_RapidFire();
+    Client_RapidFire();
 }
 
+void APJECharacterDuck::Client_RapidFire_Implementation()
+{
+    if (!bIsAiming)
+        return;
+
+    if (bCanRapidFire && Inventory->GetWeaponCount() > 2)
+    {
+        float FireInterval = 0.3f;
+        RapidFireCount = 0;
+
+        // 타이머 핸들 초기화
+        GetWorldTimerManager().SetTimer(RapidFireTimerHandle, this, &APJECharacterDuck::SpawnRapidFireProjectile, FireInterval, true, 0.0f);
+
+        // 발사 가능 상태 재설정 타이머 설정
+        bCanRapidFire = false;
+        GetWorldTimerManager().SetTimer(RapidFireDelayTimer, this, &APJECharacterDuck::ResetRapidFire, 1.0f, false);
+    }
+}
+
+
+
+/*
 void APJECharacterDuck::Server_RapidFire_Implementation()
 {
     if (!bIsAiming)
@@ -266,7 +324,7 @@ void APJECharacterDuck::Multicast_RapidFire_Implementation()
     {
         PlayAnimMontage(RapidFireMontage);
     }
-}
+}*/
 
 void APJECharacterDuck::SpawnRapidFireProjectile()
 {
@@ -430,5 +488,7 @@ void APJECharacterDuck::CalculateProjectilePath()
         }
     }
 }
+
+
 
 

@@ -54,6 +54,38 @@ protected:
 	void ExitAimingMode();
 	void CalculateProjectilePath();
 
+	// Multiplay Section
+	UFUNCTION(Client, Reliable)
+	void Client_Swallow();
+
+	UFUNCTION(Client, Reliable)
+	void Client_DropItem();
+
+	UFUNCTION(Client, Reliable)
+	void Client_Fire();
+
+	UFUNCTION(Client, Reliable)
+	void Client_RapidFire();
+
+	/*
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropItem();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Fire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Fire();
+
+	UFUNCTION(Server, Reliable)
+	void Server_RapidFire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RapidFire();*/
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 	UInventory* Inventory;
@@ -118,30 +150,4 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* RapidFireMontage;
 
-
-public:
-	// Multiplay Section
-	UFUNCTION(Server, Reliable)
-	void Server_Swallow();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_Swallow();
-
-	UFUNCTION(Server, Reliable)
-	void Server_DropItem();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_DropItem();
-
-	UFUNCTION(Server, Reliable)
-	void Server_Fire();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_Fire();
-
-	UFUNCTION(Server, Reliable)
-	void Server_RapidFire();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_RapidFire();
 };
