@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/PopUpWidget.h"
 #include "PJEUserSettingWidget.generated.h"
 
 /**
  *
  */
 UCLASS()
-class PROJECT_E_API UPJEUserSettingWidget : public UUserWidget
+class PROJECT_E_API UPJEUserSettingWidget : public UPopUpWidget
 {
 	GENERATED_BODY()
 
@@ -50,18 +50,20 @@ private:
 	void OnBackButtonClicked();
 
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> SystemSettingsWidgetClass;
+	TSubclassOf<class UPopUpWidget> SystemSettingsWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> AudioSettingWidgetClass;
+	TSubclassOf<class UPopUpWidget> AudioSettingWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> DuckGuideWidgetClass;
+	TSubclassOf<class UPopUpWidget> DuckGuideWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> CatGuideWidgetClass;
+	TSubclassOf<class UPopUpWidget> CatGuideWidgetClass;
 
-	UUserWidget* SystemSettingsWidget;
-
-	UUserWidget* AudioSettingWidget;
-
-	UUserWidget* DuckGuideWidget;
-	UUserWidget* CatGuideWidget;
+	UPROPERTY()
+	TWeakObjectPtr<class UPopUpWidget> SystemSettingsWidget;
+	UPROPERTY()
+	TWeakObjectPtr<class UPopUpWidget> AudioSettingWidget;
+	UPROPERTY()
+	TWeakObjectPtr<class UPopUpWidget> DuckGuideWidget;
+	UPROPERTY()
+	TWeakObjectPtr<class UPopUpWidget> CatGuideWidget;
 };

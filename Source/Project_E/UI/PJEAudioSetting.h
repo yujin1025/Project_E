@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/PopUpWidget.h"
 #include "PJEAudioSetting.generated.h"
 
 UCLASS()
-class PROJECT_E_API UPJEAudioSetting : public UUserWidget
+class PROJECT_E_API UPJEAudioSetting : public UPopUpWidget
 {
 	GENERATED_BODY()
 

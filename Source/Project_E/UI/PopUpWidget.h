@@ -15,10 +15,10 @@ class PROJECT_E_API UPopUpWidget : public UBaseWidget
 	GENERATED_BODY()
 
 public:
-	//UPROPERTY(meta = (BindWidget))
-	//class UProgressBar* HealthBar;
+	UPopUpWidget();
 	
 protected:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 };

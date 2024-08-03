@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/PopUpWidget.h"
 #include "PJESystemWidget.generated.h"
 
 UCLASS()
-class PROJECT_E_API UPJESystemWidget : public UUserWidget
+class PROJECT_E_API UPJESystemWidget : public UPopUpWidget
 {
 	GENERATED_BODY()
 
