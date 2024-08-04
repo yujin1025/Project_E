@@ -41,7 +41,7 @@ void UPJEUserSettingWidget::OnSystemButtonClicked()
 	// 시스템 설정 페이지로 전환하는 코드
 	if (SystemSettingsWidgetClass)
 	{
-		if (!SystemSettingsWidget.IsValid())
+		if (!SystemSettingsWidget.IsValid() || SystemSettingsWidget->IsPendingKill())
 		{
 			SystemSettingsWidget = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), SystemSettingsWidgetClass);
 		}
@@ -52,7 +52,7 @@ void UPJEUserSettingWidget::OnSoundButtonClicked()
 {
 	if (AudioSettingWidgetClass)
 	{
-		if (!AudioSettingWidget.IsValid())
+		if (!AudioSettingWidget.IsValid() || AudioSettingWidget->IsPendingKill())
 		{
 			AudioSettingWidget = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), AudioSettingWidgetClass);
 		}
@@ -65,7 +65,7 @@ void UPJEUserSettingWidget::OnGuideButtonClicked()
 	{
 		if (CatGuideWidgetClass)
 		{
-			if (!CatGuideWidget.IsValid())
+			if (!CatGuideWidget.IsValid() || CatGuideWidget->IsPendingKill())
 			{
 				CatGuideWidget = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), CatGuideWidgetClass);
 			}
@@ -75,7 +75,7 @@ void UPJEUserSettingWidget::OnGuideButtonClicked()
 	{
 		if (DuckGuideWidgetClass)
 		{
-			if (!DuckGuideWidget.IsValid())
+			if (!DuckGuideWidget.IsValid() || DuckGuideWidget->IsPendingKill())
 			{
 				DuckGuideWidget = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), DuckGuideWidgetClass);
 			}
@@ -93,4 +93,5 @@ void UPJEUserSettingWidget::OnBackButtonClicked()
 {
 	// 이전 페이지로 돌아가는 코드
 	UE_LOG(LogTemp, Warning, TEXT("Back Button Clicked"));
+	UPJEUIManager::GetInstance()->RemovePopupWidget(GetWorld(), this);
 }

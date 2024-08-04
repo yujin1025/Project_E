@@ -46,11 +46,13 @@ void UPJEUIManager::AddPopupWidget(UPopUpWidget* NewWidget)
         PopupWidgets.Add(NewWidget);
     }
 }
-void UPJEUIManager::RemovePopupWidget(UWorld* WorldContext, UPopUpWidget*& WidgetToRemove)
+void UPJEUIManager::RemovePopupWidget(UWorld* WorldContext, UPopUpWidget* WidgetToRemove)
 {
     if (WidgetToRemove)
     {
         PopupWidgets.Remove(WidgetToRemove);
+
+        WidgetToRemove->MarkPendingKill();
 
         if (WidgetToRemove == TopmostPopupWidget)
         {
@@ -61,7 +63,7 @@ void UPJEUIManager::RemovePopupWidget(UWorld* WorldContext, UPopUpWidget*& Widge
             }
             else
             {
-                APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+                APlayerController* PlayerController = WorldContext->GetFirstPlayerController();
                 if (PlayerController)
                 {
                     PlayerController->bShowMouseCursor = false;
@@ -71,7 +73,6 @@ void UPJEUIManager::RemovePopupWidget(UWorld* WorldContext, UPopUpWidget*& Widge
         }
 
         WidgetToRemove->RemoveFromParent();
-        WidgetToRemove = nullptr;
     }
 }
 
@@ -121,6 +122,8 @@ void UPJEUIManager::CloseTopmostPopupWidget(UWorld* WorldContext)
         // 최상단 위젯 제거
         TopmostPopupWidget->RemoveFromParent();
         PopupWidgets.Remove(TopmostPopupWidget);
+
+        TopmostPopupWidget->MarkPendingKill();
 
         // 최상단 위젯 업데이트
         TopmostPopupWidget = PopupWidgets.Num() > 0 ? PopupWidgets.Last() : nullptr;

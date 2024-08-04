@@ -14,7 +14,7 @@ public:
     static UPJEUIManager* GetInstance();
 
     class UPopUpWidget* ShowPopupUI(UWorld* WorldContext, TSubclassOf<class UPopUpWidget> WidgetClass);
-    void RemovePopupWidget(UWorld* WorldContext, class UPopUpWidget*& WidgetToRemove);
+    void RemovePopupWidget(UWorld* WorldContext, class UPopUpWidget* WidgetToRemove);
     class UPopUpWidget* GetTopmostPopupWidget() const;
     void CloseTopmostPopupWidget(UWorld* WorldContext);
 
@@ -26,7 +26,7 @@ private:
     TArray<TObjectPtr<class UPopUpWidget>> PopupWidgets;
 
     UPROPERTY()
-    TObjectPtr<class UPopUpWidget> TopmostPopupWidget = nullptr;
+    TObjectPtr<class UPopUpWidget> TopmostPopupWidget;
 
     void ShowTopmostPopupWidget(UWorld* WorldContext, class UPopUpWidget* NewTopmostWidget);
     void AddPopupWidget(class UPopUpWidget* NewWidget);

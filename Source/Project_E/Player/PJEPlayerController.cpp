@@ -192,9 +192,13 @@ void APJEPlayerController::ToggleSettingsMenu(const FInputActionValue& Value)
 {
 	if (SettingsMenuClass)
 	{
-		if (!SettingsMenu.IsValid())
+		if (!SettingsMenu.IsValid() || SettingsMenu->IsPendingKill())
 		{
-			UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), SettingsMenuClass);
+			if (UPJEUIManager::GetInstance()->GetTopmostPopupWidget() == nullptr)
+			{
+				SettingsMenu = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), SettingsMenuClass);
+			}
+			
 		}
 	}
 }

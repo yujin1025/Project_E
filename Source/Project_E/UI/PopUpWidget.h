@@ -16,7 +16,7 @@ class PROJECT_E_API UPopUpWidget : public UBaseWidget
 
 public:
 	UPopUpWidget();
-	
+
 protected:
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;

@@ -21,7 +21,7 @@ FReply UPopUpWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEven
     {
         // ESC Å°¸¦ ´­·¶À» ¶§ ÃÖ»ó´Ü À§Á¬ ´Ý±â
         UPJEUIManager::GetInstance()->CloseTopmostPopupWidget(GetWorld());
-        return FReply::Handled();
+        return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
     }
 
     return Super::NativeOnKeyDown(InGeometry, InKeyEvent);

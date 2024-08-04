@@ -14,7 +14,7 @@ class PROJECT_E_API UAudioSettingsSaveGame : public USaveGame
 {
     GENERATED_BODY()
 
-    public:
+public:
     UPROPERTY(VisibleAnywhere, Category = Basic)
     float MasterVolume;
 

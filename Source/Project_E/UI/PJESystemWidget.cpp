@@ -8,6 +8,7 @@
 #include "Engine/PostProcessVolume.h"
 #include "EngineUtils.h" 
 #include "PJEGameInstance.h"
+#include "UI/Manager/PJEUIManager.h"
 
 void UPJESystemWidget::NativeConstruct()
 {
@@ -167,5 +168,5 @@ void UPJESystemWidget::OnResetButtonClicked()
 void UPJESystemWidget::OnBackButtonClicked()
 {
 	// 환경설정 UI로 돌아가기
-	this->RemoveFromParent();
+	UPJEUIManager::GetInstance()->RemovePopupWidget(GetWorld(), this);
 }
