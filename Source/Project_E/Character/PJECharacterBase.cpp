@@ -8,6 +8,8 @@
 #include "Component/HitDeadComponent.h"
 #include "../Game/PJEGameModeBase.h"
 #include "Component/HealthComponent.h"
+#include "Project_E/Character/Component/PJEHpBarWidgetComponent.h"
+#include "UI/PJEHealthBarWidget.h"
 
 
 // Sets default values
@@ -42,6 +44,15 @@ APJECharacterBase::APJECharacterBase()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	HitDeadComponent = CreateDefaultSubobject<UHitDeadComponent>(TEXT("HitDeadComponent"));
 
+	HealthBarComponent = CreateDefaultSubobject<UPJEHpBarWidgetComponent>(TEXT("HealthBarComponent"));
+	HealthBarComponent->SetupAttachment(RootComponent);
+	if (HealthBarComponent->HpBarWidgetClass)
+	{
+		HealthBarComponent->SetWidgetClass(HealthBarComponent->HpBarWidgetClass);
+		HealthBarComponent->SetDrawSize(FVector2D(100, 20));
+		HealthBarComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	}
+
 	// TODO : Implement Movement 
 	
 	// TODO : Implement Attack 
@@ -73,6 +84,16 @@ void APJECharacterBase::BeginPlay()
 	
 	// 델리게이트 핸들러 등록
 	OnAttackEnd.AddDynamic(this, &APJECharacterBase::OnAttackEndHandler);
+
+	if (UCapsuleComponent* CapsuleComp = GetCapsuleComponent())
+	{
+		float CapsuleHalfHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
+		float HealthBarOffset = 50.0f;
+
+		// 상대 위치 설정
+		HealthBarComponent->SetRelativeLocation(FVector(0.0f, 0.0f, CapsuleHalfHeight + HealthBarOffset));
+	}
+	UpdateHealthBar();
 }
 
 void APJECharacterBase::SetDead()
@@ -145,6 +166,27 @@ bool APJECharacterBase::IsPlayer()
 		return Controller->IsPlayerController();
 	}
 	return false;
+}
+
+float APJECharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	HealthComponent->ChangeHealth(-DamageAmount);
+	UpdateHealthBar();
+
+	return SuperReturn;
+}
+
+void APJECharacterBase::UpdateHealthBar()
+{
+	if (UPJEHealthBarWidget* HealthBar = Cast<UPJEHealthBarWidget>(HealthBarComponent->GetUserWidgetObject()))
+	{
+		if (HealthComponent)
+		{
+			HealthBar->UpdateHealthBar(HealthComponent->GetCurrentHealth(), HealthComponent->GetMaxHealth());
+		}
+	}
 }
 
 FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget)

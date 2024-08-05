@@ -55,4 +55,12 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UPJEGameInstance> GameInstance;
+
+// SaveSection
+private:
+	void SaveSettings();
+	void LoadSettings();
+	void ApplyDefaultSettings();
+
+
 };

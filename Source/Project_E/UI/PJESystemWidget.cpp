@@ -8,6 +8,7 @@
 #include "Engine/PostProcessVolume.h"
 #include "EngineUtils.h" 
 #include "PJEGameInstance.h"
+#include "Project_E/PJESystemSettingsSaveGame.h"
 #include "UI/Manager/PJEUIManager.h"
 
 void UPJESystemWidget::NativeConstruct()
@@ -32,7 +33,6 @@ void UPJESystemWidget::NativeConstruct()
 		ResolutionComboBox->AddOption(TEXT("1280x720"));
 		ResolutionComboBox->AddOption(TEXT("1920x1080"));
 		ResolutionComboBox->AddOption(TEXT("3440x1440"));
-		ResolutionComboBox->SetSelectedIndex(0); // 기본값 설정
 	}
 
 	// 화면 모드 선택 초기값 설정
@@ -42,20 +42,17 @@ void UPJESystemWidget::NativeConstruct()
 		ScreenModeComboBox->AddOption(TEXT("전체 화면"));
 		ScreenModeComboBox->AddOption(TEXT("전체 창 화면"));
 		ScreenModeComboBox->AddOption(TEXT("창 화면"));
-		ScreenModeComboBox->SetSelectedIndex(0); // 기본값 설정
 	}
 
 	// 슬라이더 초기값 설정
 	if (CameraSpeedSlider)
 	{
 		CameraSpeedSlider->OnValueChanged.AddDynamic(this, &UPJESystemWidget::OnCameraSpeedChanged);
-		CameraSpeedSlider->SetValue(0.5f); // 기본값 설정
 	}
 
 	if (BrightnessSlider)
 	{
 		BrightnessSlider->OnValueChanged.AddDynamic(this, &UPJESystemWidget::OnBrightnessChanged);
-		BrightnessSlider->SetValue(0.5f); // 기본값 설정
 	}
 
 	// 버튼 이벤트 바인딩
@@ -67,6 +64,16 @@ void UPJESystemWidget::NativeConstruct()
 	if (BackButton)
 	{
 		BackButton->OnClicked.AddDynamic(this, &UPJESystemWidget::OnBackButtonClicked);
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(TEXT("SystemSettings"), 0))
+	{
+		LoadSettings();
+	}
+	else
+	{
+		ApplyDefaultSettings();
+		SaveSettings();
 	}
 }
 
@@ -89,6 +96,7 @@ void UPJESystemWidget::OnResolutionChanged(FString SelectedItem, ESelectInfo::Ty
 			UserSettings->SetScreenResolution(FIntPoint(3440, 1440));
 		}
 		UserSettings->ApplySettings(false);
+		SaveSettings();
 	}
 }
 
@@ -111,6 +119,7 @@ void UPJESystemWidget::OnScreenModeChanged(FString SelectedItem, ESelectInfo::Ty
 			UserSettings->SetFullscreenMode(EWindowMode::Windowed);
 		}
 		UserSettings->ApplySettings(false);
+		SaveSettings();
 	}
 }
 
@@ -118,8 +127,8 @@ void UPJESystemWidget::OnCameraSpeedChanged(float Value)
 {
 	// 카메라 속도 변경 처리
 	GameInstance = Cast<UPJEGameInstance>(GetGameInstance());
-
 	GameInstance->SetCarmeraSpeed(Value);
+	SaveSettings();
 }
 
 void UPJESystemWidget::OnBrightnessChanged(float Value)
@@ -135,6 +144,7 @@ void UPJESystemWidget::OnBrightnessChanged(float Value)
 		PostProcessVolume->Settings.AutoExposureBias = ExposureBias;
 
 		UE_LOG(LogTemp, Log, TEXT("Brightness Value: %f, Set AutoExposureBias: %f"), Value, ExposureBias);
+		SaveSettings();
 	}
 }
 
@@ -169,4 +179,103 @@ void UPJESystemWidget::OnBackButtonClicked()
 {
 	// 환경설정 UI로 돌아가기
 	UPJEUIManager::GetInstance()->RemovePopupWidget(GetWorld(), this);
+}
+
+void UPJESystemWidget::SaveSettings()
+{
+	const FString SaveSlotName = TEXT("SystemSettings");
+	const int32 UserIndex = 0;
+
+	UPJESystemSettingsSaveGame* SaveGameInstance = Cast<UPJESystemSettingsSaveGame>(UGameplayStatics::CreateSaveGameObject(UPJESystemSettingsSaveGame::StaticClass()));
+
+	if (SaveGameInstance)
+	{
+		if (ResolutionComboBox)
+		{
+			SaveGameInstance->Resolution = ResolutionComboBox->GetSelectedOption();
+		}
+		if (ScreenModeComboBox)
+		{
+			SaveGameInstance->ScreenMode = ScreenModeComboBox->GetSelectedOption();
+		}
+		if (CameraSpeedSlider)
+		{
+			SaveGameInstance->CameraSpeed = CameraSpeedSlider->GetValue();
+		}
+		if (BrightnessSlider)
+		{
+			SaveGameInstance->Brightness = BrightnessSlider->GetValue();
+		}
+
+		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveSlotName, UserIndex))
+		{
+			UE_LOG(LogTemp, Log, TEXT("System settings saved successfully."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to save system settings."));
+		}
+	}
+}
+
+void UPJESystemWidget::LoadSettings()
+{
+	const FString SaveSlotName = TEXT("SystemSettings");
+	const int32 UserIndex = 0;
+
+	UPJESystemSettingsSaveGame* LoadGameInstance = Cast<UPJESystemSettingsSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, UserIndex));
+
+	if (LoadGameInstance)
+	{
+		if (ResolutionComboBox)
+		{
+			ResolutionComboBox->SetSelectedOption(LoadGameInstance->Resolution);
+			OnResolutionChanged(LoadGameInstance->Resolution, ESelectInfo::Direct);
+		}
+		if (ScreenModeComboBox)
+		{
+			ScreenModeComboBox->SetSelectedOption(LoadGameInstance->ScreenMode);
+			OnScreenModeChanged(LoadGameInstance->ScreenMode, ESelectInfo::Direct);
+		}
+		if (CameraSpeedSlider)
+		{
+			CameraSpeedSlider->SetValue(LoadGameInstance->CameraSpeed);
+			OnCameraSpeedChanged(LoadGameInstance->CameraSpeed);
+		}
+		if (BrightnessSlider)
+		{
+			BrightnessSlider->SetValue(LoadGameInstance->Brightness);
+			OnBrightnessChanged(LoadGameInstance->Brightness);
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("System settings loaded successfully."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to load system settings."));
+	}
+}
+
+void UPJESystemWidget::ApplyDefaultSettings()
+{
+	if (ResolutionComboBox)
+	{
+		ResolutionComboBox->SetSelectedIndex(0);
+		OnResolutionChanged(ResolutionComboBox->GetSelectedOption(), ESelectInfo::Direct);
+	}
+	if (ScreenModeComboBox)
+	{
+		ScreenModeComboBox->SetSelectedIndex(0);
+		OnScreenModeChanged(ScreenModeComboBox->GetSelectedOption(), ESelectInfo::Direct);
+	}
+	if (CameraSpeedSlider)
+	{
+		CameraSpeedSlider->SetValue(0.5f);
+		OnCameraSpeedChanged(0.5f);
+	}
+	if (BrightnessSlider)
+	{
+		BrightnessSlider->SetValue(0.5f);
+		OnBrightnessChanged(0.5f);
+	}
 }
