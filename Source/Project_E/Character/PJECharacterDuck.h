@@ -67,30 +67,12 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void Client_RapidFire();
 
-	/*
-	UFUNCTION(Server, Reliable)
-	void Server_DropItem();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_DropItem();
-
-	UFUNCTION(Server, Reliable)
-	void Server_Fire();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_Fire();
-
-	UFUNCTION(Server, Reliable)
-	void Server_RapidFire();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_RapidFire();*/
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	UInventory* Inventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(BlueprintReadWrite, Category = "Data")
 	class UDataTable* ItemDatabase;
 
 	FTimerHandle ShootDelayTimer;
@@ -124,9 +106,6 @@ protected:
 	bool bIsInitialized = false;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TSubclassOf<class ADuckProjectile> ProjectileClass;
-
 	UPROPERTY()
 	UDuckInventoryWidget* WeaponInventoryWidget;
 

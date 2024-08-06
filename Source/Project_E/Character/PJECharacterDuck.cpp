@@ -137,45 +137,6 @@ void APJECharacterDuck::Client_DropItem_Implementation()
 }
 
 
-/*
-void APJECharacterDuck::Server_DropItem_Implementation()
-{
-    if (Inventory)
-    {
-        if (SwallowedItem)
-        {
-            Inventory->RemoveItem(SwallowedItem, true);
-
-            if (SwallowedItem->ItemCode == 1)
-            {
-                MagicBallCount--;
-                if (MagicBallCount < 0)
-                    MagicBallCount = 0;
-            }
-            ApplySpeedReduction();
-            LogInventory();
-            UpdateInventoryWidget(SwallowedItem->Type);
-
-            SwallowedItem = nullptr;
-        }
-    }
-
-    Multicast_DropItem();
-}
-
-void APJECharacterDuck::Multicast_DropItem_Implementation()
-{
-    if (SwallowedItem)
-    {
-        ApplySpeedReduction();
-        LogInventory();
-        UpdateInventoryWidget(SwallowedItem->Type);
-
-        SwallowedItem = nullptr;
-    }
-}
-*/
-
 
 void APJECharacterDuck::Fire()
 {
@@ -195,12 +156,12 @@ void APJECharacterDuck::Client_Fire_Implementation()
             PlayAnimMontage(FireMontage);
         }
 
-        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
-
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
         {
             UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+
+            ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
 
             if (RemovedItem->ItemCode == 1)
             {
@@ -218,52 +179,6 @@ void APJECharacterDuck::Client_Fire_Implementation()
     }
 }
 
-/*
-void APJECharacterDuck::Server_Fire_Implementation()
-{
-    if (!bIsAiming)
-        return;
-
-    if (bCanShoot && Inventory->GetWeaponCount() > 0)
-    {
-        if (FireMontage)
-        {
-            PlayAnimMontage(FireMontage);
-        }
-
-        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
-
-        UItem* RemovedItem = Inventory->RemoveLastItem(true);
-        if (RemovedItem)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
-
-            if (RemovedItem->ItemCode == 1)
-            {
-                MagicBallCount--;
-                if (MagicBallCount < 0)
-                    MagicBallCount = 0;
-            }
-            ApplySpeedReduction();
-            LogInventory();
-            UpdateInventoryWidget(RemovedItem->Type);
-        }
-
-        bCanShoot = false;
-        GetWorld()->GetTimerManager().SetTimer(ShootDelayTimer, this, &APJECharacterDuck::ResetFire, 0.2f, false);
-
-        Multicast_Fire();
-    }
-}
-
-void APJECharacterDuck::Multicast_Fire_Implementation()
-{
-    if (FireMontage)
-    {
-        PlayAnimMontage(FireMontage);
-    }
-}
-*/
 void APJECharacterDuck::ResetFire()
 {
     bCanShoot = true;
@@ -295,37 +210,6 @@ void APJECharacterDuck::Client_RapidFire_Implementation()
 }
 
 
-
-/*
-void APJECharacterDuck::Server_RapidFire_Implementation()
-{
-    if (!bIsAiming)
-        return;
-
-    if (bCanRapidFire && Inventory->GetWeaponCount() > 2)
-    {
-        float FireInterval = 0.3f;
-        RapidFireCount = 0;
-
-        // 타이머 핸들 초기화
-        GetWorldTimerManager().SetTimer(RapidFireTimerHandle, this, &APJECharacterDuck::SpawnRapidFireProjectile, FireInterval, true, 0.0f);
-
-        // 발사 가능 상태 재설정 타이머 설정
-        bCanRapidFire = false;
-        GetWorldTimerManager().SetTimer(RapidFireDelayTimer, this, &APJECharacterDuck::ResetRapidFire, 1.0f, false);
-
-        Multicast_RapidFire();
-    }
-}
-
-void APJECharacterDuck::Multicast_RapidFire_Implementation()
-{
-    if (RapidFireMontage)
-    {
-        PlayAnimMontage(RapidFireMontage);
-    }
-}*/
-
 void APJECharacterDuck::SpawnRapidFireProjectile()
 {
     if (RapidFireCount < 3 && Inventory->GetWeaponCount() > 0)
@@ -335,12 +219,12 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
             PlayAnimMontage(RapidFireMontage);
         }
 
-        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
-
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
         {
             UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+
+            ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
 
             if (RemovedItem->ItemCode == 1)
             {

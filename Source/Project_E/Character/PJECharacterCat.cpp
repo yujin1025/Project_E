@@ -28,7 +28,7 @@ void APJECharacterCat::Tick(float DeltaSeconds)
 void APJECharacterCat::InitWidget()
 {
     Super::InitWidget();
-    
+
     Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
 
@@ -42,10 +42,10 @@ void APJECharacterCat::InitWidget()
 void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
-     
-     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-         EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
-     }
+
+    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+        EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
+    }
 }
 
 
@@ -63,7 +63,7 @@ bool APJECharacterCat::Grab()
         return false;
     }
 
-    Server_Grab();
+    Client_Grab();
     return true;
 }
 
@@ -72,7 +72,7 @@ ACatWeapon* APJECharacterCat::GetEquippedWeapon() const
     return EquippedWeapon;
 }
 
-void APJECharacterCat::Server_Grab_Implementation()
+void APJECharacterCat::Client_Grab_Implementation()
 {
     if (Inventory)
     {
@@ -86,21 +86,32 @@ void APJECharacterCat::Server_Grab_Implementation()
                 CatInventoryWidget->UpdateInventory(NewItem);
             }
 
-            if (NewItem->WeaponClass)
+            if (NewItem->CatWeaponClass)
             {
-                auto SpawnedWeapon = GetWorld()->SpawnActor<ACatWeapon>(NewItem->WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
+                auto SpawnedWeapon = GetWorld()->SpawnActor<ACatWeapon>(NewItem->CatWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
 
                 if (SpawnedWeapon)
                 {
                     SpawnedWeapon->SetDamage(NewItem->CatDamage);
                     EquippedWeapon = SpawnedWeapon;
-                    Multicast_GrabWeapon(SpawnedWeapon);                
+
+                    //Multicast_GrabWeapon(SpawnedWeapon);
+                    if (SpawnedWeapon)
+                    {
+                        FName WeaponSocketName(TEXT("WeaponSocket"));
+                        FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+                        SpawnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+
+                        EquippedWeapon = SpawnedWeapon;
+                    }
+
                 }
             }
         }
     }
 }
 
+/*
 void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* SpawnedWeapon)
 {
     if (SpawnedWeapon)
@@ -111,16 +122,16 @@ void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* SpawnedWe
 
         EquippedWeapon = SpawnedWeapon;
     }
-}
+}*/
 
 
 void APJECharacterCat::DropItem()
 {
-    Server_DropItem();
+    Client_DropItem();
 }
 
 
-void APJECharacterCat::Server_DropItem_Implementation()
+void APJECharacterCat::Client_DropItem_Implementation()
 {
     Super::DropItem();
 
