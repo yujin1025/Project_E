@@ -73,8 +73,14 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_DoubleJumpAttack();
 
-	UFUNCTION(Client, Reliable)
-	void Client_Grab();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_Grab();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateInventory(UItem* UpdatedItem);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_GrabWeapon(ACatWeapon* Weapon);
 
 	//UFUNCTION(NetMulticast, Reliable)
 	//void Multicast_GrabWeapon(ACatWeapon* SpawnedWeapon);

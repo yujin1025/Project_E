@@ -10,6 +10,7 @@
 #include "Animation/AnimMontage.h"
 #include "Projectile/CatWeapon.h"
 #include "Component/HealthComponent.h"
+#include "../Items/Item.h"
 
 APJECharacterCat::APJECharacterCat()
 {
@@ -28,9 +29,6 @@ void APJECharacterCat::Tick(float DeltaSeconds)
 void APJECharacterCat::InitWidget()
 {
     Super::InitWidget();
-
-    Inventory = NewObject<UInventory>(this);
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
 
     CatInventoryWidget = CreateWidget<UCatInventoryWidget>(GetWorld(), CatInventoryClass);
     if (CatInventoryWidget)
@@ -52,6 +50,14 @@ void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void APJECharacterCat::BeginPlay()
 {
     Super::BeginPlay();
+
+    Inventory = NewObject<UInventory>(this);
+    if (Inventory)
+    {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory")));
+    }
+
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
 }
 
 
@@ -63,7 +69,7 @@ bool APJECharacterCat::Grab()
         return false;
     }
 
-    Client_Grab();
+    Server_Grab();
     return true;
 }
 
@@ -72,19 +78,19 @@ ACatWeapon* APJECharacterCat::GetEquippedWeapon() const
     return EquippedWeapon;
 }
 
-void APJECharacterCat::Client_Grab_Implementation()
+void APJECharacterCat::Server_Grab_Implementation()
 {
+    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory, 1")));
     if (Inventory)
     {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory, 2")));
         UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (NewItem)
         {
+            if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory, 3")));
             Inventory->AddItem(NewItem, false);
 
-            if (CatInventoryWidget)
-            {
-                CatInventoryWidget->UpdateInventory(NewItem);
-            }
+            Multicast_UpdateInventory(NewItem);
 
             if (NewItem->CatWeaponClass)
             {
@@ -95,34 +101,44 @@ void APJECharacterCat::Client_Grab_Implementation()
                     SpawnedWeapon->SetDamage(NewItem->CatDamage);
                     EquippedWeapon = SpawnedWeapon;
 
-                    //Multicast_GrabWeapon(SpawnedWeapon);
-                    if (SpawnedWeapon)
-                    {
-                        FName WeaponSocketName(TEXT("WeaponSocket"));
-                        FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-                        SpawnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
-
-                        EquippedWeapon = SpawnedWeapon;
-                    }
-
+                    Multicast_GrabWeapon(SpawnedWeapon);
                 }
             }
         }
     }
 }
 
-/*
-void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* SpawnedWeapon)
+bool APJECharacterCat::Server_Grab_Validate()
 {
-    if (SpawnedWeapon)
+    return true;
+}
+
+void APJECharacterCat::Multicast_UpdateInventory_Implementation(UItem* UpdatedItem)
+{
+    if (CatInventoryWidget && UpdatedItem)
     {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("update item")));
+        CatInventoryWidget->UpdateInventory(UpdatedItem);
+    }
+    else
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("no update item")));
+}
+
+void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* Weapon)
+{
+    if (Weapon)
+    {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("Nulticast, called")));
         FName WeaponSocketName(TEXT("WeaponSocket"));
         FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-        SpawnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+        Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 
-        EquippedWeapon = SpawnedWeapon;
+        EquippedWeapon = Weapon;
     }
-}*/
+    else
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("Nulticast, null")));
+}
+
 
 
 void APJECharacterCat::DropItem()

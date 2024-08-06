@@ -13,7 +13,7 @@
 #include "../UI/DuckInventoryWidget.h"
 #include "../Items/Item.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "GameFramework/PlayerController.h"
 
 
 APJECharacterDuck::APJECharacterDuck()
@@ -43,8 +43,7 @@ void APJECharacterDuck::InitWidget()
 {
     Super::InitWidget();
     
-    Inventory = NewObject<UInventory>(this);
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
+
 
     WeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), WeaponInventoryClass);
     if (WeaponInventoryWidget)
@@ -64,6 +63,9 @@ void APJECharacterDuck::BeginPlay()
     Super::BeginPlay();
 
     SetOwner(GetController());
+
+    Inventory = NewObject<UInventory>(this);
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
 }
 
 void APJECharacterDuck::Tick(float DeltaTime)

@@ -3,6 +3,10 @@
 
 #include "Inventory.h"
 
+UInventory::UInventory()
+{
+}
+
 void UInventory::AddItem(UItem* Item, bool bIsDuck)
 {
     if (!Item)
