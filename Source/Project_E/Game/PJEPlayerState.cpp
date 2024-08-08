@@ -7,7 +7,7 @@
 
 APJEPlayerState::APJEPlayerState()
 {
-	PlayerRole = EPlayerRole::Duck;
+	PlayerRole = EPlayerRole::Cat;
 }
 
 void APJEPlayerState::OnChangePlayerHealth(int objectId, float Amount)
