@@ -10,7 +10,6 @@
 #include "Animation/AnimMontage.h"
 #include "Projectile/CatWeapon.h"
 #include "Component/HealthComponent.h"
-#include "../Items/Item.h"
 
 APJECharacterCat::APJECharacterCat()
 {
@@ -52,11 +51,6 @@ void APJECharacterCat::BeginPlay()
     Super::BeginPlay();
 
     Inventory = NewObject<UInventory>(this);
-    if (Inventory)
-    {
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory")));
-    }
-
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
 }
 
@@ -80,17 +74,14 @@ ACatWeapon* APJECharacterCat::GetEquippedWeapon() const
 
 void APJECharacterCat::Server_Grab_Implementation()
 {
-    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory, 1")));
-    if (Inventory)
+    if(Inventory)
     {
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory, 2")));
         UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (NewItem)
         {
-            if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("inventory, 3")));
             Inventory->AddItem(NewItem, false);
 
-            Multicast_UpdateInventory(NewItem);
+            Multicast_UpdateInventory(NewItem->ItemCode);
 
             if (NewItem->CatWeaponClass)
             {
@@ -113,41 +104,38 @@ bool APJECharacterCat::Server_Grab_Validate()
     return true;
 }
 
-void APJECharacterCat::Multicast_UpdateInventory_Implementation(UItem* UpdatedItem)
+void APJECharacterCat::Multicast_UpdateInventory_Implementation(int32 ItemID)
 {
-    if (CatInventoryWidget && UpdatedItem)
+    if (CatInventoryWidget)
     {
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("update item")));
-        CatInventoryWidget->UpdateInventory(UpdatedItem);
+        UItem* NewItem = UItem::SetItem(ItemDatabase, ItemID);
+        if (NewItem)
+        {
+            CatInventoryWidget->UpdateInventory(NewItem);
+        }
     }
-    else
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("no update item")));
 }
 
 void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* Weapon)
 {
     if (Weapon)
     {
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("Nulticast, called")));
         FName WeaponSocketName(TEXT("WeaponSocket"));
         FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
         Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 
         EquippedWeapon = Weapon;
     }
-    else
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("Nulticast, null")));
 }
 
 
 
 void APJECharacterCat::DropItem()
 {
-    Client_DropItem();
+    Server_DropItem();
 }
 
-
-void APJECharacterCat::Client_DropItem_Implementation()
+void APJECharacterCat::Server_DropItem_Implementation()
 {
     Super::DropItem();
 
@@ -158,10 +146,7 @@ void APJECharacterCat::Client_DropItem_Implementation()
         {
             Inventory->RemoveItem(CurrentItem, false);
 
-            if (CatInventoryWidget)
-            {
-                CatInventoryWidget->UpdateInventory(nullptr);
-            }
+            Multicast_DropInventory(nullptr);
 
             TArray<AActor*> AttachedActors;
             GetAttachedActors(AttachedActors);
@@ -174,6 +159,14 @@ void APJECharacterCat::Client_DropItem_Implementation()
                 }
             }
         }
+    }
+}
+
+void APJECharacterCat::Multicast_DropInventory_Implementation(UItem* Item)
+{
+    if (CatInventoryWidget)
+    {
+        CatInventoryWidget->UpdateInventory(Item);
     }
 }
 

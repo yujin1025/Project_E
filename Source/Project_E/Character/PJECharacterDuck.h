@@ -47,7 +47,6 @@ protected:
 	void ResetRapidFire();
 	void ApplySpeedReduction();
 	void Dash();
-	void LogInventory();
 	void UpdateInventoryWidget(EItemType ItemType);
 
 	void EnterAimingMode();
@@ -55,17 +54,26 @@ protected:
 	void CalculateProjectilePath();
 
 	// Multiplay Section
-	UFUNCTION(Client, Reliable)
-	void Client_Swallow();
+	UFUNCTION(Server, Reliable)
+	void Server_Swallow();
 
-	UFUNCTION(Client, Reliable)
-	void Client_DropItem();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SwallowInventory(int32 ItemID);
 
-	UFUNCTION(Client, Reliable)
-	void Client_Fire();
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
 
-	UFUNCTION(Client, Reliable)
-	void Client_RapidFire();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropItem(int32 ItemID);
+
+	UFUNCTION(Server, Reliable)
+	void Server_Fire();
+
+	UFUNCTION(Server, Reliable)
+	void Server_RapidFire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateSpeed(float NewSpeed, bool bNewIsSwallowed);
 
 
 protected:
@@ -118,7 +126,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UDuckInventoryWidget> NonWeaponInventoryClass;
 
-	UItem* SwallowedItem = nullptr;
+	TArray<UItem*> SwallowedItems;
 
 	/**
 	* Animation montages

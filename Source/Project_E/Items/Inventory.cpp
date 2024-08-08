@@ -32,12 +32,25 @@ void UInventory::RemoveItem(UItem* Item, bool bIsDuck)
     if (!Item)
         return;
 
+    auto RemoveItemFromInventory = [&](TArray<UItem*>& Inventory)
+    {
+        for (int32 i = 0; i < Inventory.Num(); ++i)
+        {
+            if (Inventory[i] && Inventory[i]->ItemCode == Item->ItemCode)
+            {
+                Inventory.RemoveAt(i);
+                break;
+            }
+        }
+    };
+
+
     if (bIsDuck)
     {
         if (Item->Type == EItemType::Weapon)
-            DuckWeaponInventory.Remove(Item);
+            RemoveItemFromInventory(DuckWeaponInventory);
         else
-            DuckNonWeaponInventory.Remove(Item);
+            RemoveItemFromInventory(DuckNonWeaponInventory);
     }
     else
     {
@@ -45,7 +58,16 @@ void UInventory::RemoveItem(UItem* Item, bool bIsDuck)
             CatInventoryItem = nullptr;
     }
 
-	UE_LOG(LogTemp, Warning, TEXT("Removed item: %s"), *Item->Name);
+    if (GEngine)
+    {
+        FString InventoryContents = TEXT("DuckWeaponInventory: ");
+        for (UItem* InventoryItem : DuckWeaponInventory)
+        {
+            InventoryContents += InventoryItem->Name + TEXT(", ");
+        }
+
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, InventoryContents);
+    }
 }
 
 UItem* UInventory::RemoveLastItem(bool bIsDuck)

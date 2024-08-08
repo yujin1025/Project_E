@@ -77,16 +77,16 @@ public:
 	void Server_Grab();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_UpdateInventory(UItem* UpdatedItem);
+	void Multicast_UpdateInventory(int32 ItemID);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_GrabWeapon(ACatWeapon* Weapon);
 
-	//UFUNCTION(NetMulticast, Reliable)
-	//void Multicast_GrabWeapon(ACatWeapon* SpawnedWeapon);
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
 
-	UFUNCTION(Client, Reliable)
-	void Client_DropItem();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropInventory(UItem* Item);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_Swing();

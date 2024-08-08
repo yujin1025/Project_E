@@ -43,8 +43,6 @@ void APJECharacterDuck::InitWidget()
 {
     Super::InitWidget();
     
-
-
     WeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), WeaponInventoryClass);
     if (WeaponInventoryWidget)
     {
@@ -86,41 +84,58 @@ void APJECharacterDuck::Tick(float DeltaTime)
 
 void APJECharacterDuck::Swallow()
 {
-    Client_Swallow();
+    Server_Swallow();
 }
 
-void APJECharacterDuck::Client_Swallow_Implementation()
+void APJECharacterDuck::Server_Swallow_Implementation()
 {
     if (Inventory)
     {
-        SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
+        UItem* SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (SwallowedItem)
         {
             Inventory->AddItem(SwallowedItem, true);
+            SwallowedItems.Add(SwallowedItem);
 
             if (SwallowedItem->ItemCode == 1)
                 MagicBallCount++;
 
             ApplySpeedReduction();
-            LogInventory();
-            UpdateInventoryWidget(SwallowedItem->Type);
+            Multicast_SwallowInventory(SwallowedItem->ItemCode);
         }
     }
 }
+
+void APJECharacterDuck::Multicast_SwallowInventory_Implementation(int32 ItemID)
+{
+    UItem* NewItem = UItem::SetItem(ItemDatabase, ItemID);
+    if (NewItem)
+    {
+        if (!HasAuthority())
+        {
+            Inventory->AddItem(NewItem, true);
+        }
+        UpdateInventoryWidget(NewItem->Type);
+    }
+}
+
 
 void APJECharacterDuck::DropItem()
 {
     Super::DropItem();
 
-    Client_DropItem();
+    Server_DropItem();
 }
 
-void APJECharacterDuck::Client_DropItem_Implementation()
+void APJECharacterDuck::Server_DropItem_Implementation()
 {
     if (Inventory)
     {
-        if (SwallowedItem)
+        if (SwallowedItems.Num() > 0)
         {
+            UItem* SwallowedItem = SwallowedItems.Last();
+            SwallowedItems.Remove(SwallowedItem);
+
             Inventory->RemoveItem(SwallowedItem, true);
 
             if (SwallowedItem->ItemCode == 1)
@@ -130,23 +145,33 @@ void APJECharacterDuck::Client_DropItem_Implementation()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
-            LogInventory();
-            UpdateInventoryWidget(SwallowedItem->Type);
+            Multicast_DropItem(SwallowedItem->ItemCode);
 
             SwallowedItem = nullptr;
         }
     }
 }
 
+void APJECharacterDuck::Multicast_DropItem_Implementation(int32 ItemID)
+{
+    UItem* NewItem = UItem::SetItem(ItemDatabase, ItemID);
+    if (NewItem)
+    {
+        if (!HasAuthority())
+        {
+            Inventory->RemoveItem(NewItem, true);
+        }
+        UpdateInventoryWidget(NewItem->Type);
+    }
+}
 
 
 void APJECharacterDuck::Fire()
 {
-    Client_Fire();
-
+    Server_Fire();
 }
 
-void APJECharacterDuck::Client_Fire_Implementation()
+void APJECharacterDuck::Server_Fire_Implementation()
 {
     if (!bIsAiming)
         return;
@@ -172,7 +197,6 @@ void APJECharacterDuck::Client_Fire_Implementation()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
-            LogInventory();
             UpdateInventoryWidget(RemovedItem->Type);
         }
 
@@ -189,10 +213,10 @@ void APJECharacterDuck::ResetFire()
 
 void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 {
-    Client_RapidFire();
+    Server_RapidFire();
 }
 
-void APJECharacterDuck::Client_RapidFire_Implementation()
+void APJECharacterDuck::Server_RapidFire_Implementation()
 {
     if (!bIsAiming)
         return;
@@ -235,7 +259,6 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
-            LogInventory();
             UpdateInventoryWidget(RemovedItem->Type);
         }
 
@@ -256,23 +279,37 @@ void APJECharacterDuck::ResetRapidFire()
 
 void APJECharacterDuck::ApplySpeedReduction()
 {
+    float NewSpeed;
+    bool bNewIsSwallowed;
+
     if (MagicBallCount > 0 && Inventory->GetInventoryCount() > 3)
     {
-        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * SwallowedMultiplier;
-        bIsSwallowed = true;
+        NewSpeed = DefaultWalkSpeed * SwallowedMultiplier;
+        bNewIsSwallowed = true;
     }
     else if (Inventory->GetInventoryCount() > 5)
     {
-        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * SwallowedMultiplier;
-        bIsSwallowed = true;
+        NewSpeed = DefaultWalkSpeed * SwallowedMultiplier;
+        bNewIsSwallowed = true;
     }
     else
     {
-        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
-        bIsSwallowed = false;
+        NewSpeed = DefaultWalkSpeed;
+        bNewIsSwallowed = false;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Current Speed: %f"), GetCharacterMovement()->MaxWalkSpeed);
+    GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+    bIsSwallowed = bNewIsSwallowed;
+
+    Multicast_UpdateSpeed(NewSpeed, bNewIsSwallowed);
+}
+
+void APJECharacterDuck::Multicast_UpdateSpeed_Implementation(float NewSpeed, bool bNewIsSwallowed)
+{
+    GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+    bIsSwallowed = bNewIsSwallowed;
+
+    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Red, FString::Printf(TEXT("Updated Speed on Client: %f"), GetCharacterMovement()->MaxWalkSpeed));
 }
 
 
@@ -296,36 +333,12 @@ void APJECharacterDuck::Dash()
     }
 }
 
-//나중에 다 확인하고 지우기
-void APJECharacterDuck::LogInventory()
-{
-    if (Inventory)
-    {
-        if (Inventory->DuckWeaponInventory.Num() > 0)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Current Duck Weapon Inventory:"));
-            for (UItem* Item : Inventory->DuckWeaponInventory)
-            {
-                UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
-            }
-        }
-
-        if (Inventory->DuckNonWeaponInventory.Num() > 0)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Current Duck Non-Weapon Inventory:"));
-            for (UItem* Item : Inventory->DuckNonWeaponInventory)
-            {
-                UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
-            }
-        }
-    }
-}
-
 void APJECharacterDuck::UpdateInventoryWidget(EItemType ItemType)
 {
     if (ItemType == EItemType::Weapon && WeaponInventoryWidget)
     {
         WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Red, FString::Printf(TEXT("DuckWeaponInventory : %d"), Inventory->GetWeaponCount()));
     }
     else if (ItemType == EItemType::NonWeapon && NonWeaponInventoryWidget)
     {
@@ -374,7 +387,4 @@ void APJECharacterDuck::CalculateProjectilePath()
         }
     }
 }
-
-
-
 
