@@ -53,8 +53,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Id, meta = (AllowPrivateAccess = "true"))
 	int CharacterId;
 
-	UHealthComponent* HealthComponent;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Motion, meta = (AllowPrivateAccess = "true"))
 	UHitDeadComponent* HitDeadComponent;
 
@@ -79,4 +77,16 @@ public:
 	// 델리게이트 핸들러 함수
 	UFUNCTION()
 	void OnAttackEndHandler();
+
+// Hp Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Motion, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UHealthComponent> HealthComponent;
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UPJEHpBarWidgetComponent> HealthBarComponent;
+
+	void UpdateHealthBar();
 };

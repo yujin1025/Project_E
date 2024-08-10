@@ -16,8 +16,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
+
 	float CurrentHealth;
 
 public:	
@@ -29,4 +31,6 @@ public:
 		
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetCurrentHealth() const { return CurrentHealth; }
+
+	float GetMaxHealth() const { return MaxHealth; }
 };

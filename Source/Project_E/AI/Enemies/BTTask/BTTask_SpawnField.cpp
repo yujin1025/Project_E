@@ -67,7 +67,27 @@ void UBTTask_SpawnField::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
         DrawDebugSphere(GetWorld(), Location, Radius, 32, FColor::Green, false, -1.0f, 0, 5.0f);
     }
 
+    UpdateOverlappingActors(Location, NodeMemory);
     DealDamage(nullptr, NodeMemory);
+}
+
+void UBTTask_SpawnField::UpdateOverlappingActors(const FVector& Location, uint8* NodeMemory)
+{
+    FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
+
+    TArray<FOverlapResult> OverlapResults;
+    FCollisionShape CollisionShape = FCollisionShape::MakeSphere(Radius);
+
+    TaskMemory->OverlappingActors.Empty(); // 기존 목록 초기화
+    GetWorld()->OverlapMultiByChannel(OverlapResults, Location, FQuat::Identity, ECC_WorldDynamic, CollisionShape);
+
+    for (const FOverlapResult& Result : OverlapResults)
+    {
+        if (AActor* OverlappedActor = Result.GetActor())
+        {
+            TaskMemory->OverlappingActors.Add(OverlappedActor);
+        }
+    }
 }
 
 void UBTTask_SpawnField::SpawnField(AActor* OwnerActor, uint8* NodeMemory)
@@ -120,11 +140,6 @@ void UBTTask_SpawnField::DestroyField(UBehaviorTreeComponent& OwnerComp, uint8* 
         TaskMemory->FieldMesh->DestroyComponent();
     }
     FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-}
-
-void UBTTask_SpawnField::OnGameplayTaskActivated(UGameplayTask& Task)
-{
-    // Do nothing
 }
 
 uint16 UBTTask_SpawnField::GetInstanceMemorySize() const

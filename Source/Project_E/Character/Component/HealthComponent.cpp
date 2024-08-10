@@ -7,7 +7,8 @@
 UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
+	MaxHealth = 100;
+	CurrentHealth = MaxHealth;
 }
 
 

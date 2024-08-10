@@ -2,6 +2,7 @@
 
 
 #include "Character/PJECharacterMonster.h"
+#include "NavigationSystem.h"
 
 void APJECharacterMonster::OnDeath()
 {

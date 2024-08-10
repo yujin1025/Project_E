@@ -12,6 +12,7 @@
 #include "../UI/BaseWidget.h"
 #include "Game/PJEPlayerState.h"
 #include "Gimmick/PJEPushableCylinder.h"
+#include "UI/Manager/PJEUIManager.h"
 
 
 APJEPlayerController::APJEPlayerController()
@@ -185,36 +186,19 @@ void APJEPlayerController::OpenWidget()
 	{
 		InGameWindowWidget->AddToViewport(1);
 	}
-
-	if (SettingsMenuClass)
-	{
-		SettingsMenu = CreateWidget<UUserWidget>(this, SettingsMenuClass);
-		if (SettingsMenu)
-		{
-			SettingsMenu->AddToViewport();
-			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
 }
 
 void APJEPlayerController::ToggleSettingsMenu(const FInputActionValue& Value)
 {
-	if (SettingsMenu)
+	if (SettingsMenuClass)
 	{
-		if (SettingsMenu->IsVisible())
+		if (!SettingsMenu.IsValid() || SettingsMenu->IsPendingKill())
 		{
-			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
-			//FInputModeGameOnly InputMode;
-			//SetInputMode(InputMode);
-			//bShowMouseCursor = false;
-		}
-		else
-		{
-			SettingsMenu->SetVisibility(ESlateVisibility::Visible);
-			//FInputModeUIOnly InputMode;
-			//InputMode.SetWidgetToFocus(SettingsMenu->TakeWidget());
-			//SetInputMode(InputMode);
-			//bShowMouseCursor = true;
+			if (UPJEUIManager::GetInstance()->GetTopmostPopupWidget() == nullptr)
+			{
+				SettingsMenu = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), SettingsMenuClass);
+			}
+			
 		}
 	}
 }

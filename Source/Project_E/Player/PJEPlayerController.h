@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "UI/PopUpWidget.h"
 #include "PJEPlayerController.generated.h"
 
 class UBaseWidget;
@@ -74,7 +75,8 @@ private:
 	UPROPERTY()
 	UBaseWidget* InGameWindowWidget;
 
-	TObjectPtr<UUserWidget> SettingsMenu;
+	UPROPERTY()
+	TWeakObjectPtr<class UPopUpWidget> SettingsMenu;
 
 	UFUNCTION()
 	void ToggleSettingsMenu(const FInputActionValue& Value);
@@ -87,5 +89,5 @@ public:
 	class UInputAction* ToggleSettingsMenuAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<class UUserWidget> SettingsMenuClass;
+	TSubclassOf<class UPopUpWidget> SettingsMenuClass;
 };

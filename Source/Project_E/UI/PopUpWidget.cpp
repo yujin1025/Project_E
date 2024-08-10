@@ -2,11 +2,27 @@
 
 
 #include "PopUpWidget.h"
+#include "UI/Manager/PJEUIManager.h"
 #include <Kismet/GameplayStatics.h>
+
+UPopUpWidget::UPopUpWidget()
+{
+    bIsFocusable = true;
+}
 
 void UPopUpWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	//SetHp 등 이용해서 구현하기
+}
+
+FReply UPopUpWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+    if (InKeyEvent.GetKey() == EKeys::One)
+    {
+        // ESC 키를 눌렀을 때 최상단 위젯 닫기
+        UPJEUIManager::GetInstance()->CloseTopmostPopupWidget(GetWorld());
+        return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+    }
+
+    return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
