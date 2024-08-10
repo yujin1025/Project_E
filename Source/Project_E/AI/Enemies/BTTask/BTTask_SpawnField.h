@@ -20,7 +20,7 @@ class PROJECT_E_API UBTTask_SpawnField : public UBTTaskNode
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
+	void UpdateOverlappingActors(const FVector& Location, uint8* NodeMemory);
 	virtual uint16 GetInstanceMemorySize() const override;
 
 private:
@@ -35,7 +35,7 @@ private:
 	float Duration = 2.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Damage")
-	float DamagePerSecond = 10.0f;
+	float DamagePerSecond = 0.1f;
 };
 
 struct FBTSpawnFieldTaskMemory
