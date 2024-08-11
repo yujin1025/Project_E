@@ -28,6 +28,7 @@ private:
 	void DealDamage(AActor* DamagedActor, uint8* NodeMemory);
 	void DestroyField(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
 
+	/*
 	UPROPERTY(EditAnywhere, Category = "Field")
 	float Radius = 160.0f; // 1.6m
 
@@ -36,13 +37,23 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	float DamagePerSecond = 0.1f;
+	*/
 };
 
 struct FBTSpawnFieldTaskMemory
 {
 	FTimerHandle TimerHandle_DestroyField;
 	FTimerHandle TimerHandle_DealDamage;
-	TArray<AActor*> OverlappingActors;
-	UStaticMeshComponent* FieldMesh;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> OverlappingActors;
+
+	UPROPERTY()
+	TObjectPtr<UStaticMeshComponent> FieldMesh;
+
+	UPROPERTY()
+	TObjectPtr<class IPJEFieldSpawnable> FieldSpawnable;
+
 	float TimeElapsed;
+	float DamageElapsedTime;
 };

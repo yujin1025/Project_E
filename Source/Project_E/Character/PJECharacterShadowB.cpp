@@ -68,6 +68,21 @@ float APJECharacterShadowB::GetDetectMinYDifference()
 	return MinYDifference;
 }
 
+float APJECharacterShadowB::GetFieldRadius()
+{
+	return FieldRadius;
+}
+
+float APJECharacterShadowB::GetFieldDuration()
+{
+	return FieldDuration;
+}
+
+float APJECharacterShadowB::GetDamagePerSecond()
+{
+	return DamagePerSecond;
+}
+
 void APJECharacterShadowB::AttackByAI()
 {
 	//TODO :Implement this function

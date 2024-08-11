@@ -30,6 +30,21 @@ float APJECharacterShadowC::GetTeleportRange()
 	return TeleportRange * 100.0f;
 }
 
+float APJECharacterShadowC::GetFieldRadius()
+{
+	return FieldRadius;
+}
+
+float APJECharacterShadowC::GetFieldDuration()
+{
+	return FieldDuration;
+}
+
+float APJECharacterShadowC::GetDamagePerSecond()
+{
+	return DamagePerSecond;
+}
+
 void APJECharacterShadowC::BeginPlay()
 {
 	Super::BeginPlay();

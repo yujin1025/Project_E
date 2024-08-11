@@ -143,7 +143,6 @@ void UPJESystemWidget::OnBrightnessChanged(float Value)
 		float ExposureBias = FMath::Lerp(-0.f, 20.0f, Value);
 		PostProcessVolume->Settings.AutoExposureBias = ExposureBias;
 
-		UE_LOG(LogTemp, Log, TEXT("Brightness Value: %f, Set AutoExposureBias: %f"), Value, ExposureBias);
 		SaveSettings();
 	}
 }
@@ -172,7 +171,6 @@ void UPJESystemWidget::OnResetButtonClicked()
 		OnBrightnessChanged(0.5f);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Settings have been reset to default values"));
 }
 
 void UPJESystemWidget::OnBackButtonClicked()
@@ -209,7 +207,7 @@ void UPJESystemWidget::SaveSettings()
 
 		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveSlotName, UserIndex))
 		{
-			UE_LOG(LogTemp, Log, TEXT("System settings saved successfully."));
+			;
 		}
 		else
 		{
@@ -247,8 +245,6 @@ void UPJESystemWidget::LoadSettings()
 			BrightnessSlider->SetValue(LoadGameInstance->Brightness);
 			OnBrightnessChanged(LoadGameInstance->Brightness);
 		}
-
-		UE_LOG(LogTemp, Log, TEXT("System settings loaded successfully."));
 	}
 	else
 	{

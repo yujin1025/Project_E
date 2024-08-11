@@ -17,9 +17,7 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
-
 	float CurrentHealth;
 
 public:	
