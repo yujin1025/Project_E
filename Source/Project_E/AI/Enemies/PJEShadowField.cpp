@@ -74,16 +74,16 @@ void APJEShadowField::InitializeField(float Duration, float Damage, float Initia
 {
     FieldDuration = Duration;
     DamagePerSecond = Damage;
-    CollisionSphere->SetSphereRadius(InitialRadius);
+    FieldRadius = InitialRadius;
 }
 
 void APJEShadowField::ShrinkField(float DeltaTime)
 {
-    float ShrinkFactor = FMath::Clamp(1.0f - (TimeElapsed / FieldDuration), 0.0f, 1.0f);
-    float NewRadius = 100.0f * ShrinkFactor;
-    CollisionSphere->SetSphereRadius(NewRadius);
-    FieldMesh->SetWorldScale3D(FVector(ShrinkFactor));
+    // 현재 시간이 경과한 전체 지속 시간의 비율에 따라 축소 팩터 계산
+    float ShrinkFactor = FMath::Clamp(1.0f - (TimeElapsed / FieldDuration), 0.0f, 1.0f) * FieldRadius;
+    SetActorScale3D(FVector(ShrinkFactor));
 }
+
 
 void APJEShadowField::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {

@@ -38,6 +38,7 @@ private:
     float FieldDuration;
     float DamagePerSecond;
     float TimeElapsed;
+    float FieldRadius;
 
     // 저장된 겹쳐진 액터
     UPROPERTY()

@@ -14,13 +14,16 @@ class PROJECT_E_API UBTTask_SpawnField : public UBTTaskNode
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	UBTTask_SpawnField();
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	virtual uint16 GetInstanceMemorySize() const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	TObjectPtr<UClass> FieldActorClass;
 
 private:
 	void SpawnField(AActor* OwnerActor, uint8* NodeMemory);
