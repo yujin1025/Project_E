@@ -84,6 +84,9 @@ void APJECharacterDuck::Tick(float DeltaTime)
 
 void APJECharacterDuck::Swallow()
 {
+    if (!bCanSwallow)
+        return;
+
     Server_Swallow();
 }
 
@@ -102,6 +105,9 @@ void APJECharacterDuck::Server_Swallow_Implementation()
 
             ApplySpeedReduction();
             Multicast_SwallowInventory(SwallowedItem->ItemCode);
+
+            bCanSwallow = false;
+            GetWorld()->GetTimerManager().SetTimer(SwallowCooldownTimer, this, &APJECharacterDuck::ResetSwallow, 0.2f, false);
         }
     }
 }
@@ -119,6 +125,11 @@ void APJECharacterDuck::Multicast_SwallowInventory_Implementation(int32 ItemID)
     }
 }
 
+
+void APJECharacterDuck::ResetSwallow()
+{
+    bCanSwallow = true;
+}
 
 void APJECharacterDuck::DropItem()
 {
@@ -168,27 +179,32 @@ void APJECharacterDuck::Multicast_DropItem_Implementation(int32 ItemID)
 
 void APJECharacterDuck::Fire()
 {
-    Server_Fire();
-}
-
-void APJECharacterDuck::Server_Fire_Implementation()
-{
     if (!bIsAiming)
         return;
 
+    if (!HasAuthority())
+    {
+        if (bCanShoot && Inventory->GetWeaponCount() > 0)
+        {
+            UItem* RemovedItem = Inventory->RemoveLastItem(true);
+            if (RemovedItem)
+            {
+                PredictedProjectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
+            }
+        }
+    }
+
+    Server_Fire(MuzzleLocation, MuzzleRotation);
+}
+
+void APJECharacterDuck::Server_Fire_Implementation(FVector ClientMuzzleLocation, FRotator ClientMuzzleRotation)
+{
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
-        if (FireMontage)
-        {
-            PlayAnimMontage(FireMontage);
-        }
-
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
-
-            ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
+            ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, ClientMuzzleLocation, ClientMuzzleRotation);
 
             if (RemovedItem->ItemCode == 1)
             {
@@ -197,13 +213,34 @@ void APJECharacterDuck::Server_Fire_Implementation()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
-            UpdateInventoryWidget(RemovedItem->Type);
+
+            Multicast_Fire(ClientMuzzleLocation, ClientMuzzleRotation);
+            Multicast_DropItem(RemovedItem->ItemCode);
         }
 
         bCanShoot = false;
         GetWorld()->GetTimerManager().SetTimer(ShootDelayTimer, this, &APJECharacterDuck::ResetFire, 0.2f, false);
     }
 }
+
+void APJECharacterDuck::Multicast_Fire_Implementation(FVector Location, FRotator Rotation)
+{
+    if (FireMontage)
+    {
+        PlayAnimMontage(FireMontage);
+    }
+
+    if (!HasAuthority())
+    {
+        if (PredictedProjectile)
+        {
+            PredictedProjectile->Destroy();
+            PredictedProjectile = nullptr;  
+        }
+    }
+}
+
+
 
 void APJECharacterDuck::ResetFire()
 {
@@ -213,16 +250,19 @@ void APJECharacterDuck::ResetFire()
 
 void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 {
-    Server_RapidFire();
-}
-
-void APJECharacterDuck::Server_RapidFire_Implementation()
-{
     if (!bIsAiming)
         return;
 
+    Server_RapidFire(MuzzleLocation, MuzzleRotation);
+}
+
+void APJECharacterDuck::Server_RapidFire_Implementation(FVector InMuzzleLocation, FRotator InMuzzleRotation)
+{
     if (bCanRapidFire && Inventory->GetWeaponCount() > 2)
     {
+        MuzzleLocation = InMuzzleLocation;
+        MuzzleRotation = InMuzzleRotation;
+
         float FireInterval = 0.3f;
         RapidFireCount = 0;
 
@@ -309,7 +349,7 @@ void APJECharacterDuck::Multicast_UpdateSpeed_Implementation(float NewSpeed, boo
     GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
     bIsSwallowed = bNewIsSwallowed;
 
-    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Red, FString::Printf(TEXT("Updated Speed on Client: %f"), GetCharacterMovement()->MaxWalkSpeed));
+    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("Updated Speed on Client: %f"), GetCharacterMovement()->MaxWalkSpeed));
 }
 
 

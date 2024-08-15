@@ -15,10 +15,19 @@ void UDuckInventoryWidget::NativeConstruct()
 
 void UDuckInventoryWidget::UpdateInventory(const TArray<UItem*>& Items, bool bIsWeaponInventory)
 {
+    for (const UItem* Item : Items)
+    {
+        if (Item)
+        {
+            if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Red, FString::Printf(TEXT("Item in Items array: %s"), *Item->Name));
+        }
+    }
+
     int32 CurrentSlotCount = Slots.Num();
     int32 ItemCount = Items.Num();
     int32 SlotsToAdd = ItemCount - CurrentSlotCount;
 
+    // 새 slot 추가
     for (int32 i = 0; i < SlotsToAdd; i++)
     {
         USlotWidget* NewSlot = CreateWidget<USlotWidget>(this, LoadClass<USlotWidget>(nullptr, TEXT("/Game/UI/WBP_Slot.WBP_Slot_C")));
@@ -34,6 +43,7 @@ void UDuckInventoryWidget::UpdateInventory(const TArray<UItem*>& Items, bool bIs
         }
     }
     
+    // 기존 slot 업데이트
     for (int32 i = 0; i < Items.Num(); i++)
     {
         if (Slots.IsValidIndex(i) && Items.IsValidIndex(i))
@@ -47,6 +57,7 @@ void UDuckInventoryWidget::UpdateInventory(const TArray<UItem*>& Items, bool bIs
         }
     }
 
+    //필요없는 slot 삭제
     for (int32 i = ItemCount; i < Slots.Num(); i++)
     {
         if (Slots.IsValidIndex(i))
