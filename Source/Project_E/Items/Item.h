@@ -47,7 +47,10 @@ public:
     UTexture2D* ItemImage;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-    TSubclassOf<class ACatWeapon> WeaponClass;
+    TSubclassOf<class ACatWeapon> CatWeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADuckProjectile> DuckWeaponClass;
 
     FString GetItemName() const { return Name; }
 
@@ -81,5 +84,8 @@ struct FItemData : public FTableRowBase
     UTexture2D* ItemImage;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-    TSubclassOf<class ACatWeapon> WeaponClass;
+    TSubclassOf<class ACatWeapon> CatWeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADuckProjectile> DuckWeaponClass;
 };

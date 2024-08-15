@@ -28,10 +28,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(BlueprintReadWrite, Category = "Data")
 	class UDataTable* ItemDatabase;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	UInventory* Inventory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -73,14 +73,20 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_DoubleJumpAttack();
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Grab();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_GrabWeapon(ACatWeapon* SpawnedWeapon);
+	void Multicast_UpdateInventory(int32 ItemID);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_GrabWeapon(ACatWeapon* Weapon);
 
 	UFUNCTION(Server, Reliable)
 	void Server_DropItem();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropInventory(UItem* Item);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_Swing();

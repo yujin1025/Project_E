@@ -15,6 +15,8 @@ class PROJECT_E_API UInventory : public UObject
 	GENERATED_BODY()
 	
 public:
+    UInventory();
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
     TArray<UItem*> DuckWeaponInventory;
 

@@ -28,9 +28,6 @@ void APJECharacterCat::Tick(float DeltaSeconds)
 void APJECharacterCat::InitWidget()
 {
     Super::InitWidget();
-    
-    Inventory = NewObject<UInventory>(this);
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
 
     CatInventoryWidget = CreateWidget<UCatInventoryWidget>(GetWorld(), CatInventoryClass);
     if (CatInventoryWidget)
@@ -42,16 +39,19 @@ void APJECharacterCat::InitWidget()
 void APJECharacterCat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
-     
-     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-         EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
-     }
+
+    if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+        EnhancedInputComponent->BindAction(SwingAction, ETriggerEvent::Triggered, this, &APJECharacterCat::Swing);
+    }
 }
 
 
 void APJECharacterCat::BeginPlay()
 {
     Super::BeginPlay();
+
+    Inventory = NewObject<UInventory>(this);
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/CatItem.CatItem"));
 }
 
 
@@ -74,51 +74,66 @@ ACatWeapon* APJECharacterCat::GetEquippedWeapon() const
 
 void APJECharacterCat::Server_Grab_Implementation()
 {
-    if (Inventory)
+    if(Inventory)
     {
         UItem* NewItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (NewItem)
         {
             Inventory->AddItem(NewItem, false);
 
-            if (CatInventoryWidget)
-            {
-                CatInventoryWidget->UpdateInventory(NewItem);
-            }
+            Multicast_UpdateInventory(NewItem->ItemCode);
 
-            if (NewItem->WeaponClass)
+            if (NewItem->CatWeaponClass)
             {
-                auto SpawnedWeapon = GetWorld()->SpawnActor<ACatWeapon>(NewItem->WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
+                auto SpawnedWeapon = GetWorld()->SpawnActor<ACatWeapon>(NewItem->CatWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
 
                 if (SpawnedWeapon)
                 {
                     SpawnedWeapon->SetDamage(NewItem->CatDamage);
                     EquippedWeapon = SpawnedWeapon;
-                    Multicast_GrabWeapon(SpawnedWeapon);                
+
+                    Multicast_GrabWeapon(SpawnedWeapon);
                 }
             }
         }
     }
 }
 
-void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* SpawnedWeapon)
+bool APJECharacterCat::Server_Grab_Validate()
 {
-    if (SpawnedWeapon)
+    return true;
+}
+
+void APJECharacterCat::Multicast_UpdateInventory_Implementation(int32 ItemID)
+{
+    if (CatInventoryWidget)
+    {
+        UItem* NewItem = UItem::SetItem(ItemDatabase, ItemID);
+        if (NewItem)
+        {
+            CatInventoryWidget->UpdateInventory(NewItem);
+        }
+    }
+}
+
+void APJECharacterCat::Multicast_GrabWeapon_Implementation(ACatWeapon* Weapon)
+{
+    if (Weapon)
     {
         FName WeaponSocketName(TEXT("WeaponSocket"));
         FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-        SpawnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+        Weapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 
-        EquippedWeapon = SpawnedWeapon;
+        EquippedWeapon = Weapon;
     }
 }
+
 
 
 void APJECharacterCat::DropItem()
 {
     Server_DropItem();
 }
-
 
 void APJECharacterCat::Server_DropItem_Implementation()
 {
@@ -131,10 +146,7 @@ void APJECharacterCat::Server_DropItem_Implementation()
         {
             Inventory->RemoveItem(CurrentItem, false);
 
-            if (CatInventoryWidget)
-            {
-                CatInventoryWidget->UpdateInventory(nullptr);
-            }
+            Multicast_DropInventory(nullptr);
 
             TArray<AActor*> AttachedActors;
             GetAttachedActors(AttachedActors);
@@ -147,6 +159,14 @@ void APJECharacterCat::Server_DropItem_Implementation()
                 }
             }
         }
+    }
+}
+
+void APJECharacterCat::Multicast_DropInventory_Implementation(UItem* Item)
+{
+    if (CatInventoryWidget)
+    {
+        CatInventoryWidget->UpdateInventory(Item);
     }
 }
 

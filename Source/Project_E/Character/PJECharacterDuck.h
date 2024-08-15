@@ -39,6 +39,7 @@ public:
 	void Swallow();
 
 protected:
+	void ResetSwallow();
 	void DropItem() override;
 	void Fire();
 	void ResetFire();
@@ -47,7 +48,6 @@ protected:
 	void ResetRapidFire();
 	void ApplySpeedReduction();
 	void Dash();
-	void LogInventory();
 	void UpdateInventoryWidget(EItemType ItemType);
 
 	void EnterAimingMode();
@@ -55,44 +55,41 @@ protected:
 	void CalculateProjectilePath();
 
 	// Multiplay Section
-	UFUNCTION(Client, Reliable)
-	void Client_Swallow();
+	UFUNCTION(Server, Reliable)
+	void Server_Swallow();
 
-	UFUNCTION(Client, Reliable)
-	void Client_DropItem();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SwallowInventory(int32 ItemID);
 
-	UFUNCTION(Client, Reliable)
-	void Client_Fire();
-
-	UFUNCTION(Client, Reliable)
-	void Client_RapidFire();
-
-	/*
 	UFUNCTION(Server, Reliable)
 	void Server_DropItem();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_DropItem();
+	void Multicast_DropItem(int32 ItemID);
 
 	UFUNCTION(Server, Reliable)
-	void Server_Fire();
+	void Server_Fire(FVector ClientMuzzleLocation, FRotator ClientMuzzleRotation);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_Fire();
+	void Multicast_Fire(FVector Location, FRotator Rotation);
 
 	UFUNCTION(Server, Reliable)
-	void Server_RapidFire();
+	void Server_RapidFire(FVector InMuzzleLocation, FRotator InMuzzleRotation);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_RapidFire();*/
+	void Multicast_UpdateSpeed(float NewSpeed, bool bNewIsSwallowed);
+
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	UInventory* Inventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(BlueprintReadWrite, Category = "Data")
 	class UDataTable* ItemDatabase;
 
+	bool bCanSwallow = true;
+
+	FTimerHandle SwallowCooldownTimer;
 	FTimerHandle ShootDelayTimer;
 	FTimerHandle RapidFireDelayTimer;
 	bool bCanShoot;
@@ -124,9 +121,6 @@ protected:
 	bool bIsInitialized = false;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TSubclassOf<class ADuckProjectile> ProjectileClass;
-
 	UPROPERTY()
 	UDuckInventoryWidget* WeaponInventoryWidget;
 
@@ -139,7 +133,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UDuckInventoryWidget> NonWeaponInventoryClass;
 
-	UItem* SwallowedItem = nullptr;
+	TArray<UItem*> SwallowedItems;
+
+	UPROPERTY()
+	ADuckProjectile* PredictedProjectile;
 
 	/**
 	* Animation montages

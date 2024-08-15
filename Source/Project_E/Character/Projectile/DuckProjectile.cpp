@@ -31,7 +31,8 @@ ADuckProjectile::ADuckProjectile()
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Bounciness = 0.3f; 
 
-	bReplicates = true;
+	SetReplicates(true);
+	SetReplicateMovement(true);
 }
 
 void ADuckProjectile::BeginPlay()

@@ -50,6 +50,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float GravityScale = 4.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "DP_Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "item")
 	int32 ItemCode;
 };
