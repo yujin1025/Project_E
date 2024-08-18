@@ -36,4 +36,7 @@ private:
 	UNiagaraSystem* DashEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "Particle")
 	UNiagaraSystem* LandEffect;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = true))
+	float DistanceToGround;
 };
