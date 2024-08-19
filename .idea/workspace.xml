@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1ef914cf-c9b4-4cbb-9dcd-6316bb87d4c4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Content/BP_PJEGameInstance.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/BluePrints/AI/BP_ShadowArea.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Input/IA_ToggleSettingsMenu.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Input/IMC_SettingsMenu.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/BGM.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Enemy/ShadowABackGround.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Enemy/ShadowABackGround_Cue.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Enemy/ShadowALaugh.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Enemy/ShadowALaughAttenuation.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Enemy/ShadowALaugh_Cue.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Environment.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Master.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/Narration.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/SFX.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/SoundMix.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/VoiceChat.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/WBP_AudioSetting.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/WBP_CatControlGuide.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/WBP_DuckControlGuide.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/WBP_PJESystemSettingMenue.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/UI/WBP_SettingsMenue.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_DoNothing.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_DoNothing.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_FirstAttackDone.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_FirstAttackDone.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_SwitchTarget.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_SwitchTarget.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/PJEShadowArea.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/PJEShadowArea.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/AI/Managers/PJEShadowGeneratorManager.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJEAudioSetting.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJEAudioSetting.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJECatControlGuideWidget.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJECatControlGuideWidget.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJEDuckControlGuideWidget.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJEDuckControlGuideWidget.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJESystemWidget.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJESystemWidget.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJEUserSettingWidget.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/Project_E/UI/PJEUserSettingWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowA/BP_PJECharacterShadowA.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowA/BP_PJECharacterShadowA.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowA/BT_PJE_ShadowA.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowA/BT_PJE_ShadowA.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowC/BB_PJE_ShadowC.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowC/BB_PJE_ShadowC.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowC/BT_PJE_ShadowC.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/BluePrints/AI/Enemies/ShadowC/BT_PJE_ShadowC.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/BluePrints/Game/BP_InGameMode.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/BluePrints/Game/BP_InGameMode.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/BluePrints/Player/BP_PJEPlayerController.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/BluePrints/Player/BP_PJEPlayerController.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Maps/RockhoonTestMap2.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Maps/RockhoonTestMap2.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_Blink.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_Blink.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_Blink.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_Blink.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_RunAwayFromPlayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_RunAwayFromPlayer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_RunAwayFromPlayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/BTTask/BTTask_RunAwayFromPlayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/PJEShadowGenerator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/PJEShadowGenerator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/PJEShadowGenerator.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/AI/Enemies/PJEShadowGenerator.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/AI/Managers/PJEShadowGeneratorManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/AI/Managers/PJEShadowGeneratorManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowA.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowA.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowA.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowA.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowB.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowB.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowC.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/Character/PJECharacterShadowC.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/PJEGameInstance.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/PJEGameInstance.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/PJEGameInstance.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/PJEGameInstance.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/Player/PJEPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/Player/PJEPlayerController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/Player/PJEPlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/Player/PJEPlayerController.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Project_E/Project_E.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Project_E/Project_E.Build.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="2jri1tBvfo9z463h1HfKArrog5C" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Merging Develop"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1ef914cf-c9b4-4cbb-9dcd-6316bb87d4c4" name="Changes" comment="" />
+      <created>1722151385728</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1722151385728</updated>
+    </task>
+    <servers />
+  </component>
+</project>

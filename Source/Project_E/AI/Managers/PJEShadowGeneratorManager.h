@@ -16,35 +16,52 @@ class PROJECT_E_API UPJEShadowGeneratorManager : public UObject
 
 public:
     static UPJEShadowGeneratorManager* GetInstance();
-    void ShutdownInstance();
+    static void ShutdownInstance();
 
 private:
     static UPJEShadowGeneratorManager* Instance;
 
-// Init Section
+    // Init Section
 public:
     void FindAllShadowGenerators();
 
-// ShadowCount Section
+    // ShadowCount Section
 public:
-    void RemoveShadowGenerator(class APJEShadowGenerator* GeneratorToRemove);
-    void AddShadowGenerator(class APJEShadowGenerator* NewGenerator);
+    UFUNCTION(Server, Reliable, WithValidation)
+    void Server_RemoveShadowGenerator(class APJEShadowGenerator* GeneratorToRemove);
 
-    void AddSpawnedMonster(class APJECharacterShadow* SpawnedMonster);
-    void RemoveSpawnedMonster(class APJECharacterShadow* SpawnedMonsterToRemove);
+    UFUNCTION(Server, Reliable, WithValidation)
+    void Server_AddShadowGenerator(class APJEShadowGenerator* NewGenerator);
 
-    FORCEINLINE int32 GetShadowGeneratorsCount() const;
-    FORCEINLINE int32 GetShadowACount() const;
+    UFUNCTION(Server, Reliable, WithValidation)
+    void Server_AddSpawnedMonster(class APJECharacterShadow* SpawnedMonster);
+
+    UFUNCTION(Server, Reliable, WithValidation)
+    void Server_RemoveSpawnedMonster(class APJECharacterShadow* SpawnedMonsterToRemove);
+
+    FORCEINLINE int32 GetShadowGeneratorsCount() const { return ShadowGenerators.Num(); }
+    FORCEINLINE int32 GetShadowACount() const { return SpawnedShadowAArr.Num(); }
 
 protected:
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_ShadowGenerators)
     TArray<TObjectPtr<class APJEShadowGenerator>> ShadowGenerators;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SpawnedShadowAArr)
     TArray<TObjectPtr<class APJECharacterShadowA>> SpawnedShadowAArr;
 
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SpawnedShadowBArr)
     TArray<TObjectPtr<class APJECharacterShadowB>> SpawnedShadowBArr;
 
+    UFUNCTION()
+    void OnRep_ShadowGenerators();
+
+    UFUNCTION()
+    void OnRep_SpawnedShadowAArr();
+
+    UFUNCTION()
+    void OnRep_SpawnedShadowBArr();
+
     void UpdateShadowGeneratorsCount();
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

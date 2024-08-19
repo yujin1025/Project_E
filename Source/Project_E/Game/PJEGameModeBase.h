@@ -8,7 +8,6 @@
 #include "Engine/DataTable.h"
 #include "PJEGameModeBase.generated.h"
 
-class UBaseWidget;
 class APJEGameState;
 class APJEPlayerState;
 
@@ -54,14 +53,8 @@ public:
 	
 	virtual void OnPlayerDead(int PlayerNumber) override;
 	
-private:
-	void OpenWidget();
-
 
 public:
-	UPROPERTY()
-	UBaseWidget* InGameWindowWidget;
-
 	UPROPERTY()
 	APJEGameState* MyGameState;
 
@@ -69,8 +62,6 @@ public:
 	APJEPlayerState* MyPlayerState;
 
 private:
-	UPROPERTY(EditAnywhere, Category = UI)
-	TSubclassOf<UBaseWidget> InGameWindowWidgetClass;
 
 private:
 	UPROPERTY(EditAnywhere, Category = Data)

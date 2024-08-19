@@ -14,11 +14,6 @@ void APJECharacterShadow::BeginPlay()
 	MoveSpeed *= 100.0f;
 }
 
-float APJECharacterShadow::GetPlayerDetectRange()
-{
-	return PlayerDetectionRange * 100.0f;
-}
-
 void APJECharacterShadow::SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount)
 {
 	ShadowGeneratorsCount = NewShadowGeneratorsCount;

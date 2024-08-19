@@ -6,81 +6,87 @@
 #include "Character/PJECharacterShadow.h"
 #include "Character/PJECharacterShadowA.h"
 #include "Character/PJECharacterShadowB.h"
-#include "AI/Managers/PJEShadowGeneratorManager.h"
+#include "AIController.h"
+#include "NavigationSystem.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/Pawn.h"
+#include "AI/Enemies/PJEShadowArea.h"
 
 // Sets default values
 APJEShadowGenerator::APJEShadowGenerator()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
     CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CubeMesh"));
     RootComponent = CubeMesh;
+
+    bReplicates = true;
 }
 
 void APJEShadowGenerator::BeginPlay()
 {
     Super::BeginPlay();
-    StartSpawnTimer();
+    if (HasAuthority())
+    {
+        StartSpawnTimer();
+    }
 }
 
-template <typename ShadowType>
-void APJEShadowGenerator::SpawnMonsterAtRandomLocation(TSubclassOf<ShadowType> MonsterClass, bool bAddToManager)
+void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation)
 {
-    if (MonsterClass)
+    FRotator SpawnRotation = FRotator::ZeroRotator;
+
+    APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, DesiredLocation, SpawnRotation);
+    if (SpawnedMonster)
     {
-        FVector InitialSpawnLocation = FVector::ZeroVector;
-        FRotator SpawnRotation = FRotator::ZeroRotator;
-        ShadowType* SpawnedMonster = GetWorld()->SpawnActor<ShadowType>(MonsterClass, InitialSpawnLocation, SpawnRotation);
-
-        if (SpawnedMonster)
+        if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
         {
-            FVector RandomOffset = UKismetMathLibrary::RandomUnitVector() * FMath::RandRange(-SpawnedMonster->GetShadowSpawnRadius(), SpawnedMonster->GetShadowSpawnRadius());
-            RandomOffset.Z = 0.0f;
-            FVector SpawnLocation = GetActorLocation() + RandomOffset;
-            SpawnLocation.Z += 500.0f;
-
-            FHitResult HitResult;
-            FVector StartLocation = SpawnLocation;
-            FVector EndLocation = StartLocation;
-            EndLocation.Z -= 1000.0f;
-            FCollisionQueryParams Params;
-            Params.AddIgnoredActor(this);
-
-            if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params))
-            {
-                SpawnLocation = HitResult.Location;
-                FVector BoundsExtent = SpawnedMonster->GetComponentsBoundingBox().GetExtent();
-                SpawnLocation.Z += BoundsExtent.Z;
-                SpawnedMonster->SetActorLocation(SpawnLocation);
-                if (bAddToManager == true) UPJEShadowGeneratorManager::GetInstance()->AddSpawnedMonster(SpawnedMonster);
-            }
-            else
-            {
-                SpawnedMonster->Destroy();
-            }
+            APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
+            ShadowA->ShadowArea = ShadowArea;
+            ShadowArea->ShadowAArr.Add(ShadowA);
         }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to spawn monster at DesiredLocation."));
     }
 }
 
 
+bool APJEShadowGenerator::Server_SpawnMonster_Validate(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation)
+{
+    return true;
+}
+
 void APJEShadowGenerator::Destroyed()
 {
-    UPJEShadowGeneratorManager::GetInstance()->RemoveShadowGenerator(this);
+    if (ShadowArea)
+    {
+        ShadowArea->ShadowGeneratorArr.Remove(this);
+        ShadowArea->SetBackgroundVolume(ShadowArea->ShadowGeneratorArr.Num());
+    }
     Super::Destroyed();
 }
 
-
 void APJEShadowGenerator::StartSpawnTimer()
 {
-    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnShadowAWithTimer, 3.0f, true);
+    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnShadowAWithTimer, 10.0f, true);
 }
 
 void APJEShadowGenerator::SpawnShadowAWithTimer()
 {
-    if (UPJEShadowGeneratorManager::GetInstance()->GetShadowACount() < 20)
+    for (int32 i = 0; i < 1; i++)
     {
-        for (int32 i = 0; i < 3; i++) SpawnMonsterAtRandomLocation(ShadowAClass);
+        Server_SpawnMonster(ShadowBClass, SpawnPos);
+        //Server_SpawnMonster(ShadowAClass, SpawnPos);
+
+        if (ShadowArea && ShadowArea->GetIsPlayerInArea())
+        {
+            ShadowArea->PlayShadowASound();
+        }
     }
-    
-    //for (int32 i = 0; i < 3; i++) SpawnMonsterAtRandomLocation(ShadowBClass, false);
+}
+
+void APJEShadowGenerator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }

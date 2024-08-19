@@ -6,6 +6,13 @@
 #include "GameFramework/PlayerState.h"
 #include "PJEPlayerState.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerRole : uint8
+{
+	Cat UMETA(DisplayName = "고양이"),
+	Duck UMETA(DisplayName = "오리"),
+};
+
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHPChangedDelegate, int, float)
 /**
  * 
@@ -18,9 +25,21 @@ class PROJECT_E_API APJEPlayerState : public APlayerState
 public:
 	APJEPlayerState();
 
-public:
 	FOnHPChangedDelegate OnPlayerHPChanged;
+	
+	void OnChangePlayerHealth(int objectId, float Amount);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
+	
+	virtual void CopyProperties(APlayerState* NewPlayerState) override;
+	
+private:
+	UPROPERTY(Replicated, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	EPlayerRole PlayerRole;
 
 public:
-	void OnChangePlayerHealth(int objectId, float Amount);
+	FORCEINLINE void SetPlayerRole(EPlayerRole NewPlayerRole) { PlayerRole = NewPlayerRole; }
+	FORCEINLINE EPlayerRole GetPlayerRole() { return PlayerRole; }
 };

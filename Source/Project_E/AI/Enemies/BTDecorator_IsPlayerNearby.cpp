@@ -18,7 +18,7 @@ bool UBTDecorator_IsPlayerNearby::CalculateRawConditionValue(UBehaviorTreeCompon
     UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
     if (BlackboardComp)
     {
-        bool bIsPlayerNearby = BlackboardComp->GetValueAsBool("bIsPlayerNearby");
+        bool bIsPlayerNearby = BlackboardComp->GetValueAsBool(TEXT("bIsPlayerNearby"));
         return bIsPlayerNearby;
     }
 

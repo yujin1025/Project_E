@@ -3,27 +3,38 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Gimmick/PJEButtonBase.h"
+#include "Gimmick/PJEInteractiveActor.h"
 #include "PJEPressButton.generated.h"
 
-/**
- * 
- */
+class APJEPlatform;
+class UPJEMovingComponent;
+
 UCLASS()
-class PROJECT_E_API APJEPressButton : public APJEButtonBase
+class PROJECT_E_API APJEPressButton : public APJEInteractiveActor
 {
 	GENERATED_BODY()
 
+public:
+	APJEPressButton();
+
 protected:
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
-	UFUNCTION()
-	void ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+	void ActivateButton();
+	void CheckActive();
+	void NotifyPlatform(bool bActive);
 
 public:
 	virtual void Tick(float DeltaSeconds) override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
+	TObjectPtr<UStaticMeshComponent> ButtonBaseMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
+	TObjectPtr<UStaticMeshComponent> ButtonMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Mesh")
+	TObjectPtr<UPJEMovingComponent> MovingComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Component|Mesh|DP_Settings")
+	TArray<TObjectPtr<APJEPlatform>> Platforms;
 };

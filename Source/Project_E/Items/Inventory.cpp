@@ -3,49 +3,91 @@
 
 #include "Inventory.h"
 
-void UInventory::AddItem(UItem* Item)
+UInventory::UInventory()
+{
+}
+
+void UInventory::AddItem(UItem* Item, bool bIsDuck)
 {
     if (!Item)
 		return;
 
-    if (Item->Type == EItemType::Weapon)
+    if (bIsDuck)
     {
-        WeaponInventory.Add(Item);
+        if (Item->Type == EItemType::Weapon && DuckWeaponInventory.Num() < 6)
+            DuckWeaponInventory.Add(Item);
+        else
+            DuckNonWeaponInventory.Add(Item);
     }
-    else if (Item->Type == EItemType::NonWeapon)
+    else
     {
-        NonWeaponInventory.Add(Item);
+        SetCatInventoryItem(Item);
     }
 
 	UE_LOG(LogTemp, Warning, TEXT("Added item: %s"), *Item->Name);
 }
 
-void UInventory::RemoveItem(UItem* Item)
+void UInventory::RemoveItem(UItem* Item, bool bIsDuck)
 {
     if (!Item)
         return;
 
-    if (Item->Type == EItemType::Weapon)
+    auto RemoveItemFromInventory = [&](TArray<UItem*>& Inventory)
     {
-        WeaponInventory.Remove(Item);
+        for (int32 i = 0; i < Inventory.Num(); ++i)
+        {
+            if (Inventory[i] && Inventory[i]->ItemCode == Item->ItemCode)
+            {
+                Inventory.RemoveAt(i);
+                break;
+            }
+        }
+    };
+
+
+    if (bIsDuck)
+    {
+        if (Item->Type == EItemType::Weapon)
+            RemoveItemFromInventory(DuckWeaponInventory);
+        else
+            RemoveItemFromInventory(DuckNonWeaponInventory);
     }
-    else if (Item->Type == EItemType::NonWeapon)
+    else
     {
-        NonWeaponInventory.Remove(Item);
+        if (CatInventoryItem == Item)
+            CatInventoryItem = nullptr;
     }
 
-	UE_LOG(LogTemp, Warning, TEXT("Removed item: %s"), *Item->Name);
+    if (GEngine)
+    {
+        FString InventoryContents = TEXT("DuckWeaponInventory: ");
+        for (UItem* InventoryItem : DuckWeaponInventory)
+        {
+            InventoryContents += InventoryItem->Name + TEXT(", ");
+        }
+
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, InventoryContents);
+    }
 }
 
-/*
-bool UInventory::IsFull() const
+UItem* UInventory::RemoveLastItem(bool bIsDuck)
 {
-	const int32 MaxCapacity = 9;
-	int32 NumItems = Items.Num();
+    UItem* RemovedItem = nullptr;
 
-	if (NumItems >= MaxCapacity)
-		return true;
+    if (DuckWeaponInventory.Num() > 0)
+    {
+        RemovedItem = DuckWeaponInventory.Pop();
+    }
 
-	return false;
+    return RemovedItem;
 }
-*/
+
+void UInventory::SetCatInventoryItem(UItem* Item)
+{
+    CatInventoryItem = Item;
+}
+
+UItem* UInventory::GetCatInventoryItem() const
+{
+    return CatInventoryItem;
+}

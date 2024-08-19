@@ -2,13 +2,14 @@
 
 
 #include "Character/PJECharacterShadowA.h"
-#include "AI/Enemies/PJEShadowAAIController.h"
+#include "AI/Enemies/Controller/PJEShadowAAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
-#include "AI/Managers/PJEShadowGeneratorManager.h"
+#include "Components/AudioComponent.h"
+#include "AI/Enemies/PJEShadowArea.h"
 
 APJECharacterShadowA::APJECharacterShadowA()
 {
@@ -22,6 +23,19 @@ APJECharacterShadowA::APJECharacterShadowA()
 	BlinkDuration = 0.6f;
 	TeleportRange = 2.0f;
 	SingleBlinkDuration = 0.2f;
+
+	LaughAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LaughAudioComponent"));
+	LaughAudioComponent->SetupAttachment(RootComponent);
+}
+
+void APJECharacterShadowA::Destroyed()
+{
+	if (ShadowArea)
+	{
+		ShadowArea->ShadowAArr.Remove(this);
+		ShadowArea->PlayShadowASound();
+	}
+	Super::Destroyed();
 }
 
 float APJECharacterShadowA::GetMaxKeepMovingTime()
@@ -44,39 +58,58 @@ float APJECharacterShadowA::GetTeleportRange()
 	return TeleportRange * 100.0f;
 }
 
+float APJECharacterShadowA::GetRunAwaySpeed()
+{
+	return RunAwaySpeed * 100;
+}
+
+float APJECharacterShadowA::GetPlayerDetectRange()
+{
+	return PlayerDetectionRange * 100.0f;
+}
+
+float APJECharacterShadowA::GetDetectMaxYDifference()
+{
+	return MaxYDifference;
+}
+
+float APJECharacterShadowA::GetDetectMinYDifference()
+{
+	return MinYDifference;
+}
+
 void APJECharacterShadowA::BeginPlay()
 {
 	Super::BeginPlay();
-	ShadowGeneratorsCount = UPJEShadowGeneratorManager::GetInstance()->GetShadowGeneratorsCount();
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	SetCurrentHP(MaxHp);
 }
 
-float APJECharacterShadowA::GetAIPatrolRadius()
+void APJECharacterShadowA::PlaySound()
 {
-	return 0.0f;
+	if (LaughSound)
+	{
+		if (LaughAudioComponent && !LaughAudioComponent->IsPlaying())
+		{
+			LaughAudioComponent->SetSound(LaughSound);
+			LaughAudioComponent->AttenuationSettings = LaughAttenuation;
+			LaughAudioComponent->Play();
+		}
+	}
 }
 
-float APJECharacterShadowA::GetAIDetectRange()
+void APJECharacterShadowA::StopSound()
 {
-	return 0.0f;
+	if (LaughAudioComponent && LaughAudioComponent->IsPlaying())
+	{
+		LaughAudioComponent->Stop();
+	}
 }
 
-float APJECharacterShadowA::GetAIAttackRange()
+void APJECharacterShadowA::SetLaughVolume(float Volume)
 {
-	return 0.0f;
-}
-
-float APJECharacterShadowA::GetAITurnSpeed()
-{
-	return 0.0f;
-}
-
-void APJECharacterShadowA::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
-{
-}
-
-void APJECharacterShadowA::AttackByAI()
-{
-	return;
+	if (LaughAudioComponent)
+	{
+		LaughAudioComponent->SetVolumeMultiplier(FMath::Clamp(Volume, 0.0f, 1.0f));
+	}
 }

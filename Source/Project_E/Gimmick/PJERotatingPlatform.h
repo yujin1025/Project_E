@@ -16,7 +16,6 @@ class PROJECT_E_API APJERotatingPlatform : public AActor
 	
 public:	
 	APJERotatingPlatform();
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -25,8 +24,10 @@ public:
 	FORCEINLINE UPJERotateComponent* GetRotationComponent() const { return RotationComponent; }
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Root")
+	TObjectPtr<USceneComponent> Root;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Component|Mesh|DP_Settings")
 	TObjectPtr<UStaticMeshComponent> PlatformMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Function")
 	TObjectPtr<UPJERotateComponent> RotationComponent;
 };

@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/PJECharacterPlayer.h"
+#include "PJECharacterPlayer.h"
 #include "PJECharacterCat.generated.h"
 
+class UCatInventoryWidget;
+class UAnimMontage;
 /**
  *
  */
@@ -19,33 +21,76 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
+	virtual void InitWidget() override;
+
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void Landed(const FHitResult& Hit) override;
+	UPROPERTY(BlueprintReadWrite, Category = "Data")
+	class UDataTable* ItemDatabase;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
+	UInventory* Inventory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
+	UInputAction* SwingAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* DashAction;
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float DashSpeed = 1.5f;
 
-	UPROPERTY(EditAnywhere, Category = "Jump")
-	float JumpHeight = 500.0f; 
+public:
+	bool Grab();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-	bool bFirstJump = true;
+	virtual ACatWeapon* GetEquippedWeapon() const override;
 
-	UPROPERTY(EditAnywhere)
-	bool bIsWalking = true;
-
-	int32 JumpCount = 0;
-
-	// Action Section
 protected:
-	void DoubleJump();
-	void Dash();
-	void StopDash();
-	void Attack(); //¿‚±‚
+	void DoubleJump() override;
+	void JumpAttacking();
+	virtual void Landed(const FHitResult& Hit) override;
 	void Swing();
+	void Dash();
+	void DropItem() override;
+
+private:
+	UPROPERTY()
+	UCatInventoryWidget* CatInventoryWidget;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UCatInventoryWidget> CatInventoryClass;
+
+	UPROPERTY()
+	ACatWeapon* EquippedWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* SwingMontage;
+
+	bool bIsJumping = false;
+
+public:
+	// Multiplay Section
+	UFUNCTION(Server, Reliable)
+	void Server_DoubleJumpAttack();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_Grab();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateInventory(int32 ItemID);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_GrabWeapon(ACatWeapon* Weapon);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropInventory(UItem* Item);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Swing();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Swing();
 };

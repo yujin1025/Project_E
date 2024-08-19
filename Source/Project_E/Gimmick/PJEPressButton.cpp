@@ -3,32 +3,76 @@
 
 #include "Gimmick/PJEPressButton.h"
 
-#include "Components/BoxComponent.h"
+#include "PJEMovingComponent.h"
+#include "PJEPlatform.h"
+
+APJEPressButton::APJEPressButton()
+{
+	ButtonBaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button Base"));
+	ButtonBaseMesh->SetupAttachment(RootComponent);
+	ButtonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button"));
+	ButtonMesh->SetupAttachment(ButtonBaseMesh);
+
+	MovingComponent = CreateDefaultSubobject<UPJEMovingComponent>(TEXT("Moving Component"));
+}
 
 void APJEPressButton::BeginPlay()
 {
+	MovingComponent->SetMovementTarget(ButtonMesh);
 	Super::BeginPlay();
-
-	ButtonTrigger->OnComponentBeginOverlap.AddDynamic(this, &APJEPressButton::ButtonBeginOverlap);
-	ButtonTrigger->OnComponentEndOverlap.AddDynamic(this, &APJEPressButton::ButtonEndOverlap);
 }
 
-void APJEPressButton::ButtonBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+void APJEPressButton::ActivateButton()
 {
-	bIsInteracting = true;
+	bool bTemp = bIsInteracting;
+	bIsInteracting = bIsPlayerNearby;
+	if(bTemp != bIsInteracting)
+	{
+		if(bIsInteracting)
+		{
+			MovingComponent->SetMovementState(EMovementState::Moving);
+		}
+		else
+		{
+			MovingComponent->SetMovementState(EMovementState::Returning);
+		}
+	}
 }
 
-void APJEPressButton::ButtonEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void APJEPressButton::CheckActive()
 {
-	bIsInteracting = false;
+	bool bTemp = bIsActive;
+	bIsActive = MovingComponent->bIsArrived;
+	if(bTemp != bIsActive)
+	{
+		if(bIsActive)
+		{
+			NotifyPlatform(true);
+		}
+		else
+		{
+			NotifyPlatform(false);
+		}
+	}
 }
 
+void APJEPressButton::NotifyPlatform(bool bActive)
+{
+	if(!Platforms.IsEmpty())
+	{
+		for(auto Platform:Platforms)
+		{
+			Platform->SetbPlatformActive(bIsActive);
+		}
+	}
+}
 
 void APJEPressButton::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if(!HasAuthority()) return;
 	
+	ActivateButton();
+	CheckActive();
 }

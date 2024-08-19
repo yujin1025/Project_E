@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterNonPlayer.h"
+#include "AI/Enemies/Interface/PJERushable.h"
 #include "PJECharacterBoss.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterBoss : public APJECharacterNonPlayer
+class PROJECT_E_API APJECharacterBoss : public APJECharacterNonPlayer, public IPJERushable
 {
 	GENERATED_BODY()
 public:
@@ -19,13 +20,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// AI Section
+// Stat Section
 protected:
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float RushSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float RushDistance;
 
-	virtual void AttackByAI() override;
-// TODO : Special Attack, etc...
+public:
+	virtual float GetRushSpeed() override;
+	virtual float GetRushDistance() override;
+
 };

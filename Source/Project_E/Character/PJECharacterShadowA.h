@@ -4,18 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterShadow.h"
+#include "AI/Enemies/Interface/PJETeleportable.h"
+#include "AI/Enemies/Interface/PJEBlinkable.h"
+#include "AI/Enemies/Interface/PJERunAwayable.h"
+#include "Sound/SoundCue.h"
 #include "PJECharacterShadowA.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow
+class PROJECT_E_API APJECharacterShadowA : public APJECharacterShadow, public IPJETeleportable, public IPJEBlinkable, public IPJERunAwayable, public IPJEPlayerDectectable
 {
 	GENERATED_BODY()
 public:
 	APJECharacterShadowA();
+	virtual void Destroyed() override;
 
+protected:
+	virtual void BeginPlay() override;
 
 // Stat Section
 protected:
@@ -27,26 +34,43 @@ protected:
 	float SingleBlinkDuration;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float TeleportRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float RunAwaySpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float PlayerDetectionRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MaxYDifference;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float MinYDifference;
 
 public:
-	float GetMaxKeepMovingTime();
-	float GetBlinkDuration();
-	float GetSingleBlinkDuration();
-	float GetTeleportRange();
+	virtual float GetMaxKeepMovingTime() override;
+	virtual float GetBlinkDuration() override;
+	virtual float GetSingleBlinkDuration() override;
+	virtual float GetTeleportRange() override;
+	virtual float GetRunAwaySpeed() override;
+	virtual float GetPlayerDetectRange() override;
+	virtual float GetDetectMaxYDifference() override;
+	virtual float GetDetectMinYDifference() override;
 
+// Sound Section
+public:
+	UPROPERTY()
+	TObjectPtr<class APJEShadowArea> ShadowArea;
 
 protected:
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundCue> LaughSound;
 
-// AI Section
-protected:
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<class USoundAttenuation> LaughAttenuation;
 
-	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
-	virtual void AttackByAI() override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	TObjectPtr<class UAudioComponent> LaughAudioComponent;
 
+public:
+	void PlaySound();
+	void StopSound();
 
+	void SetLaughVolume(float Value);
 };

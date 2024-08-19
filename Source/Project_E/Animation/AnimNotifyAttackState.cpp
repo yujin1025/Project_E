@@ -1,20 +1,29 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "AnimNotifyAttackState.h"
 #include "../Character/PJECharacterBase.h"
 #include "../Character/Component/HealthComponent.h"
+#include "../Character/Projectile/CatWeapon.h"
 
-
-//°ø°İ ¹üÀ§ ³»¿¡ ÀÖ´Â ´ë»óÀ» Ã£¾Æ µ¥¹ÌÁö¸¦ °¡ÇÔ
+//ê³µê²© ë²”ìœ„ ë‚´ì— ìˆëŠ” ëŒ€ìƒì„ ì°¾ì•„ ë°ë¯¸ì§€ë¥¼ ê°€í•¨
 void UAnimNotifyAttackState::TryAttack(USkeletalMeshComponent* MeshComp)
 {
 	if (CurrentAttackCount >= 1)
 		return;
 
 	APJECharacterBase* MyCharacter = Cast<APJECharacterBase>(MeshComp->GetOwner());
-	TArray<APJECharacterBase*> TargetCharacters;
+	if (MyCharacter == nullptr)
+		return;
 
+	float WeaponDamageAmount = DamageAmount;
+	AActor* EquippedWeaponActor = MyCharacter->GetEquippedWeapon();
+	if (ACatWeapon* EquippedWeapon = Cast<ACatWeapon>(EquippedWeaponActor))
+	{
+		WeaponDamageAmount = EquippedWeapon->GetDamageAmount();
+	}
+
+	TArray<APJECharacterBase*> TargetCharacters;
 	if (TryGetOverlapTargets(MyCharacter, TargetCharacters))
 	{
 		for (auto* TargetCharacter : TargetCharacters)
@@ -22,7 +31,8 @@ void UAnimNotifyAttackState::TryAttack(USkeletalMeshComponent* MeshComp)
 			UHealthComponent* DamagedHealthComponent = TargetCharacter->FindComponentByClass<UHealthComponent>();
 			if (DamagedHealthComponent)
 			{
-				DamagedHealthComponent->ChangeHealth(-DamageAmount);
+				DamagedHealthComponent->ChangeHealth(-WeaponDamageAmount);
+				CurrentAttackCount++;
 			}
 		}
 	}
@@ -44,7 +54,7 @@ void UAnimNotifyAttackState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSe
 	CurrentAttackCount = 0;
 }
 
-//ÁÖ¾îÁø Ä³¸¯ÅÍÀÇ À§Ä¡¸¦ Áß½ÉÀ¸·Î ¹üÀ§ ³»¿¡ ÀÖ´Â Ä³¸¯ÅÍ¸¦ °Ë»ö
+//ì£¼ì–´ì§„ ìºë¦­í„°ì˜ ìœ„ì¹˜ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ë²”ìœ„ ë‚´ì— ìˆëŠ” ìºë¦­í„°ë¥¼ ê²€ìƒ‰
 bool UAnimNotifyAttackState::TryGetOverlapResult(APJECharacterBase* Owner, TArray<FOverlapResult>& OverlapResults)
 {
 	auto* World = Owner ? Owner->GetWorld() : nullptr;
@@ -58,14 +68,14 @@ bool UAnimNotifyAttackState::TryGetOverlapResult(APJECharacterBase* Owner, TArra
 		OverlapResults,
 		Center + CenterOffset,
 		Owner->GetActorQuat(),
-		ECollisionChannel::ECC_GameTraceChannel2,
-		FCollisionShape::MakeSphere(600.0f),
+		ECollisionChannel::ECC_GameTraceChannel6,
+		FCollisionShape::MakeSphere(100.0f),
 		CollisionParam);
-
+	
 	return bResult;
 }
 
-//ÁÖ¾îÁø Ä³¸¯ÅÍ¸¦ Áß½ÉÀ¸·Î °ø°İ ¹üÀ§ ³»¿¡ ÀÖ´Â ´ë»óÀ» °Ë»ö
+//ì£¼ì–´ì§„ ìºë¦­í„°ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ê³µê²© ë²”ìœ„ ë‚´ì— ìˆëŠ” ëŒ€ìƒì„ ê²€ìƒ‰
 bool UAnimNotifyAttackState::TryGetOverlapTargets(APJECharacterBase* Character, OUT TArray<APJECharacterBase*>& FoundTargets)
 {
 	TArray<FOverlapResult> OverlapResults;

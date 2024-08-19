@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/PJECharacterMonster.h"
+#include "AI/Enemies/Interface/PJEPlayerDectectable.h"
 #include "PJECharacterShadow.generated.h"
 
 /**
@@ -17,16 +18,6 @@ class PROJECT_E_API APJECharacterShadow : public APJECharacterMonster
 public:
 	APJECharacterShadow();
 	virtual void BeginPlay() override;
-
-// Stat Section
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float PlayerDetectionRange;
-
-	float AttackSize;
-
-public:
-	float GetPlayerDetectRange();
 
 // Spawn Section
 public:
