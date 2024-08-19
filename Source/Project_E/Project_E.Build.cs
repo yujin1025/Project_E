@@ -11,7 +11,7 @@ public class Project_E : ModuleRules
         PublicIncludePaths.AddRange(new string[] { "Project_E" });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", 
-	        "NavigationSystem", "AIModule", "GameplayTasks", "OnlineSubsystem", "OnlineSubsystemSteam", "Slate", "SlateCore", "Niagara"  });
+	        "NavigationSystem", "AIModule", "GameplayTasks", "OnlineSubsystem", "OnlineSubsystemSteam", "Slate", "SlateCore", "Niagara", "RenderCore", "RHI"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

@@ -1,15 +1,12 @@
 #include "BTTask_SpawnField.h"
-#include "GameFramework/Actor.h"
-#include "Engine/World.h"
-#include "TimerManager.h"
-#include "Components/StaticMeshComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"
-#include "DrawDebugHelpers.h"
 #include "AI/PJEAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/PJECharacterPlayer.h"
+#include "AI/Enemies/Interface/PJEFieldSpawnable.h"
+#include "Project_E/AI/PJEAIController.h"
+#include "AI/Enemies/PJEShadowField.h"
+#include "Components/CapsuleComponent.h"
 
 UBTTask_SpawnField::UBTTask_SpawnField()
 {
@@ -19,13 +16,19 @@ UBTTask_SpawnField::UBTTask_SpawnField()
 
 EBTNodeResult::Type UBTTask_SpawnField::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    AActor* OwnerActor = OwnerComp.GetOwner();
+    APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
+
+    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
     if (OwnerActor)
     {
         FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
+        TaskMemory->FieldSpawnable = Cast<IPJEFieldSpawnable>(OwnerActor);
         TaskMemory->TimeElapsed = 0.0f;
-        TaskMemory->FieldMesh = nullptr;
-        TaskMemory->OverlappingActors.Empty();
+
+        if (TaskMemory->FieldSpawnable == nullptr)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Cast Failed"));
+        }
 
         SpawnField(OwnerActor, NodeMemory);
         return EBTNodeResult::InProgress;
@@ -35,112 +38,61 @@ EBTNodeResult::Type UBTTask_SpawnField::ExecuteTask(UBehaviorTreeComponent& Owne
 
 void UBTTask_SpawnField::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+    Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
     FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
+
     TaskMemory->TimeElapsed += DeltaSeconds;
 
-    AActor* OwnerActor = OwnerComp.GetOwner();
-    if (!OwnerActor)
+    if (TaskMemory->TimeElapsed >= TaskMemory->FieldSpawnable->GetFieldDuration())
     {
-        DestroyField(OwnerComp, NodeMemory);
-        return;
-    }
-
-    AController* Controller = Cast<AController>(OwnerActor);
-    APawn* ControlledPawn = Controller ? Controller->GetPawn() : nullptr;
-    FVector Location = ControlledPawn ? ControlledPawn->GetActorLocation() : OwnerActor->GetActorLocation();
-
-    if (TaskMemory->TimeElapsed >= Duration + 2.0f)
-    {
-        DestroyField(OwnerComp, NodeMemory);
-    }
-    else if (TaskMemory->TimeElapsed > 2.0f)
-    {
-        float ShrinkTime = TaskMemory->TimeElapsed - 2.0f;
-        float ShrinkFactor = FMath::Clamp(1.0f - (ShrinkTime / Duration), 0.0f, 1.0f);
-        FVector NewScale = FVector(Radius / 50.0f) * ShrinkFactor;
-        TaskMemory->FieldMesh->SetWorldScale3D(NewScale);
-
-        DrawDebugSphere(GetWorld(), Location, Radius * ShrinkFactor, 32, FColor::Green, false, -1.0f, 0, 5.0f);
-    }
-    else
-    {
-        DrawDebugSphere(GetWorld(), Location, Radius, 32, FColor::Green, false, -1.0f, 0, 5.0f);
-    }
-
-    UpdateOverlappingActors(Location, NodeMemory);
-    DealDamage(nullptr, NodeMemory);
-}
-
-void UBTTask_SpawnField::UpdateOverlappingActors(const FVector& Location, uint8* NodeMemory)
-{
-    FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
-
-    TArray<FOverlapResult> OverlapResults;
-    FCollisionShape CollisionShape = FCollisionShape::MakeSphere(Radius);
-
-    TaskMemory->OverlappingActors.Empty(); // 기존 목록 초기화
-    GetWorld()->OverlapMultiByChannel(OverlapResults, Location, FQuat::Identity, ECC_WorldDynamic, CollisionShape);
-
-    for (const FOverlapResult& Result : OverlapResults)
-    {
-        if (AActor* OverlappedActor = Result.GetActor())
-        {
-            TaskMemory->OverlappingActors.Add(OverlappedActor);
-        }
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
 }
 
 void UBTTask_SpawnField::SpawnField(AActor* OwnerActor, uint8* NodeMemory)
 {
-    FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
+    // 몬스터의 현재 위치 가져오기
+    FVector ActorLocation = OwnerActor->GetActorLocation();
 
-    TaskMemory->FieldMesh = NewObject<UStaticMeshComponent>(OwnerActor);
-    TaskMemory->FieldMesh->AttachToComponent(OwnerActor->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-    TaskMemory->FieldMesh->SetWorldScale3D(FVector(Radius / 50.0f));
-    TaskMemory->FieldMesh->RegisterComponent();
+    // 콜리전 컴포넌트를 기반으로 발 근처 위치 조정
+    float ColliderBottomOffset = 0.0f;
 
-    AController* Controller = Cast<AController>(OwnerActor);
-    APawn* ControlledPawn = Controller ? Controller->GetPawn() : nullptr;
-    FVector Location = ControlledPawn ? ControlledPawn->GetActorLocation() : OwnerActor->GetActorLocation();
-
-    //DrawDebugSphere(GetWorld(), Location, Radius, 32, FColor::Green, false, Duration + 2.0f, 0, 5.0f);
-
-    TArray<FOverlapResult> OverlapResults;
-    FCollisionShape CollisionShape = FCollisionShape::MakeSphere(Radius);
-    GetWorld()->OverlapMultiByChannel(OverlapResults, Location, FQuat::Identity, ECC_WorldDynamic, CollisionShape);
-
-    for (const FOverlapResult& Result : OverlapResults)
+    // 콜리전 컴포넌트를 가져오기
+    UCapsuleComponent* CapsuleComponent = OwnerActor->FindComponentByClass<UCapsuleComponent>();
+    if (CapsuleComponent)
     {
-        if (AActor* OverlappedActor = Result.GetActor())
-        {
-            TaskMemory->OverlappingActors.Add(OverlappedActor);
-        }
+        // 캡슐 범위를 기반으로 하단 오프셋 계산
+        ColliderBottomOffset = -CapsuleComponent->GetScaledCapsuleHalfHeight();
+    }
+
+    // 최종 스폰 위치 설정
+    FVector SpawnLocation = ActorLocation + FVector(0.0f, 0.0f, ColliderBottomOffset);
+
+    // 스폰 파라미터 설정
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = OwnerActor;
+
+    // FieldActor 스폰
+    APJEShadowField* FieldActor = OwnerActor->GetWorld()->SpawnActor<APJEShadowField>(FieldActorClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+    if (FieldActor)
+    {
+        // FieldActor를 OwnerActor의 자식으로 부착
+        FieldActor->AttachToActor(OwnerActor, FAttachmentTransformRules::KeepRelativeTransform);
+
+        FieldActor->SetActorLocation(SpawnLocation);
+
+        // 필드 엑터 초기화
+        FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
+        FieldActor->InitializeField(
+            TaskMemory->FieldSpawnable->GetFieldDuration(),
+            TaskMemory->FieldSpawnable->GetDamagePerSecond(),
+            TaskMemory->FieldSpawnable->GetFieldRadius()
+        );
     }
 }
 
-void UBTTask_SpawnField::DealDamage(AActor* DamagedActor, uint8* NodeMemory)
-{
-    FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
 
-    for (AActor* Actor : TaskMemory->OverlappingActors)
-    {
-        if (Actor->IsA(APJECharacterPlayer::StaticClass()))
-        {
-            UGameplayStatics::ApplyDamage(Actor, DamagePerSecond, nullptr, DamagedActor, nullptr);
-        }
-    }
-}
-
-void UBTTask_SpawnField::DestroyField(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
-{
-    FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
-
-    if (TaskMemory->FieldMesh)
-    {
-        TaskMemory->FieldMesh->DestroyComponent();
-    }
-    FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-}
 
 uint16 UBTTask_SpawnField::GetInstanceMemorySize() const
 {

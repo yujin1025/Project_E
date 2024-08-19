@@ -53,16 +53,6 @@ public:
 	virtual float GetDetectMaxYDifference() override;
 	virtual float GetDetectMinYDifference() override;
 
-// AI Section
-protected:
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
-
-	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
-	virtual void AttackByAI() override;
-
 // Sound Section
 public:
 	UPROPERTY()

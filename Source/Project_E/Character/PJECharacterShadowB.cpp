@@ -28,26 +28,6 @@ void APJECharacterShadowB::BeginPlay()
 	PlayerDetectionRange = 4.0f;
 }
 
-float APJECharacterShadowB::GetAIPatrolRadius()
-{
-	return 0.0f;
-}
-
-float APJECharacterShadowB::GetAIDetectRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterShadowB::GetAIAttackRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterShadowB::GetAITurnSpeed()
-{
-	return 0.0f;
-}
-
 float APJECharacterShadowB::GetChaseSpeed()
 {
 	return ChaseSpeed;
@@ -68,9 +48,19 @@ float APJECharacterShadowB::GetDetectMinYDifference()
 	return MinYDifference;
 }
 
-void APJECharacterShadowB::AttackByAI()
+float APJECharacterShadowB::GetFieldRadius()
 {
-	//TODO :Implement this function
+	return FieldRadius;
+}
+
+float APJECharacterShadowB::GetFieldDuration()
+{
+	return FieldDuration;
+}
+
+float APJECharacterShadowB::GetDamagePerSecond()
+{
+	return DamagePerSecond;
 }
 
 float APJECharacterShadowB::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

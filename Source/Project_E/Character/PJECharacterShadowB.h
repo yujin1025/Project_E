@@ -33,21 +33,21 @@ protected:
 	float MaxYDifference;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MinYDifference;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float FieldRadius = 160.0f; // 1.6m
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float FieldDuration = 2.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float DamagePerSecond = 0.1f;
 
 public:
 	virtual float GetChaseSpeed() override;
 	virtual float GetPlayerDetectRange() override;
 	virtual float GetDetectMaxYDifference() override;
 	virtual float GetDetectMinYDifference() override;
-
-// AI Section
-protected:
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
-
-	virtual void AttackByAI() override;
+	virtual float GetFieldRadius() override;
+	virtual float GetFieldDuration() override;
+	virtual float GetDamagePerSecond() override;
 
 // Battle Section
 protected:

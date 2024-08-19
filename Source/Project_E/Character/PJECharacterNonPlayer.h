@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class PROJECT_E_API APJECharacterNonPlayer : public APJECharacterBase, public IPJECharacterAIInterface
+class PROJECT_E_API APJECharacterNonPlayer : public APJECharacterBase
 {
 	GENERATED_BODY()
 public:
@@ -23,17 +23,4 @@ protected:
 	virtual void BeginPlay() override;
 protected:
 	void SetDead() override;
-// AI Section
-protected:
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
-
-	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
-	virtual void AttackByAI() override;
-
-	FAICharacterAttackFinished OnAttackFinished;
-
-	//virtual void NotifyComboActionEnd() override;
 };

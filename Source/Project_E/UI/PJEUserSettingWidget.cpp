@@ -92,6 +92,5 @@ void UPJEUserSettingWidget::OnMainMenuButtonClicked()
 void UPJEUserSettingWidget::OnBackButtonClicked()
 {
 	// 이전 페이지로 돌아가는 코드
-	UE_LOG(LogTemp, Warning, TEXT("Back Button Clicked"));
 	UPJEUIManager::GetInstance()->RemovePopupWidget(GetWorld(), this);
 }

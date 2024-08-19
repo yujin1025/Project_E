@@ -25,6 +25,12 @@ protected:
 	float SingleBlinkDuration;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float TeleportRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float FieldRadius = 160.0f; // 1.6m
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float FieldDuration = 2.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float DamagePerSecond = 0.1f;
 
 public:
 	APJECharacterShadowC();
@@ -32,6 +38,9 @@ public:
 	virtual float GetBlinkDuration() override;
 	virtual float GetSingleBlinkDuration() override;
 	virtual float GetTeleportRange() override;
+	virtual float GetFieldRadius() override;
+	virtual float GetFieldDuration() override;
+	virtual float GetDamagePerSecond() override;
 	
 	void BeginPlay();
 

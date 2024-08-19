@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "PJEFieldSpawnable.generated.h"
+#include "PJEBackRushable.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UPJEFieldSpawnable : public UInterface
+class UPJEBackRushable : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,13 +16,12 @@ class UPJEFieldSpawnable : public UInterface
 /**
  * 
  */
-class PROJECT_E_API IPJEFieldSpawnable
+class PROJECT_E_API IPJEBackRushable
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual float GetFieldRadius() = 0;
-	virtual float GetFieldDuration() = 0;
-	virtual float GetDamagePerSecond() = 0;
+	virtual float GetBackRushDistance() = 0;
+	virtual float GetBackRushSpeed() = 0;
 };
