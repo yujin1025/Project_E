@@ -38,33 +38,3 @@ void APJECharacterNonPlayer::SetDead()
 		}
 	), DeadEventDelayTime, false);
 }
-
-float APJECharacterNonPlayer::GetAIPatrolRadius()
-{
-	return 0.0f;
-}
-
-float APJECharacterNonPlayer::GetAIDetectRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterNonPlayer::GetAIAttackRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterNonPlayer::GetAITurnSpeed()
-{
-	return 0.0f;
-}
-
-void APJECharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
-{
-	OnAttackFinished = InOnAttackFinished;
-}
-
-void APJECharacterNonPlayer::AttackByAI()
-{
-	// Attack
-}

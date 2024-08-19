@@ -11,26 +11,12 @@ void APJECharacterBoss::BeginPlay()
 {
 }
 
-float APJECharacterBoss::GetAIPatrolRadius()
+float APJECharacterBoss::GetRushSpeed()
 {
-	return 0.0f;
+	return RushSpeed;
 }
 
-float APJECharacterBoss::GetAIDetectRange()
+float APJECharacterBoss::GetRushDistance()
 {
-	return 0.0f;
-}
-
-float APJECharacterBoss::GetAIAttackRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterBoss::GetAITurnSpeed()
-{
-	return 0.0f;
-}
-
-void APJECharacterBoss::AttackByAI()
-{
+	return RushDistance;
 }

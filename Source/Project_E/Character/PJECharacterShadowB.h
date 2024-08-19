@@ -49,15 +49,6 @@ public:
 	virtual float GetFieldDuration() override;
 	virtual float GetDamagePerSecond() override;
 
-// AI Section
-protected:
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
-
-	virtual void AttackByAI() override;
-
 // Battle Section
 protected:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
