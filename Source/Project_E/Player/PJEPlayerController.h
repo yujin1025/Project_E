@@ -8,6 +8,7 @@
 #include "PJEPlayerController.generated.h"
 
 class UBaseWidget;
+class APJEPlayerState;
 
 UENUM(BlueprintType)
 enum class EControllerOperation : uint8
@@ -44,6 +45,8 @@ public:
 	void Client_Init();
 
 	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
+
+	APJEPlayerState* GetState();
 	
 protected:
 	TObjectPtr<APawn> PlayerPawn = NULL;

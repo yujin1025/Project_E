@@ -9,5 +9,8 @@ APJEGameState::APJEGameState()
 
 void APJEGameState::OnChangedHealth(int ObjectID, float Amount)
 {
-
+	if (OnNonPlayerHPChanged.IsBound())
+	{
+		OnNonPlayerHPChanged.Broadcast(ObjectID, Amount);
+	}
 }

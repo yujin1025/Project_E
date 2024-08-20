@@ -16,10 +16,12 @@ void UHPBarWidget::NativeConstruct()
 	if (GameMode && GameMode->MyPlayerState)
 	{
 		GameMode->MyPlayerState->OnPlayerHPChanged.AddLambda([this](int id, float amount) -> void
-		{
-			float PercentValue = amount / 100.0f;
-			HPText->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), PercentValue)));
-		});
+			{
+				if (HPText)
+				{
+					HPText->SetText(FText::FromString(FString::Printf(TEXT("%.1f / 100"), amount)));
+				}
+			});		
 	}
 	else
 	{

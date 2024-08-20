@@ -168,6 +168,12 @@ void APJEPlayerController::GameOver()
 {
 }
 
+APJEPlayerState* APJEPlayerController::GetState()
+{
+	if (GEngine) GEngine->AddOnScreenDebugMessage(12, 17.f, FColor::Red, FString::Printf(TEXT("GetState")));
+	return Cast<APJEPlayerState>(PlayerState);
+}
+
 void APJEPlayerController::Client_Init_Implementation()
 {
 	InitInputPawn();
