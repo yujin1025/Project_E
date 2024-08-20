@@ -20,6 +20,8 @@ APJEShadowGenerator::APJEShadowGenerator()
     RootComponent = CubeMesh;
 
     bReplicates = true;
+
+    CurrentCount = 0;
 }
 
 void APJEShadowGenerator::BeginPlay()
@@ -33,21 +35,25 @@ void APJEShadowGenerator::BeginPlay()
 
 void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class APJECharacterShadow> MonsterClass, const FVector& DesiredLocation)
 {
-    FRotator SpawnRotation = FRotator::ZeroRotator;
+    if (MaxCount > CurrentCount)
+    {
+        FRotator SpawnRotation = FRotator::ZeroRotator;
 
-    APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, DesiredLocation, SpawnRotation);
-    if (SpawnedMonster)
-    {
-        if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
+        APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, DesiredLocation, SpawnRotation);
+        if (SpawnedMonster)
         {
-            APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
-            ShadowA->ShadowArea = ShadowArea;
-            ShadowArea->ShadowAArr.Add(ShadowA);
+            if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
+            {
+                APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
+                ShadowA->ShadowArea = ShadowArea;
+                ShadowArea->ShadowAArr.Add(ShadowA);
+                CurrentCount++;
+            }
         }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Failed to spawn monster at DesiredLocation."));
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to spawn monster at DesiredLocation."));
+        }
     }
 }
 
@@ -77,7 +83,7 @@ void APJEShadowGenerator::SpawnShadowAWithTimer()
     for (int32 i = 0; i < 1; i++)
     {
         Server_SpawnMonster(ShadowBClass, SpawnPos);
-        //Server_SpawnMonster(ShadowAClass, SpawnPos);
+        Server_SpawnMonster(ShadowAClass, SpawnPos);
 
         if (ShadowArea && ShadowArea->GetIsPlayerInArea())
         {

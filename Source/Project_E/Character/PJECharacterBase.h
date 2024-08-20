@@ -84,9 +84,4 @@ protected:
 	TObjectPtr<class UHealthComponent> HealthComponent;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-	TObjectPtr<class UPJEHpBarWidgetComponent> HealthBarComponent;
-
-	void UpdateHealthBar();
 };

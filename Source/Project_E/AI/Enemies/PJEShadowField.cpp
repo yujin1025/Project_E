@@ -17,6 +17,8 @@ APJEShadowField::APJEShadowField()
 {
     PrimaryActorTick.bCanEverTick = true;
 
+    bReplicates = true;
+
     // Collision sphere
     CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
     CollisionSphere->InitSphereRadius(100.0f);

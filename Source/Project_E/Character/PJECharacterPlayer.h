@@ -27,7 +27,7 @@ public:
 	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
 	// INLINE Function for test.. to be Deleted
 	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
-	void InitInput(UEnhancedInputComponent* EnhancedInputComponent);
+	void InitInput(class UEnhancedInputComponent* EnhancedInputComponent);
 
 	virtual void InitWidget();
 

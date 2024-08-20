@@ -15,13 +15,17 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 protected:
 	float MaxHealth;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Health)
 	float CurrentHealth;
 
-public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION()
+	void OnRep_Health();
+
+public:
 	void ChangeHealth(float Amount);
 
 	UFUNCTION(Server, Reliable)
@@ -31,4 +35,5 @@ public:
 	float GetCurrentHealth() const { return CurrentHealth; }
 
 	float GetMaxHealth() const { return MaxHealth; }
+
 };
