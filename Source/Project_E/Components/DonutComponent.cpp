@@ -48,10 +48,10 @@ FPrimitiveSceneProxy* UDonutComponent::CreateSceneProxy()
                     FVector YAxis = LocalToWorld.GetScaledAxis(EAxis::Y);
                     FVector ZAxis = LocalToWorld.GetScaledAxis(EAxis::Z);
 
-                    // �ܰ� ���� �κ� �׸���
+                    // �ܰ� ���� �κ� �׸���
                     DrawWireCylinder(PDI, Origin, XAxis, YAxis, ZAxis, FLinearColor::Green, OuterRadius, DonutHeight / 2, 32, SDPG_World);
 
-                    // �߾� �κ� �׸���
+                    // �߾� �κ� �׸���
                     DrawWireCylinder(PDI, Origin, XAxis, YAxis, ZAxis, FLinearColor::Red, InnerRadius, DonutHeight / 2, 32, SDPG_World);
                 }
             }
@@ -64,9 +64,15 @@ FPrimitiveSceneProxy* UDonutComponent::CreateSceneProxy()
             Result.bDynamicRelevance = true;
             Result.bShadowRelevance = IsShadowCast(View);
             Result.bStaticRelevance = false;
-            Result.bNormalTranslucencyRelevance = IsShown(View);
-            Result.bSeparateTranslucencyRelevance = IsShown(View);
-            Result.bDistortionRelevance = IsShown(View);
+            // 빌드 시 에러
+            /** 에러 내용
+            * UATHelper: Packaging (Windows): D:\PJE\Project_E\Source\Project_E\Components\DonutComponent.cpp(67): error C2039: 'bNormalTranslucencyRelevance': 'FPrimitiveViewRelevance'의 멤버가 아닙니다.
+            * UATHelper: Packaging (Windows): D:\PJE\Project_E\Source\Project_E\Components\DonutComponent.cpp(68): error C2039: 'bSeparateTranslucencyRelevance': 'FPrimitiveViewRelevance'의 멤버가 아닙니다.
+            * UATHelper: Packaging (Windows): D:\PJE\Project_E\Source\Project_E\Components\DonutComponent.cpp(69): error C2039: 'bDistortionRelevance': 'FPrimitiveViewRelevance'의 멤버가 아닙니다.
+            */ //아래 코드 3줄 주석처리
+            // Result.bNormalTranslucencyRelevance = IsShown(View);
+            // Result.bSeparateTranslucencyRelevance = IsShown(View);
+            // Result.bDistortionRelevance = IsShown(View);
             Result.bEditorPrimitiveRelevance = IsSelected();
             Result.bRenderCustomDepth = ShouldRenderCustomDepth();
             Result.bMasked = false;
