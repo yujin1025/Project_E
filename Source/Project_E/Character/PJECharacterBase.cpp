@@ -141,7 +141,7 @@ bool APJECharacterBase::IsPlayer()
 {
 	if(Controller)
 	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Emerald, FString::Printf(TEXT("Player has Controller")));
+		//if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Emerald, FString::Printf(TEXT("Player has Controller")));
 		return Controller->IsPlayerController();
 	}
 	return false;

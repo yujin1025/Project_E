@@ -12,7 +12,10 @@ APJEPlayerState::APJEPlayerState()
 
 void APJEPlayerState::OnChangePlayerHealth(int objectId, float Amount)
 {
-
+	if (this && OnPlayerHPChanged.IsBound())
+	{
+		OnPlayerHPChanged.Broadcast(objectId, Amount);
+	}
 }
 
 void APJEPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

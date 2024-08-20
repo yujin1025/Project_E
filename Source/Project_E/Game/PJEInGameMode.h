@@ -22,14 +22,14 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void PostSeamlessTravel() override;
+	virtual void PostInitializeComponents() override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 	
 	void SetPlayerControllerClass();
-
 	void InitializePlayer();
-
 	void PossessController();
 	
-	virtual void PostSeamlessTravel() override;
 
 private:
 	TSubclassOf<APJECharacterPlayer> PlayerClass;
