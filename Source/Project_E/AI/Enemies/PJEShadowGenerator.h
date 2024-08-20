@@ -50,4 +50,9 @@ protected:
     void SpawnShadowAWithTimer();
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+    int32 MaxCount;
+
+    int32 CurrentCount;
 };

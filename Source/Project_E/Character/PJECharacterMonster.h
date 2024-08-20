@@ -23,6 +23,16 @@ class PROJECT_E_API APJECharacterMonster : public APJECharacterNonPlayer
 {
 	GENERATED_BODY()
 	
+public:
+	APJECharacterMonster();
+
+	virtual void BeginPlay() override;
+
+// Component Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UPJEHpBarWidgetComponent> HealthBarComponent;
+
 // Destory Section
 public:
 	void OnDeath();
@@ -47,4 +57,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MoveSpeed;
+
+// HP Section
+protected:
+	void UpdateHealthBar();
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

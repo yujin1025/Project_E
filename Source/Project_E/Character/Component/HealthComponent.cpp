@@ -3,13 +3,14 @@
 #include "../PJECharacterBase.h"
 #include "../../Game/PJEGameState.h"
 #include "../../Game/PJEPlayerState.h"
+#include "Net/UnrealNetwork.h"
 
 UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	CurrentHealth = MaxHealth;
+	SetIsReplicatedByDefault(true); // 컴포넌트를 복제하도록 설정
 }
-
 
 void UHealthComponent::BeginPlay()
 {
@@ -33,13 +34,6 @@ void UHealthComponent::BeginPlay()
 	CurrentHealth = MaxHealth;
 }
 
-
-void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-}
-
 void UHealthComponent::ChangeHealth(float Amount)
 {
 	auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
@@ -55,15 +49,15 @@ void UHealthComponent::ChangeHealth(float Amount)
 	if (Character == nullptr)
 		return;
 
-	if (Character->IsPlayer()) 
+	if (Character->IsPlayer())
 	{
 		GameMode->MyPlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
 		UE_LOG(LogTemp, Warning, TEXT("Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth);
 	}
-	else 
+	else
 	{
 		GameMode->MyGameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth));
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth));
 	}
 
 	Server_ChangeHealth(CurrentHealth);
@@ -87,3 +81,14 @@ void UHealthComponent::Server_ChangeHealth_Implementation(float Health)
 	CurrentHealth = Health;
 }
 
+void UHealthComponent::OnRep_Health()
+{
+	;
+}
+
+void UHealthComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UHealthComponent, CurrentHealth);
+}
