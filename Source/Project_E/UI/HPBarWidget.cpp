@@ -2,7 +2,7 @@
 
 
 #include "HPBarWidget.h"
-#include "../Game/PJEGameModeBase.h"
+#include "../Player/PJEPlayerController.h"
 #include "../Game/PJEPlayerState.h"
 #include "Components/TextBlock.h"
 
@@ -12,19 +12,27 @@ void UHPBarWidget::NativeConstruct()
 
 	HPText = Cast<UTextBlock>(GetWidgetFromName(TEXT("HPTextBlock")));
 
-	auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
-	if (GameMode && GameMode->MyPlayerState)
-	{
-		GameMode->MyPlayerState->OnPlayerHPChanged.AddLambda([this](int id, float amount) -> void
-			{
-				if (HPText)
-				{
-					HPText->SetText(FText::FromString(FString::Printf(TEXT("%.1f / 100"), amount)));
-				}
-			});		
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("Something Wrong!"));
-	}
+    APlayerController* PlayerController = GetOwningPlayer();
+    if (PlayerController)
+    {
+        APJEPlayerState* PlayerState = PlayerController->GetPlayerState<APJEPlayerState>();
+        if (PlayerState)
+        {
+            PlayerState->OnPlayerHPChanged.AddLambda([this](int id, float amount) -> void
+                {
+                    if (HPText)
+                    {
+                        HPText->SetText(FText::FromString(FString::Printf(TEXT("%.0f / 100"), amount)));
+                    }
+                });
+        }
+        else
+        {
+            if (GEngine) GEngine->AddOnScreenDebugMessage(7, 10.f, FColor::Red, TEXT("PlayerState is null!"));
+        }
+    }
+    else
+    {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(7, 10.f, FColor::Red, TEXT("PlayerController is null!"));
+    }
 }

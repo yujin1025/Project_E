@@ -52,6 +52,9 @@ protected:
 	TObjectPtr<APawn> PlayerPawn = NULL;
 	TObjectPtr<AActor> OperatingActor = NULL;
 
+	virtual void OnRep_PlayerState() override;
+	void TryClientInit();
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultContext;

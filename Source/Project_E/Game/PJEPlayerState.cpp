@@ -12,7 +12,7 @@ APJEPlayerState::APJEPlayerState()
 
 void APJEPlayerState::OnChangePlayerHealth(int objectId, float Amount)
 {
-	if (this && OnPlayerHPChanged.IsBound())
+	if (OnPlayerHPChanged.IsBound())
 	{
 		OnPlayerHPChanged.Broadcast(objectId, Amount);
 	}

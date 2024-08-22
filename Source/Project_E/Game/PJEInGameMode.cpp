@@ -102,27 +102,5 @@ void APJEInGameMode::PostSeamlessTravel()
 {
 	Super::PostSeamlessTravel();
 	if(GEngine) GEngine->AddOnScreenDebugMessage(7, 10.f, FColor::Emerald, FString::Printf(TEXT("Seamless Travel Complete")));
-
-	PostInitializeComponents();
-
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	{
-		APlayerController* PlayerController = It->Get();
-		if (PlayerController)
-		{
-			PostLogin(PlayerController);
-		}
-	}
 }
 
-void APJEInGameMode::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}
-
-void APJEInGameMode::PostLogin(APlayerController* NewPlayer)
-{
-	Super::PostLogin(NewPlayer);
-
-	APJEPlayerController* PlayerController = Cast<APJEPlayerController>(NewPlayer);
-}

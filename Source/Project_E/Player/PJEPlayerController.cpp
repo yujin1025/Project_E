@@ -11,6 +11,7 @@
 #include "Gimmick/IgnitionHandle.h"
 #include "../UI/BaseWidget.h"
 #include "Game/PJEPlayerState.h"
+#include "Game/PJEGameState.h"
 #include "Gimmick/PJEPushableCylinder.h"
 #include "UI/Manager/PJEUIManager.h"
 
@@ -28,7 +29,11 @@ void APJEPlayerController::BeginPlay()
 	PlayerPawn = GetPawn();
 	
 	InitInputPawn();
-	OpenWidget();
+
+	if (HasAuthority())
+	{
+		OpenWidget();
+	}
 }
 
 void APJEPlayerController::Tick(float DeltaSeconds)
@@ -80,6 +85,35 @@ void APJEPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(ToggleSettingsMenuAction, ETriggerEvent::Triggered, this, &APJEPlayerController::ToggleSettingsMenu);
+	}
+}
+
+void APJEPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (PlayerState)
+	{
+		if (GetPawn())
+		{
+			Client_Init();
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &APJEPlayerController::TryClientInit);
+		}
+	}
+}
+
+void APJEPlayerController::TryClientInit()
+{
+	if (GetPawn())
+	{
+		Client_Init();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &APJEPlayerController::TryClientInit);
 	}
 }
 
@@ -168,9 +202,9 @@ void APJEPlayerController::GameOver()
 {
 }
 
+
 APJEPlayerState* APJEPlayerController::GetState()
 {
-	if (GEngine) GEngine->AddOnScreenDebugMessage(12, 17.f, FColor::Red, FString::Printf(TEXT("GetState")));
 	return Cast<APJEPlayerState>(PlayerState);
 }
 
@@ -179,9 +213,15 @@ void APJEPlayerController::Client_Init_Implementation()
 	InitInputPawn();
 
 	PlayerPawn = GetPawn();
+	if (!PlayerPawn)
+		return;
 
-	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(GetPawn());
-	CharacterPlayer->InitWidget();
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(PlayerPawn);
+	if (CharacterPlayer)
+	{
+		CharacterPlayer->InitWidget();
+		OpenWidget();
+	}
 }
 
 

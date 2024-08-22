@@ -23,8 +23,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void PostSeamlessTravel() override;
-	virtual void PostInitializeComponents() override;
-	virtual void PostLogin(APlayerController* NewPlayer) override;
 	
 	void SetPlayerControllerClass();
 	void InitializePlayer();

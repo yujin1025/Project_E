@@ -36,10 +36,6 @@ void UHealthComponent::BeginPlay()
 
 void UHealthComponent::ChangeHealth(float Amount)
 {
-	auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
-	if (GameMode == nullptr)
-		return;
-
 	if (CurrentHealth <= 0)
 		return;
 
@@ -49,15 +45,20 @@ void UHealthComponent::ChangeHealth(float Amount)
 	if (Character == nullptr)
 		return;
 
-	if (Character->IsPlayer())
+	auto* PlayerState = Character->GetPlayerState<APJEPlayerState>();
+	if (Character->IsPlayer() && PlayerState)
 	{
-		GameMode->MyPlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
-		UE_LOG(LogTemp, Warning, TEXT("Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth);
+		PlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth));
+
 	}
-	else
+
+	auto* GameState = Cast<APJEGameState>(GetWorld()->GetGameState());
+	if (!Character->IsPlayer() && GameState)
 	{
-		GameMode->MyGameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
+		GameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
 		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth));
+
 	}
 
 	Server_ChangeHealth(CurrentHealth);
@@ -79,11 +80,20 @@ void UHealthComponent::ChangeHealth(float Amount)
 void UHealthComponent::Server_ChangeHealth_Implementation(float Health)
 {
 	CurrentHealth = Health;
+	OnRep_Health();
 }
 
 void UHealthComponent::OnRep_Health()
 {
-	;
+	auto* Character = Cast<APJECharacterBase>(GetOwner());
+	if (Character)
+	{
+		auto* PlayerState = Character->GetPlayerState<APJEPlayerState>();
+		if (PlayerState)
+		{
+			PlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
+		}
+	}
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
