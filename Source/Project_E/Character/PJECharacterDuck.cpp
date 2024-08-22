@@ -10,8 +10,10 @@
 #include "../Items/Inventory.h"
 #include "Projectile/DuckProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/SphereComponent.h"
 #include "../UI/DuckInventoryWidget.h"
 #include "../Items/Item.h"
+#include "../Items/DropItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 
@@ -155,13 +157,28 @@ void APJECharacterDuck::Server_DropItem_Implementation()
                 if (MagicBallCount < 0)
                     MagicBallCount = 0;
             }
+
+            FVector StartLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+            FVector EndLocation = StartLocation - FVector(0.0f, 0.0f, 500.0f);
+
+            FHitResult HitResult;
+            FCollisionQueryParams CollisionParams;
+            CollisionParams.AddIgnoredActor(this);
+
+            bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, CollisionParams);
+
+            FVector DropLocation = bHit ? HitResult.ImpactPoint : StartLocation;
+            FRotator DropRotation = GetActorRotation();
+
+            ADropItem* DroppedItem = GetWorld()->SpawnActor<ADropItem>(SwallowedItem->DropItmeClass, DropLocation, DropRotation);
+
             ApplySpeedReduction();
             Multicast_DropItem(SwallowedItem->ItemCode);
-
             SwallowedItem = nullptr;
         }
     }
 }
+
 
 void APJECharacterDuck::Multicast_DropItem_Implementation(int32 ItemID)
 {
@@ -391,12 +408,20 @@ void APJECharacterDuck::EnterAimingMode()
     bIsAiming = true;
     GetCharacterMovement()->bOrientRotationToMovement = false;
     GetCharacterMovement()->RotationRate = FRotator(0.f, 360.f, 0.f);
+
+    // 카메라를 오른쪽으로 이동
+    FVector CameraOffset = FVector(50.0f, 0.0f, 0.0f); 
+    FollowCamera->SetWorldLocation(FollowCamera->GetComponentLocation() + CameraOffset);
 }
 
 void APJECharacterDuck::ExitAimingMode()
 {
     bIsAiming = false;
     GetCharacterMovement()->bOrientRotationToMovement = true;
+
+    FVector CameraOffset = FVector(-50.0f, 0.0f, 0.0f); 
+    FollowCamera->SetWorldLocation(FollowCamera->GetComponentLocation() + CameraOffset);
+
 }
 
 void APJECharacterDuck::CalculateProjectilePath()
@@ -427,4 +452,3 @@ void APJECharacterDuck::CalculateProjectilePath()
         }
     }
 }
-

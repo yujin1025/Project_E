@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../UI/CatInventoryWidget.h"
 #include "../Items/Inventory.h"
+#include "../Items/DropItem.h"
 #include "Animation/AnimMontage.h"
 #include "Projectile/CatWeapon.h"
 #include "Component/HealthComponent.h"
@@ -148,16 +149,25 @@ void APJECharacterCat::Server_DropItem_Implementation()
 
             Multicast_DropInventory(nullptr);
 
-            TArray<AActor*> AttachedActors;
-            GetAttachedActors(AttachedActors);
-            for (AActor* Actor : AttachedActors)
+            FVector StartLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+            FVector EndLocation = StartLocation - FVector(0.0f, 0.0f, 500.0f);
+
+            FHitResult HitResult;
+            FCollisionQueryParams CollisionParams;
+            CollisionParams.AddIgnoredActor(this);
+
+            bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, CollisionParams);
+
+            FVector DropLocation = bHit ? HitResult.ImpactPoint : StartLocation;
+            FRotator DropRotation = GetActorRotation();
+
+            ADropItem* DroppedItem = GetWorld()->SpawnActor<ADropItem>(CurrentItem->DropItmeClass, DropLocation, DropRotation);
+            
+            if (EquippedWeapon)
             {
-                if (ACatWeapon* Weapon = Cast<ACatWeapon>(Actor))
-                {
-                    Weapon->Destroy();
-                    EquippedWeapon = nullptr;
-                }
+                EquippedWeapon->Destroy();
             }
+            EquippedWeapon = nullptr;
         }
     }
 }

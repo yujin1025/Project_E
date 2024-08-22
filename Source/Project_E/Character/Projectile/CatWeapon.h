@@ -1,15 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Gimmick/PJEInteractiveActor.h"
 #include "CatWeapon.generated.h"
 
 UCLASS()
-class PROJECT_E_API ACatWeapon : public AActor
+class PROJECT_E_API ACatWeapon : public APJEInteractiveActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	ACatWeapon();
 
 	virtual void Tick(float DeltaTime) override;
@@ -17,7 +17,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
 	float DamageAmount = 0.0f;
 
@@ -34,6 +34,12 @@ public:
 	UFUNCTION()
 	void OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	virtual void InteractionKeyPressed(APJECharacterPlayer* Character) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "item")
 	int32 ItemCode;
+
+protected:
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_Weapon();
 };

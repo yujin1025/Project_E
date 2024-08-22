@@ -33,8 +33,7 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_GetBall();
 
-
-private:
+public:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* CollisionComponent;
 
@@ -44,6 +43,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
+private:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float Speed = 3200.0f;
 

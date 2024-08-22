@@ -52,6 +52,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     TSubclassOf<class ADuckProjectile> DuckWeaponClass;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADropItem> DropItmeClass;
+
     FString GetItemName() const { return Name; }
 
     static UItem* SetItem(const UDataTable* ItemDataTable, int32 Code);
@@ -88,4 +91,7 @@ struct FItemData : public FTableRowBase
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     TSubclassOf<class ADuckProjectile> DuckWeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADropItem> DropItmeClass;
 };

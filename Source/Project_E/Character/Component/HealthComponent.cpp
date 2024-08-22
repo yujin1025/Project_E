@@ -49,16 +49,12 @@ void UHealthComponent::ChangeHealth(float Amount)
 	if (Character->IsPlayer() && PlayerState)
 	{
 		PlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth));
-
 	}
 
 	auto* GameState = Cast<APJEGameState>(GetWorld()->GetGameState());
 	if (!Character->IsPlayer() && GameState)
 	{
 		GameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("Non Player Number : (%d) Current Health: %f"), Character->CharacterId, CurrentHealth));
-
 	}
 
 	Server_ChangeHealth(CurrentHealth);

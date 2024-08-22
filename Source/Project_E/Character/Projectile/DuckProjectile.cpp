@@ -73,7 +73,6 @@ void ADuckProjectile::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyPressed(Character);
 
-	//현재 서버에서는 잘됨. 클라이언트에서는 로그도 안뜸
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Emerald, FString::Printf(TEXT("Get Projectile")));
 
 	if (Character)
