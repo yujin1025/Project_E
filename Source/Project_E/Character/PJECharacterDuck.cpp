@@ -66,6 +66,8 @@ void APJECharacterDuck::BeginPlay()
 
     Inventory = NewObject<UInventory>(this);
     ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
+    OriginalCameraLocation = FollowCamera->GetRelativeLocation();
+    OriginalCameraRotation = FollowCamera->GetRelativeRotation();
 }
 
 void APJECharacterDuck::Tick(float DeltaTime)
@@ -206,6 +208,7 @@ void APJECharacterDuck::Fire()
             UItem* RemovedItem = Inventory->RemoveLastItem(true);
             if (RemovedItem)
             {
+                MuzzleRotation.Pitch += 7.0f;
                 PredictedProjectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
             }
         }
@@ -409,9 +412,12 @@ void APJECharacterDuck::EnterAimingMode()
     GetCharacterMovement()->bOrientRotationToMovement = false;
     GetCharacterMovement()->RotationRate = FRotator(0.f, 360.f, 0.f);
 
-    // 카메라를 오른쪽으로 이동
-    FVector CameraOffset = FVector(50.0f, 0.0f, 0.0f); 
-    FollowCamera->SetWorldLocation(FollowCamera->GetComponentLocation() + CameraOffset);
+    if (FollowCamera)
+    {
+        // 카메라를 오른쪽으로 이동
+        FVector CameraOffset = FVector(0.0f, 50.0f, 0.0f);
+        FollowCamera->SetRelativeLocation(OriginalCameraLocation + CameraOffset);
+    }
 }
 
 void APJECharacterDuck::ExitAimingMode()
@@ -419,8 +425,11 @@ void APJECharacterDuck::ExitAimingMode()
     bIsAiming = false;
     GetCharacterMovement()->bOrientRotationToMovement = true;
 
-    FVector CameraOffset = FVector(-50.0f, 0.0f, 0.0f); 
-    FollowCamera->SetWorldLocation(FollowCamera->GetComponentLocation() + CameraOffset);
+    if (FollowCamera)
+    {
+        FollowCamera->SetRelativeLocation(OriginalCameraLocation);
+        FollowCamera->SetRelativeRotation(OriginalCameraRotation);
+    }
 
 }
 
@@ -430,25 +439,71 @@ void APJECharacterDuck::CalculateProjectilePath()
     FRotator CameraRotation;
     GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-    // 발사 위치 계산
-    MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
-    MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
-    MuzzleRotation = CameraRotation;
-    MuzzleRotation.Pitch += 23.0f;
+    FVector CameraForwardVector = CameraRotation.Vector();
 
-    // 예측 궤도 계산
-    FPredictProjectilePathParams PredictParams(1.0f, MuzzleLocation, MuzzleRotation.Vector() * 1000.f, 10.f, ECC_Visibility, this);
-    FPredictProjectilePathResult PredictResult;
+    MuzzleLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 
-    bool bHit = UGameplayStatics::PredictProjectilePath(this, PredictParams, PredictResult);
+    FVector2D CrosshairScreenPosition = GetCrosshairScreenPosition();
+    FVector CrosshairWorldPosition;
+    FVector WorldDirection;
+    UGameplayStatics::DeprojectScreenToWorld(GetWorld()->GetFirstPlayerController(), CrosshairScreenPosition, CrosshairWorldPosition, WorldDirection);
 
-    FlushPersistentDebugLines(GetWorld());
+    float DesiredDistance = 1000.0f;
+    FVector TargetPoint = CrosshairWorldPosition + WorldDirection * DesiredDistance;
 
-    if (bHit && PredictResult.PathData.Num() > 0)
+    FVector MuzzleToTarget = (TargetPoint - MuzzleLocation).GetSafeNormal();
+    MuzzleRotation = MuzzleToTarget.Rotation();
+    MuzzleRotation.Pitch += 5.0f;
+
+    float ProjectileSpeed = 3200.0f;
+    float GravityScale = 4.0f;
+    FVector Velocity = MuzzleRotation.Vector() * ProjectileSpeed;
+
+    TArray<FVector> TrajectoryPoints;
+    FVector CurrentPosition = MuzzleLocation;
+    FVector CurrentVelocity = Velocity;
+    float TimeStep = 0.05f; 
+    float MaxTime = 10.0f; 
+
+    for (float Time = 0.0f; Time <= MaxTime; Time += TimeStep)
     {
-        for (FPredictProjectilePathPointData PointData : PredictResult.PathData)
-        {
-            DrawDebugSphere(GetWorld(), PointData.Location, 5.f, 8, FColor::Green, false, 0.0f);
-        }
+        FVector NewPosition = CurrentPosition + CurrentVelocity * TimeStep;
+        FVector NewVelocity = CurrentVelocity;
+        NewVelocity.Z -= GravityScale * 980.0f * TimeStep;
+
+        TrajectoryPoints.Add(NewPosition);
+
+        CurrentPosition = NewPosition;
+        CurrentVelocity = NewVelocity;
     }
+
+    for (const FVector& Point : TrajectoryPoints)
+    {
+        DrawDebugSphere(GetWorld(), Point, 5.f, 8, FColor::Green, false, 0.0f);
+    }
+}
+
+FVector2D APJECharacterDuck::GetCrosshairScreenPosition()
+{
+    UWorld* World = GetWorld();
+    if (!World)
+        return FVector2D::ZeroVector;
+
+    APlayerController* PlayerController = UGameplayStatics::GetPlayerController(World, 0);
+    if (!PlayerController)
+        return FVector2D::ZeroVector;
+
+    FVector2D ViewportSize;
+    if (GEngine && GEngine->GameViewport)
+    {
+        GEngine->GameViewport->GetViewportSize(ViewportSize);
+    }
+    else
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    FVector2D CrosshairScreenPosition = FVector2D(ViewportSize.X * 0.5f, ViewportSize.Y * 0.5f);
+
+    return CrosshairScreenPosition;
 }

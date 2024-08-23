@@ -53,6 +53,7 @@ protected:
 	void EnterAimingMode();
 	void ExitAimingMode();
 	void CalculateProjectilePath();
+	FVector2D GetCrosshairScreenPosition();
 
 	// Multiplay Section
 	UFUNCTION(Server, Reliable)
@@ -104,7 +105,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float SwallowedMultiplier = 0.7f;
 
-	
+	FVector OriginalCameraLocation;
+	FRotator OriginalCameraRotation;
 	FVector MuzzleLocation;
 	FRotator MuzzleRotation;
 

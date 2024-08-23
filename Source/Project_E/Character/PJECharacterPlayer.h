@@ -176,8 +176,6 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AActor> InteractActor = NULL;
 
-//Projectile
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 };
