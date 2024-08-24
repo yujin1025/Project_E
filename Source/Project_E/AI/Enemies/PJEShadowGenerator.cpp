@@ -45,7 +45,7 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
             if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))
             {
                 APJECharacterShadowA* ShadowA = Cast<APJECharacterShadowA>(SpawnedMonster);
-                ShadowA->ShadowArea = ShadowArea;
+                ShadowA->SetShadowArea(ShadowArea);
                 ShadowArea->ShadowAArr.Add(ShadowA);
                 CurrentCount++;
             }
