@@ -54,10 +54,6 @@ public:
 	virtual float GetDetectMinYDifference() override;
 
 // Sound Section
-public:
-	UPROPERTY()
-	TObjectPtr<class APJEShadowArea> ShadowArea;
-
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TObjectPtr<USoundCue> LaughSound;
@@ -68,7 +64,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<class UAudioComponent> LaughAudioComponent;
 
+	UPROPERTY()
+	TObjectPtr<class APJEShadowArea> ShadowArea;
+
 public:
+	class APJEShadowArea* GetShadowArea();
+	void SetShadowArea(class APJEShadowArea* NewShadowArea);
+
 	void PlaySound();
 	void StopSound();
 

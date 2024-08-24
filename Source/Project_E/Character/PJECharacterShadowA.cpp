@@ -85,6 +85,16 @@ void APJECharacterShadowA::BeginPlay()
 	SetCurrentHP(MaxHp);
 }
 
+APJEShadowArea* APJECharacterShadowA::GetShadowArea()
+{
+	return ShadowArea;
+}
+
+void APJECharacterShadowA::SetShadowArea(APJEShadowArea* NewShadowArea)
+{
+	ShadowArea = NewShadowArea;
+}
+
 void APJECharacterShadowA::PlaySound()
 {
 	if (LaughSound)
