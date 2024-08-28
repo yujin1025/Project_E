@@ -59,11 +59,8 @@ protected:
 	float MoveSpeed;
 
 // HP Section
-/*
-public:
+protected:
 	void UpdateHealthBar();
 
-protected:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-*/
 };

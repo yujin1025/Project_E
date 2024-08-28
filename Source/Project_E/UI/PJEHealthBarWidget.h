@@ -14,18 +14,10 @@ class PROJECT_E_API UPJEHealthBarWidget : public UPJEWorldSpaceWidget
 {
 	GENERATED_BODY()
 
-protected:
-	UPROPERTY()
-	TObjectPtr<class UHealthComponent> HealthComponent;
-
 public:
-	virtual void NativeConstruct() override;
-
 	UFUNCTION()
-	void UpdateHealthBar();
+	void UpdateHealthBar(float CurrentHealth, float MaxHealth);
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HealthProgressBar;
-
-	void SetHealthComponent(class UHealthComponent* NewHealthComponent);
 };

@@ -10,11 +10,11 @@ APJEPlayerState::APJEPlayerState()
 	PlayerRole = EPlayerRole::Cat;
 }
 
-void APJEPlayerState::OnChangePlayerHealth(int objectId, float NewCurrentHealth)
+void APJEPlayerState::OnChangePlayerHealth(int objectId, float Amount)
 {
 	if (OnPlayerHPChanged.IsBound())
 	{
-		OnPlayerHPChanged.Broadcast(objectId, NewCurrentHealth);
+		OnPlayerHPChanged.Broadcast(objectId, Amount);
 	}
 }
 
