@@ -4,18 +4,96 @@
 #include "../../Game/PJEGameState.h"
 #include "../../Game/PJEPlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "Character/PJECharacterMonster.h"
+#include "Character/Component/PJEHpBarWidgetComponent.h"
+#include "UI/PJEHealthBarWidget.h"
 
 UHealthComponent::UHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	CurrentHealth = MaxHealth;
-	SetIsReplicatedByDefault(true); // 컴포넌트를 복제하도록 설정
+	SetIsReplicatedByDefault(true);
 }
 
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	Server_BeginPlay();
+}
 
+void UHealthComponent::ChangeHealth(float Amount)
+{
+	Server_ChangeHealth(Amount);
+}
+
+void UHealthComponent::Server_ChangeHealth_Implementation(float Amount)
+{
+	if (CurrentHealth <= 0)
+		return;
+
+	CurrentHealth += Amount;
+
+	OnRep_CurrentHealth();
+}
+
+void UHealthComponent::DestroyIfDead()
+{
+	auto* Character = Cast<APJECharacterBase>(GetOwner());
+	if (Character)
+	{
+		if (CurrentHealth <= 0)
+		{
+			Character->Destroy(); // 몬스터 애니메이션 나오면 변경하기
+		}
+		else
+		{
+			// Character->OnHit();
+		}
+	}
+}
+
+void UHealthComponent::OnRep_HpBarWidgetComponent()
+{
+	UpdateHpBar();
+}
+
+void UHealthComponent::UpdateHpBar()
+{
+	if (HpBarWidgetComponent)
+	{
+		HealthBarWidget = Cast<UPJEHealthBarWidget>(HpBarWidgetComponent->GetUserWidgetObject());
+		if (HealthBarWidget)
+		{
+			HealthBarWidget->UpdateHealthBar();
+		}
+	}
+}
+
+void UHealthComponent::OnRep_CurrentHealth()
+{
+	auto* Character = Cast<APJECharacterBase>(GetOwner());
+	if (Character)
+	{
+		auto* PlayerState = Character->GetPlayerState<APJEPlayerState>();
+		if (PlayerState)
+		{
+			PlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
+			return;
+		}
+
+		auto* GameState = Cast<APJEGameState>(GetWorld()->GetGameState());
+		if (!Character->IsPlayer() && GameState)
+		{
+			GameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
+		}
+	}
+
+	UpdateHpBar();
+	DestroyIfDead();
+}
+
+void UHealthComponent::Server_BeginPlay_Implementation()
+{
 	APJECharacterBase* Character = Cast<APJECharacterBase>(GetOwner());
 	if (Character == nullptr)
 		return;
@@ -32,64 +110,7 @@ void UHealthComponent::BeginPlay()
 
 	MaxHealth = Data->MaxHp;
 	CurrentHealth = MaxHealth;
-}
-
-void UHealthComponent::ChangeHealth(float Amount)
-{
-	if (CurrentHealth <= 0)
-		return;
-
-	CurrentHealth += Amount;
-
-	auto* Character = Cast<APJECharacterBase>(GetOwner());
-	if (Character == nullptr)
-		return;
-
-	auto* PlayerState = Character->GetPlayerState<APJEPlayerState>();
-	if (Character->IsPlayer() && PlayerState)
-	{
-		PlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
-	}
-
-	auto* GameState = Cast<APJEGameState>(GetWorld()->GetGameState());
-	if (!Character->IsPlayer() && GameState)
-	{
-		GameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
-	}
-
-	Server_ChangeHealth(CurrentHealth);
-
-	if (Amount < 0)
-	{
-		if (CurrentHealth <= 0)
-		{
-			Character->Destroy(); //몬스터 애니메이션 나오면 변경하기
-			//Character->OnDie();
-		}
-		else
-		{
-			//Character->OnHit();
-		}
-	}
-}
-
-void UHealthComponent::Server_ChangeHealth_Implementation(float Health)
-{
-	CurrentHealth = Health;
-	OnRep_Health();
-}
-
-void UHealthComponent::OnRep_Health()
-{
-	auto* Character = Cast<APJECharacterBase>(GetOwner());
-	if (Character)
-	{
-		auto* PlayerState = Character->GetPlayerState<APJEPlayerState>();
-		if (PlayerState)
-		{
-			PlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
-		}
-	}
+	HpBarWidgetComponent = Character->FindComponentByClass<UPJEHpBarWidgetComponent>();
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -97,4 +118,10 @@ void UHealthComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UHealthComponent, CurrentHealth);
+	DOREPLIFETIME(UHealthComponent, MaxHealth);
+	DOREPLIFETIME(UHealthComponent, HpBarWidgetComponent);
+}
+
+void UHealthComponent::OnRep_MaxHealth()
+{
 }
