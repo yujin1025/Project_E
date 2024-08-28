@@ -2,7 +2,8 @@
 
 
 #include "Character/Component/PJEHpBarWidgetComponent.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/PJEHealthBarWidget.h"
+#include "Project_E/Character/Component/HealthComponent.h"
 
 UPJEHpBarWidgetComponent::UPJEHpBarWidgetComponent()
 {
@@ -10,5 +11,26 @@ UPJEHpBarWidgetComponent::UPJEHpBarWidgetComponent()
     if (HealthBarWidgetClass.Succeeded())
     {
         HpBarWidgetClass = HealthBarWidgetClass.Class;
+    }
+}
+
+TSubclassOf<class UUserWidget> UPJEHpBarWidgetComponent::GetHpBarWidgetClass()
+{
+    return HpBarWidgetClass;
+}
+
+void UPJEHpBarWidgetComponent::InitWidget()
+{
+    Super::InitWidget();
+
+    UHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<UHealthComponent>();
+    if (HealthComponent)
+    {
+        UPJEHealthBarWidget* HpBarWidget = Cast<UPJEHealthBarWidget>(GetUserWidgetObject());
+        if (HpBarWidget)
+        {
+            HpBarWidget->SetHealthComponent(HealthComponent);
+            HpBarWidget->UpdateHealthBar();
+        }
     }
 }
