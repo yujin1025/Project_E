@@ -58,8 +58,6 @@ void ACatWeapon::OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
             return;
 
         DamagedHealthComponent->ChangeHealth(-DamageAmount);
-
-
     }
 }
 

@@ -27,7 +27,7 @@ public:
 
 	FOnHPChangedDelegate OnPlayerHPChanged;
 	
-	void OnChangePlayerHealth(int objectId, float NewCurrentHealth);
+	void OnChangePlayerHealth(int objectId, float Amount);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

@@ -12,13 +12,17 @@ APJECharacterMonster::APJECharacterMonster()
 {
 	HealthBarComponent = CreateDefaultSubobject<UPJEHpBarWidgetComponent>(TEXT("HealthBarComponent"));
 	HealthBarComponent->SetupAttachment(RootComponent);
-	if (HealthBarComponent->GetHpBarWidgetClass())
+	if (HealthBarComponent->HpBarWidgetClass)
 	{
-		HealthBarComponent->SetWidgetClass(HealthBarComponent->GetHpBarWidgetClass());
+		HealthBarComponent->SetWidgetClass(HealthBarComponent->HpBarWidgetClass);
 		HealthBarComponent->SetDrawSize(FVector2D(100, 20));
 		HealthBarComponent->SetWidgetSpace(EWidgetSpace::Screen);
-		
 	}
+}
+
+void APJECharacterMonster::BeginPlay()
+{
+	Super::BeginPlay();
 
 	if (UCapsuleComponent* CapsuleComp = GetCapsuleComponent())
 	{
@@ -28,11 +32,7 @@ APJECharacterMonster::APJECharacterMonster()
 		// 상대 위치 설정
 		HealthBarComponent->SetRelativeLocation(FVector(0.0f, 0.0f, CapsuleHalfHeight + HealthBarOffset));
 	}
-}
-
-void APJECharacterMonster::BeginPlay()
-{
-	Super::BeginPlay();
+	UpdateHealthBar();
 }
 
 void APJECharacterMonster::OnDeath()
@@ -60,15 +60,13 @@ float APJECharacterMonster::GetMoveSpeed() const
 	return MoveSpeed;
 }
 
-/*
 float APJECharacterMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float ReturnFloat = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	// UpdateHealthBar();
+	UpdateHealthBar();
 
 	return ReturnFloat;
 }
-
 
 void APJECharacterMonster::UpdateHealthBar()
 {
@@ -80,4 +78,3 @@ void APJECharacterMonster::UpdateHealthBar()
 		}
 	}
 }
-*/
