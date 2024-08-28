@@ -7,7 +7,6 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/PJEAIController.h"
 #include "AI/PJEAI.h"
-#include "AI/Enemies/PJEShadowField.h"
 
 APJECharacterShadowC::APJECharacterShadowC()
 {
@@ -52,8 +51,6 @@ void APJECharacterShadowC::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 	SetCurrentHP(MaxHp);
-
-	OnDestroyed.AddDynamic(this, &APJECharacterShadowC::DestoryField);
 }
 
 float APJECharacterShadowC::GetAIPatrolRadius()
@@ -95,23 +92,4 @@ float APJECharacterShadowC::TakeDamage(float DamageAmount, FDamageEvent const& D
 		}
 	}
 	return 0.0f;
-}
-
-void APJECharacterShadowC::SetFieldActor(APJEShadowField* NewFieldActor)
-{
-	FieldActor = NewFieldActor;
-}
-
-APJEShadowField* APJECharacterShadowC::GetFieldActor()
-{
-	return FieldActor;
-}
-
-void APJECharacterShadowC::DestoryField(AActor* DestroyedActor)
-{
-	if (FieldActor)
-	{
-		FieldActor->Destroy();
-		FieldActor = nullptr;
-	}
 }

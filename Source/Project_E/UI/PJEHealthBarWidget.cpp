@@ -3,23 +3,12 @@
 
 #include "UI/PJEHealthBarWidget.h"
 #include "Components/ProgressBar.h"
-#include "Project_E/Character/Component/HealthComponent.h"
 
-void UPJEHealthBarWidget::NativeConstruct()
-{
-    Super::NativeConstruct();
-}
-
-void UPJEHealthBarWidget::UpdateHealthBar()
+void UPJEHealthBarWidget::UpdateHealthBar(float CurrentHealth, float MaxHealth)
 {
     if (HealthProgressBar)
     {
-        float HealthPercent = HealthComponent->GetCurrentHealth() / HealthComponent->GetMaxHealth();
+        float HealthPercent = CurrentHealth / MaxHealth;
         HealthProgressBar->SetPercent(HealthPercent);
     }
-}
-
-void UPJEHealthBarWidget::SetHealthComponent(UHealthComponent* NewHealthComponent)
-{
-    HealthComponent = NewHealthComponent;
 }

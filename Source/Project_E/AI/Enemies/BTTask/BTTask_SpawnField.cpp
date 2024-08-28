@@ -75,27 +75,24 @@ void UBTTask_SpawnField::SpawnField(AActor* OwnerActor, uint8* NodeMemory)
 
     // FieldActor 스폰
     APJEShadowField* FieldActor = OwnerActor->GetWorld()->SpawnActor<APJEShadowField>(FieldActorClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-
-    FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
-
     if (FieldActor)
     {
         // FieldActor를 OwnerActor의 자식으로 부착
-        FieldActor->AttachToActor(OwnerActor, FAttachmentTransformRules::KeepWorldTransform);
+        FieldActor->AttachToActor(OwnerActor, FAttachmentTransformRules::KeepRelativeTransform);
 
         FieldActor->SetActorLocation(SpawnLocation);
 
         // 필드 엑터 초기화
+        FBTSpawnFieldTaskMemory* TaskMemory = (FBTSpawnFieldTaskMemory*)NodeMemory;
         FieldActor->InitializeField(
             TaskMemory->FieldSpawnable->GetFieldDuration(),
             TaskMemory->FieldSpawnable->GetDamagePerSecond(),
             TaskMemory->FieldSpawnable->GetFieldRadius()
         );
     }
-
-    TaskMemory->FieldSpawnable->SetFieldActor(FieldActor);
-
 }
+
+
 
 uint16 UBTTask_SpawnField::GetInstanceMemorySize() const
 {

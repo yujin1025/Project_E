@@ -21,5 +21,5 @@ public:
 	FOnHealthChangedDelegate OnNonPlayerHPChanged;
 	
 public:
-	void OnChangedHealth(int ObjectID, float NewCurrentHealth);
+	void OnChangedHealth(int ObjectID, float Amount);
 };
