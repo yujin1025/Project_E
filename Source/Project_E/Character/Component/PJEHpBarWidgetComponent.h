@@ -17,12 +17,6 @@ class PROJECT_E_API UPJEHpBarWidgetComponent : public UWidgetComponent
 public:
 	UPJEHpBarWidgetComponent();
 
-public:
-	TSubclassOf<class UUserWidget> GetHpBarWidgetClass();
-
-protected:
 	UPROPERTY()
 	TSubclassOf<class UUserWidget> HpBarWidgetClass;
-
-	virtual void InitWidget() override;
 };
