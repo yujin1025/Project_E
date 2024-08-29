@@ -58,12 +58,4 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MoveSpeed;
 
-// HP Section
-/*
-public:
-	void UpdateHealthBar();
-
-protected:
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-*/
 };

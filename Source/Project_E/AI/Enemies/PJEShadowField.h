@@ -22,6 +22,9 @@ public:
 
     void InitializeField(float Duration, float Damage, float InitialRadius);
 
+    UFUNCTION()
+    void DestroySelf(AActor* DestroyedActor);
+
 private:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<class USphereComponent> CollisionSphere;

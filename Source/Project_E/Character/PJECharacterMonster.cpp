@@ -59,25 +59,3 @@ float APJECharacterMonster::GetMoveSpeed() const
 {
 	return MoveSpeed;
 }
-
-/*
-float APJECharacterMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float ReturnFloat = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	// UpdateHealthBar();
-
-	return ReturnFloat;
-}
-
-
-void APJECharacterMonster::UpdateHealthBar()
-{
-	if (UPJEHealthBarWidget* HealthBar = Cast<UPJEHealthBarWidget>(HealthBarComponent->GetUserWidgetObject()))
-	{
-		if (HealthComponent)
-		{
-			HealthBar->UpdateHealthBar(HealthComponent->GetCurrentHealth(), HealthComponent->GetMaxHealth());
-		}
-	}
-}
-*/

@@ -4,6 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+DECLARE_DELEGATE(FOnHealthChangeDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_E_API UHealthComponent : public UActorComponent
@@ -16,9 +17,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UFUNCTION(Server, Reliable)
-	void Server_BeginPlay();
-	void Server_BeginPlay_Implementation();
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 protected:
@@ -35,6 +33,8 @@ protected:
 	void OnRep_CurrentHealth();
 
 public:
+	FOnHealthChangeDelegate OnHealthChanged;
+
 	void ChangeHealth(float Amount);
 
 	UFUNCTION(Server, Reliable)
@@ -53,11 +53,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UPJEHealthBarWidget> HealthBarWidget;
 
-	UPROPERTY(ReplicatedUsing = OnRep_HpBarWidgetComponent)
+	UPROPERTY()
 	TObjectPtr<class UPJEHpBarWidgetComponent> HpBarWidgetComponent;
-
-	UFUNCTION()
-	void OnRep_HpBarWidgetComponent();
-
-	void UpdateHpBar();
 };
