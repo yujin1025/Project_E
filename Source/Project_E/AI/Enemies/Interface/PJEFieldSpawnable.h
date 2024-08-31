@@ -25,9 +25,5 @@ public:
 	virtual float GetFieldRadius() = 0;
 	virtual float GetFieldDuration() = 0;
 	virtual float GetDamagePerSecond() = 0;
-	virtual void SetFieldActor(class APJEShadowField* NewFieldActor) = 0;
-	virtual class APJEShadowField* GetFieldActor() = 0;
 
-protected:
-	virtual void DestoryField(AActor* DestroyedActor) = 0;
 };
