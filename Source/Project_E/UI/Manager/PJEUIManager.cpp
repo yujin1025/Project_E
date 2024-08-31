@@ -46,33 +46,20 @@ void UPJEUIManager::AddPopupWidget(UPopUpWidget* NewWidget)
         PopupWidgets.Add(NewWidget);
     }
 }
+
 void UPJEUIManager::RemovePopupWidget(UWorld* WorldContext, UPopUpWidget* WidgetToRemove)
 {
     if (WidgetToRemove)
     {
-        PopupWidgets.Remove(WidgetToRemove);
-
-        WidgetToRemove->MarkPendingKill();
-
         if (WidgetToRemove == TopmostPopupWidget)
         {
-            TopmostPopupWidget = PopupWidgets.Num() > 0 ? PopupWidgets.Last() : nullptr;
-            if (TopmostPopupWidget)
-            {
-                ShowTopmostPopupWidget(WorldContext, TopmostPopupWidget);
-            }
-            else
-            {
-                APlayerController* PlayerController = WorldContext->GetFirstPlayerController();
-                if (PlayerController)
-                {
-                    PlayerController->bShowMouseCursor = false;
-                    PlayerController->SetInputMode(FInputModeGameOnly());
-                }
-            }
+            CloseTopmostPopupWidget(WorldContext);
+            return;
         }
 
         WidgetToRemove->RemoveFromParent();
+        PopupWidgets.Remove(WidgetToRemove);
+        WidgetToRemove->MarkPendingKill();
     }
 }
 
@@ -119,23 +106,18 @@ void UPJEUIManager::CloseTopmostPopupWidget(UWorld* WorldContext)
     if (TopmostPopupWidget)
     {
 
-        // 최상단 위젯 제거
         TopmostPopupWidget->RemoveFromParent();
         PopupWidgets.Remove(TopmostPopupWidget);
 
         TopmostPopupWidget->MarkPendingKill();
-
-        // 최상단 위젯 업데이트
         TopmostPopupWidget = PopupWidgets.Num() > 0 ? PopupWidgets.Last() : nullptr;
 
         if (TopmostPopupWidget)
         {
-            // 새 최상단 위젯을 보이게 설정
             ShowTopmostPopupWidget(WorldContext, TopmostPopupWidget);
         }
         else
         {
-            // 모든 팝업이 닫힌 경우 입력 모드 초기화
             APlayerController* PlayerController = WorldContext->GetFirstPlayerController();
             if (PlayerController)
             {

@@ -7,6 +7,7 @@
 #include "UI/PJEHealthBarWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "Component/HealthComponent.h"
+#include "Character/PJECharacterPlayer.h"
 
 APJECharacterMonster::APJECharacterMonster()
 {
@@ -28,6 +29,8 @@ APJECharacterMonster::APJECharacterMonster()
 		// 상대 위치 설정
 		HealthBarComponent->SetRelativeLocation(FVector(0.0f, 0.0f, CapsuleHalfHeight + HealthBarOffset));
 	}
+
+	GetMesh()->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 }
 
 void APJECharacterMonster::BeginPlay()
@@ -38,6 +41,20 @@ void APJECharacterMonster::BeginPlay()
 void APJECharacterMonster::OnDeath()
 {
 	GetWorld()->GetTimerManager().SetTimer(DestructionTimer, this, &APJECharacterMonster::DelayedDestroy, 1.0f, false);
+}
+
+void APJECharacterMonster::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	// 플레이어와 충돌한 경우 처리
+	if (OtherActor->IsA(APJECharacterPlayer::StaticClass()))
+	{
+		// 충돌 방향의 반대 방향으로 밀어내기
+		FVector PushDirection = Hit.ImpactNormal * -1.0f;
+		PushDirection.Z = 0.0f; // 수평 방향으로 힘 가하기 (Y축으로 밀리지 않게)
+
+		float PushStrength = 1000.0f; // Impulse의 세기 조절
+		GetMesh()->AddImpulse(PushDirection * PushStrength, NAME_None, true); // Impulse 적용
+	}
 }
 
 void APJECharacterMonster::DelayedDestroy()
