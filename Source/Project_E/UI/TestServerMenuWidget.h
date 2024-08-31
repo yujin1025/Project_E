@@ -31,6 +31,12 @@ protected:
 	UFUNCTION()
 	void OnDestroySession(bool bWasSuccessful);
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<class UPopUpWidget> SettingsMenuClass;
+
+	UPROPERTY()
+	TWeakObjectPtr<class UPopUpWidget> SettingsMenu;
+
 private:
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
 	
@@ -40,6 +46,8 @@ private:
 	UButton* JoinButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* QuitButton;
+	UPROPERTY(meta = (BindWidget))
+	UButton* SettingButton;
 
 	UFUNCTION()
 	void PlayButtonClicked();
@@ -47,6 +55,8 @@ private:
 	void JoinButtonClicked();
 	UFUNCTION()
 	void QuitButtonClicked();
+	UFUNCTION()
+	void SettingButtonClicked();
 
 	void MenuTearDown();
 
