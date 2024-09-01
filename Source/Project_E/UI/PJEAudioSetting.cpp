@@ -86,31 +86,31 @@ void UPJEAudioSetting::OnMasterVolumeChanged(float Value)
 
 void UPJEAudioSetting::OnBGMVolumeChanged(float Value)
 {
-    SetVolume(BGMSoundClass, Value * MasterVolumeSlider->GetValue());
+    SetVolume(BGMSoundClass, Value);
     SaveSettings();
 }
 
 void UPJEAudioSetting::OnEnvironmentVolumeChanged(float Value)
 {
-    SetVolume(EnvironmentSoundClass, Value * MasterVolumeSlider->GetValue());
+    SetVolume(EnvironmentSoundClass, Value);
     SaveSettings();
 }
 
 void UPJEAudioSetting::OnSFXVolumeChanged(float Value)
 {
-    SetVolume(SFXSoundClass, Value * MasterVolumeSlider->GetValue());
+    SetVolume(SFXSoundClass, Value);
     SaveSettings();
 }
 
 void UPJEAudioSetting::OnNarrationVolumeChanged(float Value)
 {
-    SetVolume(NarrationSoundClass, Value * MasterVolumeSlider->GetValue());
+    SetVolume(NarrationSoundClass, Value);
     SaveSettings();
 }
 
 void UPJEAudioSetting::OnVoiceChatVolumeChanged(float Value)
 {
-    SetVolume(VoiceChatSoundClass, Value * MasterVolumeSlider->GetValue());
+    SetVolume(VoiceChatSoundClass, Value);
     SaveSettings();
 }
 

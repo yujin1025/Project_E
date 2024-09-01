@@ -149,7 +149,7 @@ bool APJECharacterBase::IsPlayer()
 	return false;
 }
 
-
+/*
 float APJECharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -158,6 +158,7 @@ float APJECharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 
 	return SuperReturn;
 }
+*/
 
 FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget)
 {

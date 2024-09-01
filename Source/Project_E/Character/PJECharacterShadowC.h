@@ -58,5 +58,13 @@ public:
 protected:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+public:
+	virtual void SetFieldActor(class APJEShadowField* NewFieldActor) override;
+	virtual class APJEShadowField* GetFieldActor() override;
 
+protected:
+	UPROPERTY()
+	TObjectPtr<class APJEShadowField> FieldActor;
+
+	virtual void DestoryField(AActor* DestroyedActor) override;
 };

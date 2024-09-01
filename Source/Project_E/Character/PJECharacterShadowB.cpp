@@ -27,6 +27,8 @@ void APJECharacterShadowB::BeginPlay()
 	SetCurrentHP(MaxHp);
 
 	PlayerDetectionRange = 4.0f;
+
+	OnDestroyed.AddDynamic(this, &APJECharacterShadowB::DestoryField);
 }
 
 float APJECharacterShadowB::GetChaseSpeed()
@@ -64,6 +66,16 @@ float APJECharacterShadowB::GetDamagePerSecond()
 	return DamagePerSecond;
 }
 
+void APJECharacterShadowB::SetFieldActor(APJEShadowField* NewFieldActor)
+{
+	FieldActor = NewFieldActor;
+}
+
+APJEShadowField* APJECharacterShadowB::GetFieldActor()
+{
+	return FieldActor;
+}
+
 float APJECharacterShadowB::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 
@@ -80,4 +92,13 @@ float APJECharacterShadowB::TakeDamage(float DamageAmount, FDamageEvent const& D
 		}
 	}
 	return 0.0f;
+}
+
+void APJECharacterShadowB::DestoryField(AActor* DestroyedActor)
+{
+	if (FieldActor)
+	{
+		FieldActor->Destroy();
+		FieldActor = nullptr;
+	}
 }

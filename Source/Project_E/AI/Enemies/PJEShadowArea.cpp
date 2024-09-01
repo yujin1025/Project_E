@@ -35,6 +35,12 @@ APJEShadowArea::APJEShadowArea()
 void APJEShadowArea::BeginPlay()
 {
     Super::BeginPlay();
+
+    if (BackgroundSoundCue)
+    {
+        BackgroundAudioComponent->SetSound(BackgroundSoundCue);
+        BackgroundAudioComponent->Play();
+    }
 }
 
 void APJEShadowArea::Tick(float DeltaTime)

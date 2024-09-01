@@ -35,35 +35,26 @@ FPrimitiveSceneProxy* UDonutComponent::CreateSceneProxy()
         virtual void GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const override
         {
             FPrimitiveSceneProxy::GetDynamicMeshElements(Views, ViewFamily, VisibilityMap, Collector);
-            
+
             for (int32 ViewIndex = 0; ViewIndex < Views.Num(); ViewIndex++)
             {
-                // ViewIndex와 VisibilityMap의 비트 연산 검사
-                if ((VisibilityMap & (1 << ViewIndex)) != 0)
+                if (VisibilityMap & (1 << ViewIndex))
                 {
-                    if (ViewIndex >= 0 && ViewIndex < Views.Num()) // 인덱스가 배열 크기 내에 있는지 다시 확인
-                    {
-                        FPrimitiveDrawInterface* PDI = Collector.GetPDI(ViewIndex);
-                        const FMatrix& LocalToWorld = GetLocalToWorld();
+                    FPrimitiveDrawInterface* PDI = Collector.GetPDI(ViewIndex);
+                    const FMatrix& LocalToWorld = GetLocalToWorld();
 
-                        FVector Origin = LocalToWorld.GetOrigin();
-                        FVector XAxis = LocalToWorld.GetScaledAxis(EAxis::X);
-                        FVector YAxis = LocalToWorld.GetScaledAxis(EAxis::Y);
-                        FVector ZAxis = LocalToWorld.GetScaledAxis(EAxis::Z);
+                    FVector Origin = LocalToWorld.GetOrigin();
+                    FVector XAxis = LocalToWorld.GetScaledAxis(EAxis::X);
+                    FVector YAxis = LocalToWorld.GetScaledAxis(EAxis::Y);
+                    FVector ZAxis = LocalToWorld.GetScaledAxis(EAxis::Z);
 
-                        // 외부 실린더 그리기
-                        DrawWireCylinder(PDI, Origin, XAxis, YAxis, ZAxis, FLinearColor::Green, OuterRadius, DonutHeight / 2, 32, SDPG_World);
+                    // �ܰ� ���� �κ� �׸���
+                    DrawWireCylinder(PDI, Origin, XAxis, YAxis, ZAxis, FLinearColor::Green, OuterRadius, DonutHeight / 2, 32, SDPG_World);
 
-                        // 내부 실린더 그리기
-                        DrawWireCylinder(PDI, Origin, XAxis, YAxis, ZAxis, FLinearColor::Red, InnerRadius, DonutHeight / 2, 32, SDPG_World);
-                    }
-                    else
-                    {
-                        UE_LOG(LogTemp, Error, TEXT("Invalid ViewIndex: %d, Views.Num(): %d"), ViewIndex, Views.Num());
-                    }
+                    // �߾� �κ� �׸���
+                    DrawWireCylinder(PDI, Origin, XAxis, YAxis, ZAxis, FLinearColor::Red, InnerRadius, DonutHeight / 2, 32, SDPG_World);
                 }
             }
-
         }
 
         virtual FPrimitiveViewRelevance GetViewRelevance(const FSceneView* View) const override
@@ -73,6 +64,15 @@ FPrimitiveSceneProxy* UDonutComponent::CreateSceneProxy()
             Result.bDynamicRelevance = true;
             Result.bShadowRelevance = IsShadowCast(View);
             Result.bStaticRelevance = false;
+            // 빌드 시 에러
+            /** 에러 내용
+            * UATHelper: Packaging (Windows): D:\PJE\Project_E\Source\Project_E\Components\DonutComponent.cpp(67): error C2039: 'bNormalTranslucencyRelevance': 'FPrimitiveViewRelevance'의 멤버가 아닙니다.
+            * UATHelper: Packaging (Windows): D:\PJE\Project_E\Source\Project_E\Components\DonutComponent.cpp(68): error C2039: 'bSeparateTranslucencyRelevance': 'FPrimitiveViewRelevance'의 멤버가 아닙니다.
+            * UATHelper: Packaging (Windows): D:\PJE\Project_E\Source\Project_E\Components\DonutComponent.cpp(69): error C2039: 'bDistortionRelevance': 'FPrimitiveViewRelevance'의 멤버가 아닙니다.
+            */ //아래 코드 3줄 주석처리
+            // Result.bNormalTranslucencyRelevance = IsShown(View);
+            // Result.bSeparateTranslucencyRelevance = IsShown(View);
+            // Result.bDistortionRelevance = IsShown(View);
             Result.bEditorPrimitiveRelevance = IsSelected();
             Result.bRenderCustomDepth = ShouldRenderCustomDepth();
             Result.bMasked = false;
