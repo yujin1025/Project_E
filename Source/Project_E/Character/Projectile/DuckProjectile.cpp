@@ -25,11 +25,12 @@ ADuckProjectile::ADuckProjectile()
 	ProjectileMesh->SetupAttachment(CollisionComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
-	ProjectileMovementComponent->InitialSpeed = Speed;
-	ProjectileMovementComponent->MaxSpeed = Speed;
-	ProjectileMovementComponent->ProjectileGravityScale = GravityScale;
+	//ProjectileMovementComponent->InitialSpeed = Speed;
+	//ProjectileMovementComponent->MaxSpeed = Speed;
+	//ProjectileMovementComponent->ProjectileGravityScale = GravityScale;
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Bounciness = 0.3f; 
+	CalculateGravityScale(25.0f, 32.0f);
 
 	SetReplicates(true);
 	SetReplicateMovement(true);
@@ -98,6 +99,18 @@ void ADuckProjectile::InteractionKeyPressed(APJECharacterPlayer* Character)
 			}
 		}
 	}
+}
+
+void ADuckProjectile::CalculateGravityScale(float DesiredRange, float InitialSpeed)
+{
+	float AngleInRadians = FMath::DegreesToRadians(45.0f);
+	float Gravity = (InitialSpeed * InitialSpeed * FMath::Sin(2 * AngleInRadians)) / DesiredRange;
+
+	float ProjectileSpeed = InitialSpeed * 100.0f;
+	GravityScale = Gravity / 9.81f;
+	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;
+	ProjectileMovementComponent->MaxSpeed = ProjectileSpeed;
+	ProjectileMovementComponent->ProjectileGravityScale = GravityScale;
 }
 
 

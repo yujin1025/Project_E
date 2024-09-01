@@ -110,10 +110,6 @@ protected:
 	FVector MuzzleLocation;
 	FRotator MuzzleRotation;
 
-	// 카메라 위치로부터의 총구 오프셋
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector MuzzleOffset;
-
 	int32 MagicBallCount;
 	FTimerHandle RapidFireTimerHandle;
 	int32 RapidFireCount;

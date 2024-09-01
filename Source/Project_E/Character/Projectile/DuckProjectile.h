@@ -29,6 +29,8 @@ public:
 
 	FORCEINLINE void SetItemCode(int32 NewItemCode) { ItemCode = NewItemCode; }
 
+	float GetGravityScale() const { return GravityScale; }
+
 protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_GetBall();
@@ -44,12 +46,11 @@ public:
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	float Speed = 3200.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	float GravityScale = 4.0f;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "item")
 	int32 ItemCode;
+
+	float GravityScale;
+
+private:
+	void CalculateGravityScale(float DesiredRange, float InitialSpeed);
 };

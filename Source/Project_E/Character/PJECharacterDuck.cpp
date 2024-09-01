@@ -208,7 +208,7 @@ void APJECharacterDuck::Fire()
             UItem* RemovedItem = Inventory->RemoveLastItem(true);
             if (RemovedItem)
             {
-                MuzzleRotation.Pitch += 7.0f;
+                MuzzleRotation.Pitch += 10.0f;
                 PredictedProjectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
             }
         }
@@ -439,26 +439,28 @@ void APJECharacterDuck::CalculateProjectilePath()
     FRotator CameraRotation;
     GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-    FVector CameraForwardVector = CameraRotation.Vector();
-
+    //발사체의 발사 위치
     MuzzleLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 
+    // 목표 지점 계산
     FVector2D CrosshairScreenPosition = GetCrosshairScreenPosition();
     FVector CrosshairWorldPosition;
     FVector WorldDirection;
     UGameplayStatics::DeprojectScreenToWorld(GetWorld()->GetFirstPlayerController(), CrosshairScreenPosition, CrosshairWorldPosition, WorldDirection);
-
+    
     float DesiredDistance = 1000.0f;
     FVector TargetPoint = CrosshairWorldPosition + WorldDirection * DesiredDistance;
-
+    
+    // 발사체 방향과 속도 설정
     FVector MuzzleToTarget = (TargetPoint - MuzzleLocation).GetSafeNormal();
     MuzzleRotation = MuzzleToTarget.Rotation();
     MuzzleRotation.Pitch += 5.0f;
 
     float ProjectileSpeed = 3200.0f;
-    float GravityScale = 4.0f;
     FVector Velocity = MuzzleRotation.Vector() * ProjectileSpeed;
+    float GravityScale = PredictedProjectile->GetGravityScale();
 
+    //궤적 계산
     TArray<FVector> TrajectoryPoints;
     FVector CurrentPosition = MuzzleLocation;
     FVector CurrentVelocity = Velocity;
@@ -477,6 +479,7 @@ void APJECharacterDuck::CalculateProjectilePath()
         CurrentVelocity = NewVelocity;
     }
 
+    //궤적 시각화
     for (const FVector& Point : TrajectoryPoints)
     {
         DrawDebugSphere(GetWorld(), Point, 5.f, 8, FColor::Green, false, 0.0f);

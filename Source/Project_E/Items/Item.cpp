@@ -22,7 +22,6 @@ UItem* UItem::SetItem(const UDataTable* ItemDataTable, int32 Code)
             NewItem->ItemCode = ItemData->ItemCode;
             NewItem->Name = ItemData->Name;
             NewItem->Type = ItemData->Type;
-            NewItem->Weight = ItemData->Weight;
             NewItem->CatDamage = ItemData->CatDamage;
             NewItem->DuckDamage = ItemData->DuckDamage;
             NewItem->ItemImage = ItemData->ItemImage;
