@@ -1,12 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AI/Enemies/BTTask/BTTask_SetRandomDestPos.h"
 #include "AI/PJEAI.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "AI/Enemies/Controller/PJEShadowAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "NavigationPath.h"
 
 UBTTask_SetRandomDestPos::UBTTask_SetRandomDestPos()
 {
@@ -15,20 +13,39 @@ UBTTask_SetRandomDestPos::UBTTask_SetRandomDestPos()
 EBTNodeResult::Type UBTTask_SetRandomDestPos::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
-
+    
     APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
-    if (nullptr == ControllingPawn)
+    if (ControllingPawn == nullptr)
     {
         return EBTNodeResult::Failed;
     }
 
-    FVector OriPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_ORIPOS);
-
-    APJEShadowAIController* AIController = Cast<APJEShadowAIController>(OwnerComp.GetAIOwner());
-    if (AIController)
+    UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
+    if (Blackboard == nullptr)
     {
-        AIController->Server_SetRandomDestPos(OriPos);
+        return EBTNodeResult::Failed;
     }
+
+    Blackboard->SetValueAsVector(BBKEY_DESTPOS, ControllingPawn->GetActorLocation());
+
+    UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
+    if (NavSystem == nullptr)
+    {
+        return EBTNodeResult::Failed;
+    }
+
+    FVector SubPatrolPos;
+    FNavLocation SubNavLocation;
+    NavSystem->GetRandomReachablePointInRadius(Blackboard->GetValueAsVector(BBKEY_DESTPOS), 2000.0f, SubNavLocation);
+    SubPatrolPos = SubNavLocation.Location;
+    Blackboard->SetValueAsVector(BBKEY_SUBDESTPOS, SubPatrolPos);
+    
+    FVector NextPatrolPos;
+    FNavLocation NavLocation;
+    NavSystem->GetRandomReachablePointInRadius(Blackboard->GetValueAsVector(BBKEY_SUBDESTPOS), 1000.0f, NavLocation);
+    NextPatrolPos = NavLocation.Location;
+
+    Blackboard->SetValueAsVector(BBKEY_DESTPOS, NextPatrolPos);
 
     return EBTNodeResult::Succeeded;
 }

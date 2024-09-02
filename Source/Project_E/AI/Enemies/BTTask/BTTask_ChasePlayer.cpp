@@ -6,6 +6,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Actor.h"
 #include "AI/PJEAI.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 
 UBTTask_ChasePlayer::UBTTask_ChasePlayer()
 {
@@ -36,5 +38,25 @@ void UBTTask_ChasePlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
         return;
     }
 
-    AICon->MoveToLocation(TargetActor->GetActorLocation(), 0.0001f, true, false, false, false, nullptr, true);
+    ACharacter* Character = Cast<ACharacter>(AICon->GetPawn());
+    if (!Character)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Controlled Pawn not found"));
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+        return;
+    }
+
+    FVector DirVec = TargetActor->GetActorLocation() - Character->GetActorLocation();
+    DirVec.Normalize();
+
+    FVector NewLocation = Character->GetActorLocation() + DirVec * 100.0f;
+
+    if (!IsFrontEmpty(Character, DirVec) || !IsLocationInNavMesh(NewLocation) || IsCliff(Character, DirVec))
+    {
+        AICon->StopMovement();
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+        return;
+    }
+
+    AICon->MoveToLocation(NewLocation, 0.0001f, true, false, false, false, nullptr, true);
 }

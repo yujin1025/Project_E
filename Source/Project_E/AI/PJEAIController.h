@@ -6,6 +6,8 @@
 #include "AIController.h"
 #include "PJEAIController.generated.h"
 
+class UBlackboardData;
+class UBehaviorTree;
 /**
  * 
  */
@@ -14,7 +16,7 @@ class PROJECT_E_API APJEAIController : public AAIController
 {
     GENERATED_BODY()
 
-    public:
+public:
     APJEAIController();
 
     UFUNCTION(BlueprintCallable, Category = "AI")
@@ -25,36 +27,24 @@ class PROJECT_E_API APJEAIController : public AAIController
 
     UFUNCTION(Server, Reliable, WithValidation)
     void Server_RunAI();
+    void Server_RunAI_Implementation();
 
     UFUNCTION(Server, Reliable, WithValidation)
     void Server_StopAI();
-
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_RunAI();
-
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_StopAI();
+    void Server_StopAI_Implementation();
 
     virtual void OnPossess(APawn* InPawn) override;
 
-    UFUNCTION()
-    void OnRep_BBAsset();
+    UBlackboardData* GetBB();
 
-    UFUNCTION()
-    void OnRep_BTAsset();
-
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-    TObjectPtr<class UBlackboardData> GetBB();
-
-    TObjectPtr<class UBehaviorTree> GetBT();
+    UBehaviorTree* GetBT();
 
 protected:
-    UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_BBAsset)
-    TObjectPtr<class UBlackboardData> BBAsset;
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UBlackboardData> BBAsset;
 
-    UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_BTAsset)
-    TObjectPtr<class UBehaviorTree> BTAsset;
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UBehaviorTree> BTAsset;
 
     virtual void InitBB();
 

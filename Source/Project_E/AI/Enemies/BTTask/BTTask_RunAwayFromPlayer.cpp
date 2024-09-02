@@ -10,7 +10,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "Project_E/Character/PJECharacterShadowA.h"
 #include "Project_E/AI/PJEAIController.h"
-#include "DrawDebugHelpers.h"
+#include "Components/CapsuleComponent.h"
 
 UBTTask_RunAwayFromPlayer::UBTTask_RunAwayFromPlayer()
 {
@@ -55,8 +55,8 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
         return;
     }
 
-    ACharacter* ControlledPawn = Cast<ACharacter>(AICon->GetPawn());
-    if (!ControlledPawn)
+    ACharacter* Character = Cast<ACharacter>(AICon->GetPawn());
+    if (!Character)
     {
         UE_LOG(LogTemp, Error, TEXT("Controlled Pawn not found"));
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
@@ -70,7 +70,7 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     if (CurrentTime - KeepMovingTime >= MaxKeepMovingTime)
     {
         AICon->StopMovement();
-        ControlledPawn->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
+        Character->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         return;
     }
@@ -84,7 +84,7 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     }
 
     FVector PlayerPos = PlayerActor->GetActorLocation();
-    FVector AIPos = ControlledPawn->GetActorLocation();
+    FVector AIPos = Character->GetActorLocation();
     FVector DirectionToPlayer = PlayerPos - AIPos;
     FVector DirectionAwayFromPlayer = -DirectionToPlayer.GetSafeNormal();
 
@@ -92,25 +92,11 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     FVector RandomDirectionAwayFromPlayer = RandomRotation.RotateVector(DirectionAwayFromPlayer);
     RandomDirectionAwayFromPlayer.Normalize();
 
-    FVector NewLocation = AIPos + RandomDirectionAwayFromPlayer * ControlledPawn->GetCharacterMovement()->MaxWalkSpeed * DeltaSeconds * 100.0f;
-
-    FCollisionQueryParams CollisionParams;
-    CollisionParams.AddIgnoredActor(ControlledPawn);
-
-    FVector Start = ControlledPawn->GetActorLocation();
-    FVector End = Start + RandomDirectionAwayFromPlayer * 100.0f;
-    FHitResult HitResult;
-    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
-
-    FVector DownStart = End;
-    FVector DownEnd = End + FVector(0.0f, 0.0f, -200.0f);
-    FHitResult DownHitResult;
-    bool bDownHit = GetWorld()->LineTraceSingleByChannel(DownHitResult, DownStart, DownEnd, ECC_Visibility, CollisionParams);
-
-    if (bHit || !bDownHit)
+    FVector NewLocation = Character->GetActorLocation() + RandomDirectionAwayFromPlayer * 100.0f;
+    if (!IsFrontEmpty(Character, RandomDirectionAwayFromPlayer) || !IsLocationInNavMesh(NewLocation) || IsCliff(Character, RandomDirectionAwayFromPlayer))
     {  
         AICon->StopMovement();
-        ControlledPawn->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
+        Character->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         return;
     }

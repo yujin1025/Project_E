@@ -39,7 +39,10 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
     {
         FRotator SpawnRotation = FRotator::ZeroRotator;
 
-        APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, DesiredLocation, SpawnRotation);
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+        APJECharacterShadow* SpawnedMonster = GetWorld()->SpawnActor<APJECharacterShadow>(MonsterClass, DesiredLocation, SpawnRotation, SpawnParams);
         if (SpawnedMonster)
         {
             if (SpawnedMonster->IsA(APJECharacterShadowA::StaticClass()))

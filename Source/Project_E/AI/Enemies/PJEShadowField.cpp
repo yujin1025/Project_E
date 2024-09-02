@@ -11,6 +11,8 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
+#include "Character/PJECharacterPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APJEShadowField::APJEShadowField()
@@ -66,7 +68,12 @@ void APJEShadowField::Tick(float DeltaTime)
         {
             if (Actor && Actor->IsA(APJECharacterPlayer::StaticClass()))
             {
-                UGameplayStatics::ApplyDamage(Actor, DamagePerSecond * DeltaTime, nullptr, this, UDamageType::StaticClass());
+                APJECharacterPlayer* PlayerCharacter = Cast<APJECharacterPlayer>(Actor);
+                if (PlayerCharacter && PlayerCharacter->GetCharacterMovement()->IsMovingOnGround())
+                {
+                    // 지면에 붙어있는 경우에만 데미지 적용
+                    UGameplayStatics::ApplyDamage(Actor, DamagePerSecond * DeltaTime, nullptr, this, UDamageType::StaticClass());
+                }
             }
         }
     }
