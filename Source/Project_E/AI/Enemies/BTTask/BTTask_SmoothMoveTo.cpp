@@ -20,6 +20,14 @@ EBTNodeResult::Type UBTTask_SmoothMoveTo::ExecuteTask(UBehaviorTreeComponent& Ow
 {
     APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
     ACharacter* ControllingCharacter = Cast<ACharacter>(ControllingPawn);
+
+    UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+    if (BlackboardComp == nullptr)
+    {
+        return EBTNodeResult::Failed;
+    }
+
+    BlackboardComp->SetValueAsFloat(BBKEY_PROGRESS, 0.2f);
     return EBTNodeResult::InProgress;
 }
 
@@ -29,6 +37,7 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
     if (nullptr == ControllingPawn)
     {
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
 
@@ -40,18 +49,13 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
         return;
     }
 
-    UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
-    if (nullptr == NavSystem)
-    {
-        return;
-    }
-
     UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
     if (BlackboardComp == nullptr)
     {
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
-        
+
 
     FVector NewLocation = CalculateQuadraticBezierPoint(
         BlackboardComp->GetValueAsFloat(BBKEY_PROGRESS),
@@ -63,41 +67,23 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     FVector DirVec = NewLocation - Character->GetActorLocation();
     DirVec.Normalize();
 
-    FCollisionQueryParams CollisionParams;
-    CollisionParams.AddIgnoredActor(ControllingPawn);
+    NewLocation = Character->GetActorLocation() + DirVec * 100.0f;
 
-    // 충돌 검사
-    FVector Start = Character->GetActorLocation();
-    FVector End = Start + DirVec * 100.0f;
-    FHitResult HitResult;
-    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
-
-    // 낭떠러지 검사
-    FVector DownStart = Start + DirVec * 100.0f;
-    FVector DownEnd = Start + DirVec * 100.0f + FVector(0.0f, 0.0f, -200.0f);
-    FHitResult DownHitResult;
-    bool bDownHit = GetWorld()->LineTraceSingleByChannel(DownHitResult, DownStart, DownEnd, ECC_Visibility, CollisionParams);
-
-    
-    if (bHit || !bDownHit)
+    if (!IsFrontEmpty(Character, DirVec) || !IsLocationInNavMesh(NewLocation) || IsCliff(Character, DirVec))
     {
-        // 충돌 또는 낭떠러지 시 태스크 실패로 설정
+        AIController->StopMovement();
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
-    
 
-    AIController->MoveToLocation(Character->GetActorLocation() + DirVec * 10.0f, -1.0f, false, false, false, false, nullptr, true);
+    AIController->MoveToLocation(NewLocation, 0.00001f , false, false, false, false, nullptr, true);
     BlackboardComp->SetValueAsFloat(BBKEY_PROGRESS, BlackboardComp->GetValueAsFloat(BBKEY_PROGRESS) + DeltaSeconds * 0.6);
 
     if (OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_PROGRESS) >= 0.9)
     {
         BlackboardComp->SetValueAsFloat(BBKEY_PROGRESS, 0.2f);
-        if (AIController)
-        {
-            FVector DestPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_DESTPOS);
-            AIController->Server_SetRandomDestPos(DestPos);
-        }
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+        return;
     }
 }
 

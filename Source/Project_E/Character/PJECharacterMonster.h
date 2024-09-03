@@ -62,4 +62,14 @@ protected:
 protected:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Push")
+	float PushStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Push")
+	float MinimumPlayerSpeed;
+
+// HP Section
+protected:
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

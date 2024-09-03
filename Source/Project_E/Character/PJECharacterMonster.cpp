@@ -8,6 +8,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Component/HealthComponent.h"
 #include "Character/PJECharacterPlayer.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 APJECharacterMonster::APJECharacterMonster()
 {
@@ -30,7 +32,7 @@ APJECharacterMonster::APJECharacterMonster()
 		HealthBarComponent->SetRelativeLocation(FVector(0.0f, 0.0f, CapsuleHalfHeight + HealthBarOffset));
 	}
 
-	GetMesh()->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 }
 
 void APJECharacterMonster::BeginPlay()
@@ -45,16 +47,39 @@ void APJECharacterMonster::OnDeath()
 
 void APJECharacterMonster::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// 플레이어와 충돌한 경우 처리
 	if (OtherActor->IsA(APJECharacterPlayer::StaticClass()))
 	{
-		// 충돌 방향의 반대 방향으로 밀어내기
-		FVector PushDirection = Hit.ImpactNormal * -1.0f;
-		PushDirection.Z = 0.0f; // 수평 방향으로 힘 가하기 (Y축으로 밀리지 않게)
+		FVector PlayerVelocity = OtherActor->GetVelocity();
 
-		float PushStrength = 1000.0f; // Impulse의 세기 조절
-		GetMesh()->AddImpulse(PushDirection * PushStrength, NAME_None, true); // Impulse 적용
+		if (PlayerVelocity.Size() > MinimumPlayerSpeed)
+		{
+			// 플레이어와 몬스터 간의 벡터 계산
+			FVector PlayerLocation = OtherActor->GetActorLocation();
+			FVector MonsterLocation = GetActorLocation();
+			FVector PlayerToMonsterVector = (MonsterLocation - PlayerLocation).GetSafeNormal();
+
+			// 플레이어의 정면 벡터 계산
+			FVector PlayerForwardVector = OtherActor->GetActorForwardVector().GetSafeNormal();
+
+			// 두 벡터 간의 각도 계산
+			float DotProduct = FVector::DotProduct(PlayerToMonsterVector, PlayerForwardVector);
+			float Angle = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
+
+			// 각도가 0에서 90도 사이인지 확인
+			if (Angle >= 0.0f && Angle <= 90.0f)
+			{
+				FVector PushDirection = (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();
+				FVector Impulse = PushDirection * PushStrength;
+				GetCharacterMovement()->AddImpulse(Impulse, true);
+			}
+		}
 	}
+}
+
+float APJECharacterMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return SuperReturn;
 }
 
 void APJECharacterMonster::DelayedDestroy()

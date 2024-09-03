@@ -6,11 +6,13 @@
 APJECharacterShadow::APJECharacterShadow()
 {
 	ShadowSpawnRadius = 1000.0f;
+	bReplicates = true;
 }
 
 void APJECharacterShadow::BeginPlay()
 {
 	Super::BeginPlay();
+	SetReplicateMovement(true);
 	MoveSpeed *= 100.0f;
 }
 
