@@ -76,6 +76,12 @@ void APJECharacterMonster::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	}
 }
 
+float APJECharacterMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return SuperReturn;
+}
+
 void APJECharacterMonster::DelayedDestroy()
 {
 	Destroy();
