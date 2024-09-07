@@ -6,6 +6,7 @@
 #include "../PJECharacterDuck.h"
 #include "../Component/HealthComponent.h"
 #include "Components/WidgetComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 ACatWeapon::ACatWeapon()
 {
@@ -57,8 +58,7 @@ void ACatWeapon::OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
         if (DamagedHealthComponent == nullptr)
             return;
 
-        DamagedHealthComponent->ChangeHealth(-DamageAmount);
-
+        UGameplayStatics::ApplyDamage(OtherActor, DamageAmount, nullptr, this, UDamageType::StaticClass());
 
     }
 }

@@ -93,7 +93,7 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     RandomDirectionAwayFromPlayer.Normalize();
 
     FVector NewLocation = Character->GetActorLocation() + RandomDirectionAwayFromPlayer * 100.0f;
-    if (!IsFrontEmpty(Character, RandomDirectionAwayFromPlayer) || !IsLocationInNavMesh(NewLocation) || IsCliff(Character, RandomDirectionAwayFromPlayer))
+    if (!IsFrontEmpty(Character, RandomDirectionAwayFromPlayer) || !IsLocationInNavMesh(Character, NewLocation) || IsCliff(Character, RandomDirectionAwayFromPlayer))
     {  
         AICon->StopMovement();
         Character->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;

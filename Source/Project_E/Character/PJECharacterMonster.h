@@ -37,6 +37,7 @@ protected:
 public:
 	void OnDeath();
 
+	/**/
 protected:
 	void DelayedDestroy();
 	FTimerHandle DestructionTimer;
@@ -72,4 +73,9 @@ protected:
 // HP Section
 protected:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TObjectPtr<class UNiagaraSystem> HitEffect;
+
+	void PlayHitEffect(AActor* DamageCauser);
 };

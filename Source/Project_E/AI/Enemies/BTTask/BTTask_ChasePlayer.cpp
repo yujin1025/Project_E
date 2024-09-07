@@ -51,7 +51,7 @@ void UBTTask_ChasePlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 
     FVector NewLocation = Character->GetActorLocation() + DirVec * 100.0f;
 
-    if (!IsFrontEmpty(Character, DirVec) || !IsLocationInNavMesh(NewLocation) || IsCliff(Character, DirVec))
+    if (!IsFrontEmpty(Character, DirVec) || !IsLocationInNavMesh(Character, NewLocation) || IsCliff(Character, DirVec))
     {
         AICon->StopMovement();
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

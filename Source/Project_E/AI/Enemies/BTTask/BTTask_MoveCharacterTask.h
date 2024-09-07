@@ -15,7 +15,7 @@ class PROJECT_E_API UBTTask_MoveCharacterTask : public UBTTaskNode
 	GENERATED_BODY()
 
 public:
-	bool IsLocationInNavMesh(FVector TargetLocation);
+	bool IsLocationInNavMesh(ACharacter* CurrentCharacter, FVector TargetLocation);
 	bool IsFrontEmpty(ACharacter* CurrentCharacter, FVector DirVec);
 	bool IsCliff(ACharacter* CurrentCharacter, FVector DirVec);
 	

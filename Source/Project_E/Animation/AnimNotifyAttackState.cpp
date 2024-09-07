@@ -5,6 +5,7 @@
 #include "../Character/PJECharacterBase.h"
 #include "../Character/Component/HealthComponent.h"
 #include "../Character/Projectile/CatWeapon.h"
+#include <Kismet/GameplayStatics.h>
 
 //공격 범위 내에 있는 대상을 찾아 데미지를 가함
 void UAnimNotifyAttackState::TryAttack(USkeletalMeshComponent* MeshComp)
@@ -28,12 +29,16 @@ void UAnimNotifyAttackState::TryAttack(USkeletalMeshComponent* MeshComp)
 	{
 		for (auto* TargetCharacter : TargetCharacters)
 		{
+			UGameplayStatics::ApplyDamage(TargetCharacter, WeaponDamageAmount, nullptr, MyCharacter, UDamageType::StaticClass());
+			CurrentAttackCount++;
+			/*
 			UHealthComponent* DamagedHealthComponent = TargetCharacter->FindComponentByClass<UHealthComponent>();
 			if (DamagedHealthComponent)
 			{
 				DamagedHealthComponent->ChangeHealth(-WeaponDamageAmount);
 				CurrentAttackCount++;
 			}
+			*/
 		}
 	}
 }

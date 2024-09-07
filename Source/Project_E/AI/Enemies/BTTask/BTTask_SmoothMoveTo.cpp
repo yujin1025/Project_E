@@ -37,6 +37,7 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
     if (nullptr == ControllingPawn)
     {
+        //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error0"));
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
@@ -45,6 +46,7 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     ACharacter* Character = Cast<ACharacter>(AIController->GetPawn());
     if (Character == nullptr)
     {
+        //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error1"));
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
@@ -52,6 +54,7 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
     if (BlackboardComp == nullptr)
     {
+        //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error2"));
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
         return;
     }
@@ -69,7 +72,7 @@ void UBTTask_SmoothMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 
     NewLocation = Character->GetActorLocation() + DirVec * 100.0f;
 
-    if (!IsFrontEmpty(Character, DirVec) || !IsLocationInNavMesh(NewLocation) || IsCliff(Character, DirVec))
+    if (!IsFrontEmpty(Character, DirVec) || !IsLocationInNavMesh(Character, NewLocation) || IsCliff(Character, DirVec))
     {
         AIController->StopMovement();
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
