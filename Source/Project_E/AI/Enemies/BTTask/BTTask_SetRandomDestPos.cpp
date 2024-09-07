@@ -31,20 +31,26 @@ EBTNodeResult::Type UBTTask_SetRandomDestPos::ExecuteTask(UBehaviorTreeComponent
     UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
     if (NavSystem == nullptr)
     {
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error0"));
         return EBTNodeResult::Failed;
     }
 
     FVector SubPatrolPos;
     FNavLocation SubNavLocation;
-    NavSystem->GetRandomReachablePointInRadius(Blackboard->GetValueAsVector(BBKEY_DESTPOS), 2000.0f, SubNavLocation);
+    if (!(NavSystem->GetRandomReachablePointInRadius(Blackboard->GetValueAsVector(BBKEY_DESTPOS), 2000.0f, SubNavLocation)))
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error1"));
+    }
     SubPatrolPos = SubNavLocation.Location;
     Blackboard->SetValueAsVector(BBKEY_SUBDESTPOS, SubPatrolPos);
     
     FVector NextPatrolPos;
     FNavLocation NavLocation;
-    NavSystem->GetRandomReachablePointInRadius(Blackboard->GetValueAsVector(BBKEY_SUBDESTPOS), 1000.0f, NavLocation);
+    if (!(NavSystem->GetRandomReachablePointInRadius(Blackboard->GetValueAsVector(BBKEY_SUBDESTPOS), 1000.0f, NavLocation)))
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error2"));
+    }
     NextPatrolPos = NavLocation.Location;
-
     Blackboard->SetValueAsVector(BBKEY_DESTPOS, NextPatrolPos);
 
     return EBTNodeResult::Succeeded;

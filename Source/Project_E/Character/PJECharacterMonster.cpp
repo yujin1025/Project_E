@@ -10,6 +10,10 @@
 #include "Character/PJECharacterPlayer.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+
+
 
 APJECharacterMonster::APJECharacterMonster()
 {
@@ -76,12 +80,6 @@ void APJECharacterMonster::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	}
 }
 
-float APJECharacterMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	return SuperReturn;
-}
-
 void APJECharacterMonster::DelayedDestroy()
 {
 	Destroy();
@@ -100,4 +98,21 @@ int32 APJECharacterMonster::GetCurrentHP() const
 float APJECharacterMonster::GetMoveSpeed() const
 {
 	return MoveSpeed;
+}
+
+float APJECharacterMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	PlayHitEffect(DamageCauser);
+	return SuperReturn;
+}
+
+void APJECharacterMonster::PlayHitEffect(AActor* DamageCauser)
+{
+	if (HitEffect)
+	{
+		FVector DirectionToCauser = (DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+		FVector EffectLocation = GetActorLocation() + DirectionToCauser * GetCapsuleComponent()->GetScaledCapsuleRadius();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, EffectLocation, DirectionToCauser.Rotation());
+	}
 }
