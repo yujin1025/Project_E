@@ -32,7 +32,7 @@ APJECharacterMonster::APJECharacterMonster()
 		float CapsuleHalfHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
 		float HealthBarOffset = 50.0f;
 
-		// »ó´ë À§Ä¡ ¼³Á¤
+		// ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 		HealthBarComponent->SetRelativeLocation(FVector(0.0f, 0.0f, CapsuleHalfHeight + HealthBarOffset));
 	}
 
@@ -57,19 +57,19 @@ void APJECharacterMonster::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 		if (PlayerVelocity.Size() > MinimumPlayerSpeed)
 		{
-			// ÇÃ·¹ÀÌ¾î¿Í ¸ó½ºÅÍ °£ÀÇ º¤ÅÍ °è»ê
+			// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 			FVector PlayerLocation = OtherActor->GetActorLocation();
 			FVector MonsterLocation = GetActorLocation();
 			FVector PlayerToMonsterVector = (MonsterLocation - PlayerLocation).GetSafeNormal();
 
-			// ÇÃ·¹ÀÌ¾îÀÇ Á¤¸é º¤ÅÍ °è»ê
+			// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 			FVector PlayerForwardVector = OtherActor->GetActorForwardVector().GetSafeNormal();
 
-			// µÎ º¤ÅÍ °£ÀÇ °¢µµ °è»ê
+			// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 			float DotProduct = FVector::DotProduct(PlayerToMonsterVector, PlayerForwardVector);
 			float Angle = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
 
-			// °¢µµ°¡ 0¿¡¼­ 90µµ »çÀÌÀÎÁö È®ÀÎ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ 90ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 			if (Angle >= 0.0f && Angle <= 90.0f)
 			{
 				FVector PushDirection = (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();

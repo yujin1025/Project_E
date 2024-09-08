@@ -35,9 +35,6 @@ public:
     EItemType Type;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-    float Weight;
-    
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
     float CatDamage;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
@@ -73,9 +70,6 @@ struct FItemData : public FTableRowBase
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     EItemType Type;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-    float Weight;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     float CatDamage;

@@ -17,29 +17,8 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	APJECharacterBase* Character = Cast<APJECharacterBase>(GetOwner());
-	if (Character == nullptr)
-		return;
-
-	ECharacterType CharacterType = Character->GetCharacterType();
-
-	auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
-	if (GameMode == nullptr)
-		return;
-
-	auto* Data = GameMode->GetCharacterStat(CharacterType);
-	if (Data == nullptr)
-		return;
-
-	MaxHealth = Data->MaxHp;
-	HpBarWidgetComponent = Character->FindComponentByClass<UPJEHpBarWidgetComponent>();
-	CurrentHealth = MaxHealth;
-
-	if (OnHealthChanged.IsBound())
-	{
-		OnHealthChanged.Execute();
-	}
+	
+	Server_BeginPlay();
 }
 
 void UHealthComponent::ChangeHealth(float Amount)
@@ -73,6 +52,23 @@ void UHealthComponent::DestroyIfDead()
 	}
 }
 
+void UHealthComponent::OnRep_HpBarWidgetComponent()
+{
+	UpdateHpBar();
+}
+
+void UHealthComponent::UpdateHpBar()
+{
+	if (HpBarWidgetComponent)
+	{
+		HealthBarWidget = Cast<UPJEHealthBarWidget>(HpBarWidgetComponent->GetUserWidgetObject());
+		if (HealthBarWidget)
+		{
+			HealthBarWidget->UpdateHealthBar();
+		}
+	}
+}
+
 void UHealthComponent::OnRep_CurrentHealth()
 {
 	auto* Character = Cast<APJECharacterBase>(GetOwner());
@@ -82,23 +78,39 @@ void UHealthComponent::OnRep_CurrentHealth()
 		if (PlayerState)
 		{
 			PlayerState->OnChangePlayerHealth(Character->CharacterId, CurrentHealth);
+			return;
 		}
-		else
+
+		auto* GameState = Cast<APJEGameState>(GetWorld()->GetGameState());
+		if (!Character->IsPlayer() && GameState)
 		{
-			auto* GameState = Cast<APJEGameState>(GetWorld()->GetGameState());
-			if (!Character->IsPlayer() && GameState)
-			{
-				GameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
-			}
+			GameState->OnChangedHealth(Character->CharacterId, CurrentHealth);
 		}
 	}
 
-	if (OnHealthChanged.IsBound())
-	{
-		OnHealthChanged.Execute();
-	}
-
+	UpdateHpBar();
 	DestroyIfDead();
+}
+
+void UHealthComponent::Server_BeginPlay_Implementation()
+{
+	APJECharacterBase* Character = Cast<APJECharacterBase>(GetOwner());
+	if (Character == nullptr)
+		return;
+
+	ECharacterType CharacterType = Character->GetCharacterType();
+
+	auto* GameMode = Cast<APJEGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode == nullptr)
+		return;
+
+	auto* Data = GameMode->GetCharacterStat(CharacterType);
+	if (Data == nullptr)
+		return;
+
+	MaxHealth = Data->MaxHp;
+	CurrentHealth = MaxHealth;
+	HpBarWidgetComponent = Character->FindComponentByClass<UPJEHpBarWidgetComponent>();
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -107,6 +119,7 @@ void UHealthComponent::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& O
 
 	DOREPLIFETIME(UHealthComponent, CurrentHealth);
 	DOREPLIFETIME(UHealthComponent, MaxHealth);
+	DOREPLIFETIME(UHealthComponent, HpBarWidgetComponent);
 }
 
 void UHealthComponent::OnRep_MaxHealth()

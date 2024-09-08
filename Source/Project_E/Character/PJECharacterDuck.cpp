@@ -201,6 +201,7 @@ void APJECharacterDuck::Fire()
     if (!bIsAiming)
         return;
 
+    //일단 임의로 클라에서 발사 먼저 하고 서버에서 발사하면 destroy(나중에 수정하기)
     if (!HasAuthority())
     {
         if (bCanShoot && Inventory->GetWeaponCount() > 0)
@@ -208,7 +209,6 @@ void APJECharacterDuck::Fire()
             UItem* RemovedItem = Inventory->RemoveLastItem(true);
             if (RemovedItem)
             {
-                MuzzleRotation.Pitch += 7.0f;
                 PredictedProjectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
             }
         }
@@ -233,6 +233,7 @@ void APJECharacterDuck::Server_Fire_Implementation(FVector ClientMuzzleLocation,
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
+            Projectile->SetDamage(RemovedItem->DuckDamage);
 
             Multicast_Fire(ClientMuzzleLocation, ClientMuzzleRotation);
             Multicast_DropItem(RemovedItem->ItemCode);
@@ -319,6 +320,7 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
+            Projectile->SetDamage(RemovedItem->DuckDamage);
             UpdateInventoryWidget(RemovedItem->Type);
         }
 
@@ -398,7 +400,6 @@ void APJECharacterDuck::UpdateInventoryWidget(EItemType ItemType)
     if (ItemType == EItemType::Weapon && WeaponInventoryWidget)
     {
         WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Red, FString::Printf(TEXT("DuckWeaponInventory : %d"), Inventory->GetWeaponCount()));
     }
     else if (ItemType == EItemType::NonWeapon && NonWeaponInventoryWidget)
     {
@@ -439,26 +440,28 @@ void APJECharacterDuck::CalculateProjectilePath()
     FRotator CameraRotation;
     GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-    FVector CameraForwardVector = CameraRotation.Vector();
-
+    //발사체의 발사 위치
     MuzzleLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 
+    // 목표 지점 계산
     FVector2D CrosshairScreenPosition = GetCrosshairScreenPosition();
     FVector CrosshairWorldPosition;
     FVector WorldDirection;
     UGameplayStatics::DeprojectScreenToWorld(GetWorld()->GetFirstPlayerController(), CrosshairScreenPosition, CrosshairWorldPosition, WorldDirection);
-
+    
     float DesiredDistance = 1000.0f;
     FVector TargetPoint = CrosshairWorldPosition + WorldDirection * DesiredDistance;
-
+    
+    // 발사체 방향과 속도 설정
     FVector MuzzleToTarget = (TargetPoint - MuzzleLocation).GetSafeNormal();
     MuzzleRotation = MuzzleToTarget.Rotation();
     MuzzleRotation.Pitch += 5.0f;
 
     float ProjectileSpeed = 3200.0f;
-    float GravityScale = 4.0f;
     FVector Velocity = MuzzleRotation.Vector() * ProjectileSpeed;
+    float GravityScale = 4.175f;
 
+    //궤적 계산
     TArray<FVector> TrajectoryPoints;
     FVector CurrentPosition = MuzzleLocation;
     FVector CurrentVelocity = Velocity;
@@ -477,6 +480,7 @@ void APJECharacterDuck::CalculateProjectilePath()
         CurrentVelocity = NewVelocity;
     }
 
+    //궤적 시각화
     for (const FVector& Point : TrajectoryPoints)
     {
         DrawDebugSphere(GetWorld(), Point, 5.f, 8, FColor::Green, false, 0.0f);

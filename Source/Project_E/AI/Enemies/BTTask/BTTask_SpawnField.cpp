@@ -83,8 +83,6 @@ void UBTTask_SpawnField::SpawnField(AActor* OwnerActor, uint8* NodeMemory)
         // FieldActor를 OwnerActor의 자식으로 부착
         FieldActor->AttachToActor(OwnerActor, FAttachmentTransformRules::KeepWorldTransform);
 
-        OwnerActor->OnDestroyed.AddDynamic(FieldActor, &APJEShadowField::DestroySelf);
-
         FieldActor->SetActorLocation(SpawnLocation);
 
         // 필드 엑터 초기화
@@ -94,6 +92,8 @@ void UBTTask_SpawnField::SpawnField(AActor* OwnerActor, uint8* NodeMemory)
             TaskMemory->FieldSpawnable->GetFieldRadius()
         );
     }
+
+    TaskMemory->FieldSpawnable->SetFieldActor(FieldActor);
 
 }
 

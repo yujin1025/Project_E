@@ -31,7 +31,6 @@ void UPJEHpBarWidgetComponent::InitWidget()
         {
             HpBarWidget->SetHealthComponent(HealthComponent);
             HpBarWidget->UpdateHealthBar();
-            HealthComponent->OnHealthChanged.BindUObject(HpBarWidget, &UPJEHealthBarWidget::UpdateHealthBar);
         }
     }
 }

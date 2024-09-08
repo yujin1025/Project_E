@@ -8,8 +8,6 @@
 #include "Components/Button.h"
 #include "GameSession/SessionSubsystem.h"
 #include "Kismet/GameplayStatics.h"
-#include "UI/PopUpWidget.h"
-#include "UI/Manager/PJEUIManager.h"
 
 UTestServerMenuWidget::UTestServerMenuWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -80,10 +78,7 @@ bool UTestServerMenuWidget::Initialize()
 	{
 		QuitButton->OnClicked.AddDynamic(this, &ThisClass::QuitButtonClicked);
 	}
-	if (SettingButton)
-	{
-		SettingButton->OnClicked.AddDynamic(this, &ThisClass::SettingButtonClicked);
-	}
+	
 	return true;
 }
 
@@ -186,21 +181,6 @@ void UTestServerMenuWidget::JoinButtonClicked()
 
 void UTestServerMenuWidget::QuitButtonClicked()
 {
-}
-
-void UTestServerMenuWidget::SettingButtonClicked()
-{
-	if (SettingsMenuClass)
-	{
-		if (!SettingsMenu.IsValid() || SettingsMenu->IsPendingKill())
-		{
-			if (UPJEUIManager::GetInstance()->GetTopmostPopupWidget() == nullptr)
-			{
-				SettingsMenu = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), SettingsMenuClass);
-			}
-
-		}
-	}
 }
 
 void UTestServerMenuWidget::MenuTearDown()

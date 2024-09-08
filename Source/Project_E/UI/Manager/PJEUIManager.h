@@ -30,5 +30,4 @@ private:
 
     void ShowTopmostPopupWidget(UWorld* WorldContext, class UPopUpWidget* NewTopmostWidget);
     void AddPopupWidget(class UPopUpWidget* NewWidget);
-
 };

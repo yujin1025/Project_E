@@ -86,11 +86,6 @@ void APJEShadowField::InitializeField(float Duration, float Damage, float Initia
     FieldRadius = InitialRadius;
 }
 
-void APJEShadowField::DestroySelf(AActor* DestroyedActor)
-{
-    this->Destroy();
-}
-
 void APJEShadowField::ShrinkField(float DeltaTime)
 {
     // 현재 시간이 경과한 전체 지속 시간의 비율에 따라 축소 팩터 계산
