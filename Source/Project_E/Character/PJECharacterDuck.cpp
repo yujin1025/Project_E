@@ -201,6 +201,7 @@ void APJECharacterDuck::Fire()
     if (!bIsAiming)
         return;
 
+    //일단 임의로 클라에서 발사 먼저 하고 서버에서 발사하면 destroy(나중에 수정하기)
     if (!HasAuthority())
     {
         if (bCanShoot && Inventory->GetWeaponCount() > 0)
@@ -208,7 +209,6 @@ void APJECharacterDuck::Fire()
             UItem* RemovedItem = Inventory->RemoveLastItem(true);
             if (RemovedItem)
             {
-                MuzzleRotation.Pitch += 10.0f;
                 PredictedProjectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
             }
         }
@@ -233,6 +233,7 @@ void APJECharacterDuck::Server_Fire_Implementation(FVector ClientMuzzleLocation,
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
+            Projectile->SetDamage(RemovedItem->DuckDamage);
 
             Multicast_Fire(ClientMuzzleLocation, ClientMuzzleRotation);
             Multicast_DropItem(RemovedItem->ItemCode);
@@ -319,6 +320,7 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
+            Projectile->SetDamage(RemovedItem->DuckDamage);
             UpdateInventoryWidget(RemovedItem->Type);
         }
 
@@ -398,7 +400,6 @@ void APJECharacterDuck::UpdateInventoryWidget(EItemType ItemType)
     if (ItemType == EItemType::Weapon && WeaponInventoryWidget)
     {
         WeaponInventoryWidget->UpdateInventory(Inventory->DuckWeaponInventory, true);
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Red, FString::Printf(TEXT("DuckWeaponInventory : %d"), Inventory->GetWeaponCount()));
     }
     else if (ItemType == EItemType::NonWeapon && NonWeaponInventoryWidget)
     {
@@ -458,7 +459,7 @@ void APJECharacterDuck::CalculateProjectilePath()
 
     float ProjectileSpeed = 3200.0f;
     FVector Velocity = MuzzleRotation.Vector() * ProjectileSpeed;
-    float GravityScale = PredictedProjectile->GetGravityScale();
+    float GravityScale = 4.175f;
 
     //궤적 계산
     TArray<FVector> TrajectoryPoints;

@@ -29,7 +29,7 @@ public:
 
 	FORCEINLINE void SetItemCode(int32 NewItemCode) { ItemCode = NewItemCode; }
 
-	float GetGravityScale() const { return GravityScale; }
+	void SetDamage(float Damage);
 
 protected:
 	UFUNCTION(NetMulticast, Reliable)
@@ -49,7 +49,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "item")
 	int32 ItemCode;
 
-	float GravityScale;
+	float DamageAmount = 0.0f;
 
 private:
 	void CalculateGravityScale(float DesiredRange, float InitialSpeed);
