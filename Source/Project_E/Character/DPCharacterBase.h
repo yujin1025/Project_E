@@ -18,15 +18,22 @@ class PROJECT_E_API ADPCharacterBase : public ACharacter
 
 public:
 	ADPCharacterBase();
-	
 	virtual void Tick(float DeltaTime) override;
 	virtual void Jump() override;
+	virtual void Dash();
 
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_Dash();
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_Dash();
+	
 	virtual void Landed(const FHitResult& Hit) override;
 
 private:
+	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Camera")
 	USpringArmComponent* SpringArm;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Camera")
@@ -35,6 +42,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Player")
 	ECharacterType CharacterType;
 
+	// Variables
 	uint8 JumpCount = 0;
 	float JumpHeight = 500.f;
+
+public:
+	FORCEINLINE void SetJumpHeight(const float NewJumpHeight) { JumpHeight = NewJumpHeight; }
+	FORCEINLINE void SetCharacterType(const ECharacterType NewCharacterType) { CharacterType = NewCharacterType; }
+	FORCEINLINE ECharacterType GetCharacterType() const { return CharacterType; }
 };

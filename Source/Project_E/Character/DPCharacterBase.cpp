@@ -4,6 +4,7 @@
 #include "Character/DPCharacterBase.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -12,6 +13,8 @@ ADPCharacterBase::ADPCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Component
+	GetCapsuleComponent()->SetCollisionProfileName(FName("Player"));
+	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->bUsePawnControlRotation = true;
@@ -36,12 +39,30 @@ void ADPCharacterBase::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ADPCharacterBase::Landed(const FHitResult& Hit)
+void ADPCharacterBase::Tick(float DeltaTime)
 {
-	Super::Landed(Hit);
-	JumpCount = 0;
+	Super::Tick(DeltaTime);
 }
 
+
+// Dash
+void ADPCharacterBase::Dash()
+{
+	// How to Activate & Deactivate Dash??
+}
+
+void ADPCharacterBase::Server_Dash_Implementation()
+{
+	
+}
+
+void ADPCharacterBase::NetMulticast_Dash_Implementation()
+{
+	
+}
+
+
+// Jump
 void ADPCharacterBase::Jump()
 {
 	Super::Jump();
@@ -53,7 +74,8 @@ void ADPCharacterBase::Jump()
 	}
 }
 
-void ADPCharacterBase::Tick(float DeltaTime)
+void ADPCharacterBase::Landed(const FHitResult& Hit)
 {
-	Super::Tick(DeltaTime);
+	Super::Landed(Hit);
+	JumpCount = 0;
 }
