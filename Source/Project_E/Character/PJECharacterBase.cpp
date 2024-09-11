@@ -85,20 +85,6 @@ void APJECharacterBase::SetDead()
 	//HpBar->SetHiddenInGame(true);
 }
 
-// Called every frame
-void APJECharacterBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void APJECharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
 void APJECharacterBase::Move(const FVector2D Value)
 {
 	if (Controller != nullptr)
