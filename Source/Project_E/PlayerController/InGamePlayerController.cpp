@@ -47,9 +47,9 @@ void AInGamePlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
-	//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
 	
 }
 
@@ -68,8 +68,6 @@ void AInGamePlayerController::Move(const FInputActionValue& Value)
 		GetPawn()->AddMovementInput(ForwardVector, MovementVector.Y);
 		GetPawn()->AddMovementInput(RightVector, MovementVector.X);
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("DOO"));
 }
 
 void AInGamePlayerController::Look(const FInputActionValue& Value)
@@ -77,7 +75,7 @@ void AInGamePlayerController::Look(const FInputActionValue& Value)
 	const FVector2D LookVector = Value.Get<FVector2D>(); // Multiply Mouse Sensitivity
 
 	AddYawInput(LookVector.X);
-	AddPitchInput(-LookVector.Y);
+	AddPitchInput(LookVector.Y);
 }
 
 void AInGamePlayerController::Jump()
@@ -87,6 +85,7 @@ void AInGamePlayerController::Jump()
 		ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
 		if(DpCharacter)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Jump"));
 			DpCharacter->Jump();
 		}
 	}
