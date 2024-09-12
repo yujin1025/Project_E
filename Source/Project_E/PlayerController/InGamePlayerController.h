@@ -34,9 +34,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-
-	// Delegate
-	DECLARE_DELEGATE_OneParam(DashDelegate, bool)
 	
 	// Player Function
 	void Move(const FInputActionValue& Value);

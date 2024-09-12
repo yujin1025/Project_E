@@ -42,10 +42,11 @@ private:
 	ECharacterType CharacterType;
 
 	// Variables
+	float Speed;
 	uint8 JumpCount = 0;
 	float JumpHeight = 500.f;
 	bool bIsDash;
-
+	
 public:
 	FORCEINLINE void SetJumpHeight(const float NewJumpHeight) { JumpHeight = NewJumpHeight; }
 	FORCEINLINE void SetCharacterType(const ECharacterType NewCharacterType) { CharacterType = NewCharacterType; }

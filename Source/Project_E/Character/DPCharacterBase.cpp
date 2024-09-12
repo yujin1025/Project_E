@@ -54,11 +54,11 @@ void ADPCharacterBase::Tick(float DeltaTime)
 	// Dash Logic
 	if(bIsDash)
 	{
-		
+		GetCharacterMovement()->MaxWalkSpeed = Speed * 1.5f;
 	}
 	else
 	{
-		
+		GetCharacterMovement()->MaxWalkSpeed = Speed;
 	}
 }
 
