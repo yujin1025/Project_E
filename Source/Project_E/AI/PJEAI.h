@@ -6,3 +6,4 @@
 #define BBKEY_PROGRESS TEXT("Progress")
 #define BBKEY_ISFIRSTATTACKED TEXT("bIsFirstAttacked")
 #define BBKEY_PLAYERACTOR TEXT("PlayerActor")
+#define BBKEY_SHOULDMOVETOPOINT TEXT("bShouldMoveToPoint")

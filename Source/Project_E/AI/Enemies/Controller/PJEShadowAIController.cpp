@@ -8,8 +8,14 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Character/PJECharacterShadow.h"
 
 APJEShadowAIController::APJEShadowAIController()
 {
     
+}
+
+void APJEShadowAIController::InitBB()
+{
+    Super::InitBB();
 }

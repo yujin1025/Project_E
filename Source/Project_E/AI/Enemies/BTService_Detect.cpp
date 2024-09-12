@@ -68,5 +68,6 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, PlayerActor);
         }
+        OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_SHOULDMOVETOPOINT, false);
     }
 }

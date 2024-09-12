@@ -78,6 +78,13 @@ void APJECharacterMonster::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			}
 		}
 	}
+
+	if (OtherActor->IsA(APJECharacterMonster::StaticClass()))
+	{
+		FVector PushDirection = (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();
+		FVector Impulse = PushDirection * PushStrength;
+		GetCharacterMovement()->AddImpulse(Impulse, true);
+	}
 }
 
 void APJECharacterMonster::DelayedDestroy()
@@ -104,6 +111,7 @@ float APJECharacterMonster::TakeDamage(float DamageAmount, FDamageEvent const& D
 {
 	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	PlayHitEffect(DamageCauser);
+
 	return SuperReturn;
 }
 

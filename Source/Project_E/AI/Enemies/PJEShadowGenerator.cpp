@@ -11,6 +11,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Pawn.h"
 #include "AI/Enemies/PJEShadowArea.h"
+#include <AI/PJEAI.h>
 
 // Sets default values
 APJEShadowGenerator::APJEShadowGenerator()
@@ -18,6 +19,8 @@ APJEShadowGenerator::APJEShadowGenerator()
     PrimaryActorTick.bCanEverTick = true;
     CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CubeMesh"));
     RootComponent = CubeMesh;
+
+    RallyPoint = FVector(0, 0, 0);
 
     bReplicates = true;
 
@@ -52,6 +55,9 @@ void APJEShadowGenerator::Server_SpawnMonster_Implementation(TSubclassOf<class A
                 ShadowArea->ShadowAArr.Add(ShadowA);
                 CurrentCount++;
             }
+            SpawnedMonster->SetRallyPoint(RallyPoint);
+
+            SpawnedMonster->InitBB();
         }
         else
         {
@@ -79,20 +85,17 @@ void APJEShadowGenerator::Destroyed()
 void APJEShadowGenerator::StartSpawnTimer()
 {
     GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnShadowAWithTimer, 10.0f, true);
+    GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &APJEShadowGenerator::SpawnShadowBWithTimer, 10.0f, true, 5.0f);
 }
 
 void APJEShadowGenerator::SpawnShadowAWithTimer()
 {
-    for (int32 i = 0; i < 1; i++)
-    {
-        Server_SpawnMonster(ShadowBClass, SpawnPos);
-        Server_SpawnMonster(ShadowAClass, SpawnPos);
+    Server_SpawnMonster(ShadowBClass, SpawnPos);
+}
 
-        if (ShadowArea && ShadowArea->GetIsPlayerInArea())
-        {
-            ShadowArea->PlayShadowASound();
-        }
-    }
+void APJEShadowGenerator::SpawnShadowBWithTimer()
+{
+    Server_SpawnMonster(ShadowBClass, SpawnPos);
 }
 
 void APJEShadowGenerator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
