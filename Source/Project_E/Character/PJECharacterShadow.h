@@ -24,10 +24,17 @@ public:
 	FORCEINLINE void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
 	FORCEINLINE float GetShadowSpawnRadius() const;
 
+	void SetRallyPoint(FVector NewPoint);
+	FVector GetRallyPoint();
+
+	virtual void InitBB();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shadow Generator")
 	int32 ShadowGeneratorsCount;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	float ShadowSpawnRadius;
+
+	FVector RallyPoint;
 };

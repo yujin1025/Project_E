@@ -16,4 +16,7 @@ class PROJECT_E_API APJEShadowAIController : public APJEAIController
 
 public:
     APJEShadowAIController();
+
+protected:
+	virtual void InitBB() override;
 };

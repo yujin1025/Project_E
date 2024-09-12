@@ -66,8 +66,7 @@ void APJEAIController::OnPossess(APawn* InPawn)
 
 void APJEAIController::InitBB()
 {
-    Blackboard->SetValueAsVector(BBKEY_SUBDESTPOS, FVector(0, 0, 0));
-    Blackboard->SetValueAsVector(BBKEY_DESTPOS, GetPawn()->GetActorLocation());
+    
 }
 
 UBlackboardData* APJEAIController::GetBB()

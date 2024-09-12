@@ -29,6 +29,8 @@ bool UBTTask_MoveCharacterTask::IsLocationInNavMesh(ACharacter* CurrentCharacter
     return false;
 }
 
+#include "DrawDebugHelpers.h"  // 디버깅용 라인 출력을 위한 헤더 파일 추가
+
 bool UBTTask_MoveCharacterTask::IsFrontEmpty(ACharacter* CurrentCharacter, FVector DirVec)
 {
     if (!DirVec.Normalize())
@@ -47,10 +49,15 @@ bool UBTTask_MoveCharacterTask::IsFrontEmpty(ACharacter* CurrentCharacter, FVect
 
     // 충돌 검사
     FVector Start = CurrentCharacter->GetActorLocation();
-    Start.Z -= Capsule->GetScaledCapsuleHalfHeight() * 0.9f;
-    FVector End = Start + DirVec * Capsule->GetScaledCapsuleRadius() * 1.1f;
+    float ZPos = CurrentCharacter->GetActorLocation().Z - Capsule->GetScaledCapsuleHalfHeight() * 0.95f;
+    Start += DirVec * Capsule->GetScaledCapsuleRadius() * 0.5f;
+    Start.Z = ZPos;
+
+    FVector End = Start + DirVec * 1.1f;
+    End.Z = ZPos + 1.1f;
     FHitResult HitResult;
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
+
     if (bHit == true)
     {
         if (HitResult.GetActor()->IsA(APJECharacterBase::StaticClass()) == true)
@@ -60,6 +67,7 @@ bool UBTTask_MoveCharacterTask::IsFrontEmpty(ACharacter* CurrentCharacter, FVect
     }
     return !bHit;
 }
+
 
 bool UBTTask_MoveCharacterTask::IsCliff(ACharacter* CurrentCharacter, FVector DirVec)
 {

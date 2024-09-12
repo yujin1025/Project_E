@@ -13,7 +13,7 @@ UBTTask_SetRandomDestPos::UBTTask_SetRandomDestPos()
 EBTNodeResult::Type UBTTask_SetRandomDestPos::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
-    
+
     APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
     if (ControllingPawn == nullptr)
     {
@@ -26,6 +26,7 @@ EBTNodeResult::Type UBTTask_SetRandomDestPos::ExecuteTask(UBehaviorTreeComponent
         return EBTNodeResult::Failed;
     }
 
+    Blackboard->SetValueAsBool(BBKEY_SHOULDMOVETOPOINT, false);
     Blackboard->SetValueAsVector(BBKEY_DESTPOS, ControllingPawn->GetActorLocation());
 
     UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
