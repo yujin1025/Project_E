@@ -3,12 +3,11 @@
 #include "Character/DPCharacterCat.h"
 
 #include "Game/PJEGameModeBase.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 ADPCharacterCat::ADPCharacterCat()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 355.f;
 	SetJumpHeight(700.f);
+	SetSpeed(355.f);
 	SetCharacterType(ECharacterType::Cat);
 }
 

@@ -45,9 +45,12 @@ private:
 	float Speed;
 	uint8 JumpCount = 0;
 	float JumpHeight = 500.f;
+	UPROPERTY(Replicated)
 	bool bIsDash;
 	
 public:
+	FORCEINLINE float GetSpeed() const { return Speed; }
+	FORCEINLINE void SetSpeed(const float NewSpeed) { Speed = NewSpeed; }
 	FORCEINLINE void SetJumpHeight(const float NewJumpHeight) { JumpHeight = NewJumpHeight; }
 	FORCEINLINE void SetCharacterType(const ECharacterType NewCharacterType) { CharacterType = NewCharacterType; }
 	FORCEINLINE ECharacterType GetCharacterType() const { return CharacterType; }
