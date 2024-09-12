@@ -50,7 +50,8 @@ void AInGamePlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
-	
+	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ThisClass::Dash, true);
+	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ThisClass::Dash, false);
 }
 
 void AInGamePlayerController::Move(const FInputActionValue& Value)
@@ -91,9 +92,15 @@ void AInGamePlayerController::Jump()
 	}
 }
 
-void AInGamePlayerController::Dash()
+void AInGamePlayerController::Dash(const bool bIsDash)
 {
-	
+	if(GetPawn())
+	{
+		ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
+		if(DpCharacter){
+			DpCharacter->Dash(bIsDash);
+		}
+	}
 }
 
 void AInGamePlayerController::Drop()

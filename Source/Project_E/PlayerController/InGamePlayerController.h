@@ -34,12 +34,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+
+	// Delegate
+	DECLARE_DELEGATE_OneParam(DashDelegate, bool)
 	
 	// Player Function
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Jump();
-	void Dash();
+	void Dash(const bool bIsDash);
 	void Drop();
 	void Interact();
 	void Shoot();

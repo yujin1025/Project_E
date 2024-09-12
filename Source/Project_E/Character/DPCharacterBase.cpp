@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ADPCharacterBase::ADPCharacterBase()
 {
@@ -34,6 +35,13 @@ ADPCharacterBase::ADPCharacterBase()
 	GetCharacterMovement()->AirControl = 0.35f;
 }
 
+void ADPCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADPCharacterBase, bIsDash);
+}
+
 void ADPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,23 +50,28 @@ void ADPCharacterBase::BeginPlay()
 void ADPCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Dash Logic
+	if(bIsDash)
+	{
+		
+	}
+	else
+	{
+		
+	}
 }
 
 
 // Dash
-void ADPCharacterBase::Dash()
+void ADPCharacterBase::Dash(bool bDash)
 {
-	// How to Activate & Deactivate Dash??
+	Server_Dash(bDash);
 }
 
-void ADPCharacterBase::Server_Dash_Implementation()
+void ADPCharacterBase::Server_Dash_Implementation(bool bDash)
 {
-	
-}
-
-void ADPCharacterBase::NetMulticast_Dash_Implementation()
-{
-	
+	bIsDash = bDash;
 }
 
 

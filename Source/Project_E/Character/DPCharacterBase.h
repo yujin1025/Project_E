@@ -18,17 +18,16 @@ class PROJECT_E_API ADPCharacterBase : public ACharacter
 
 public:
 	ADPCharacterBase();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void Jump() override;
-	virtual void Dash();
+	virtual void Dash(bool bDash);
 
 protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(Server, Reliable)
-	void Server_Dash();
-	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticast_Dash();
+	void Server_Dash(bool bDash);
 	
 	virtual void Landed(const FHitResult& Hit) override;
 
@@ -45,6 +44,7 @@ private:
 	// Variables
 	uint8 JumpCount = 0;
 	float JumpHeight = 500.f;
+	bool bIsDash;
 
 public:
 	FORCEINLINE void SetJumpHeight(const float NewJumpHeight) { JumpHeight = NewJumpHeight; }
