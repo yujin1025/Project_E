@@ -29,11 +29,14 @@ class PROJECT_E_API AInGamePlayerController : public APlayerController
 
 public:
 	UFUNCTION(Client, Reliable)
-	void Client_SwitchInput(EInputType InputType);
+	void Client_SwitchInput(EInputType NewInputType);
 	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	void InitPlayerInput();
+	void InitHandleInput();
+	void InitCylinderInput();
 	
 	// Player Function
 	void Move(const FInputActionValue& Value);
@@ -42,7 +45,7 @@ protected:
 	void Dash(const bool bIsDash);
 	void Drop();
 	void Interact();
-	void Shoot();
+	void Attack();
 	void Aim();
 	
 	// Handle Function
@@ -68,7 +71,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input|PlayerInput")
 	UInputAction* InteractAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input|PlayerInput")
-	UInputAction* ShootAction;
+	UInputAction* AttackAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input|PlayerInput")
 	UInputAction* AimAction;
 	
@@ -81,8 +84,11 @@ private:
 	UInputAction* InterruptAction;
 
 	//Cylinder Context
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input|CylinderInput")
 	UInputMappingContext* CylinderContext;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Input|CylinderInput")
 	UInputAction* PushAction;
+
+	//Variables
+	EInputType InputType;
 };

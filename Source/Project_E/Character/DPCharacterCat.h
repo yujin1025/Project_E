@@ -15,11 +15,20 @@ class PROJECT_E_API ADPCharacterCat : public ADPCharacterBase
 
 public:
 	ADPCharacterCat();
+	void Attack();
 
 protected:
-	void Attack();
 	UFUNCTION(Server, Reliable)
 	void Server_Attack();
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_Attack();
+	void ResetAttack();
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Animation")
+	UAnimMontage* BrandishMontage;
+
+	FTimerHandle AttackTimerHandle;
+	float AttackCooldown = 1.f;
+	bool bCanAttack = true;
 };

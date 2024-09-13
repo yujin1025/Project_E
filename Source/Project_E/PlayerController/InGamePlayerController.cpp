@@ -6,24 +6,30 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/DPCharacterBase.h"
+#include "Character/DPCharacterCat.h"
+#include "Character/DPCharacterDuck.h"
 
-void AInGamePlayerController::Client_SwitchInput_Implementation(EInputType InputType)
+void AInGamePlayerController::Client_SwitchInput_Implementation(EInputType NewInputType)
 {
 	if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->ClearAllMappings();
-		switch (InputType)
+		InputType = NewInputType;
+		switch (NewInputType)
 		{
 		case EInputType::IT_Player:
 			Subsystem->AddMappingContext(PlayerContext, 1);
+			InitPlayerInput();
 			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Change input to player!")));
 			break;
 		case EInputType::IT_Handle:
 			Subsystem->AddMappingContext(HandleContext, 1);
+			InitHandleInput();
 			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Change input to handle!")));
 			break;
 		case EInputType::IT_Cylinder:
 			Subsystem->AddMappingContext(CylinderContext, 1);
+			InitCylinderInput();
 			if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Change input to cylinder!")));
 			break;
 		}
@@ -45,13 +51,40 @@ void AInGamePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
+	InitPlayerInput();
+}
+
+void AInGamePlayerController::InitPlayerInput()
+{
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
+	EnhancedInputComponent->ClearActionBindings();
+	
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
 	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ThisClass::Dash, true);
 	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ThisClass::Dash, false);
+	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::Attack);
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::Interact);
+}
+
+void AInGamePlayerController::InitHandleInput()
+{
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
+	EnhancedInputComponent->ClearActionBindings();
+	
+	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Started, this, &ThisClass::Interact);
+}
+
+void AInGamePlayerController::InitCylinderInput()
+{
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
+	EnhancedInputComponent->ClearActionBindings();
+	
+	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Started, this, &ThisClass::Interact);
 }
 
 void AInGamePlayerController::Move(const FInputActionValue& Value)
@@ -109,12 +142,40 @@ void AInGamePlayerController::Drop()
 
 void AInGamePlayerController::Interact()
 {
+	ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
+	if(DpCharacter)
+	{
+		if(InputType == EInputType::IT_Player)
+		{
+			// Begin Interact
+			DpCharacter->Interact(true);
+		}
+		else
+		{
+			// End Intereact
+			DpCharacter->Interact(false);
+		}
+	}
 }
 
-void AInGamePlayerController::Shoot()
+void AInGamePlayerController::Attack()
 {
+	// Success Cast to Cat
+	if(ADPCharacterCat* Cat = Cast<ADPCharacterCat>(GetPawn()))
+	{
+		Cat->Attack();
+	}
+	// Success Cast to Duck
+	else if(ADPCharacterDuck* Duck = Cast<ADPCharacterDuck>(GetPawn()))
+	{
+		// Call duck attack function
+	}
 }
 
 void AInGamePlayerController::Aim()
 {
+	if(ADPCharacterDuck* Duck = Cast<ADPCharacterDuck>(GetPawn()))
+	{
+		// Aim action only execute at duck
+	}
 }

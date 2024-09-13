@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "PlayerController/InGamePlayerController.h"
 
 ADPCharacterBase::ADPCharacterBase()
 {
@@ -60,8 +61,22 @@ void ADPCharacterBase::Tick(float DeltaTime)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = Speed;
 	}
+
+	MarkWidget();
+	FindClosestInteractiveActor();
 }
 
+// Find Closest Interactive Actor
+void ADPCharacterBase::FindClosestInteractiveActor()
+{
+	
+}
+
+// Activate & DisActivate Widgets
+void ADPCharacterBase::MarkWidget()
+{
+	
+}
 
 // Dash
 void ADPCharacterBase::Dash(bool bDash)
@@ -74,6 +89,24 @@ void ADPCharacterBase::Server_Dash_Implementation(bool bDash)
 	bIsDash = bDash;
 }
 
+// Interact
+void ADPCharacterBase::Interact(bool bBeginInteract)
+{
+	AInGamePlayerController* DPController = Cast<AInGamePlayerController>(Controller);
+	if(DPController)
+	{
+		if(bBeginInteract)
+		{
+			// Begin Interact
+			DPController->Client_SwitchInput(EInputType::IT_Cylinder);
+		}
+		else
+		{
+			// End Interact
+			DPController->Client_SwitchInput(EInputType::IT_Player);
+		}
+	}
+}
 
 // Jump
 void ADPCharacterBase::Jump()
@@ -91,4 +124,14 @@ void ADPCharacterBase::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 	JumpCount = 0;
+
+	FVector Velocity = GetVelocity();
+	// Landing speed determines death leap
+	if(Velocity.Z < -1400.f)
+	{
+		// Death Leap Logic
+		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Death Leap")));
+	}
 }
+
+

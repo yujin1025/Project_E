@@ -24,11 +24,14 @@ public:
 	
 	virtual void Jump() override;
 	virtual void Dash(bool bDash);
+	virtual void Interact(bool bBeginInteract);
 
 protected:
 	virtual void BeginPlay() override;
 	
 	virtual void Landed(const FHitResult& Hit) override;
+	void FindClosestInteractiveActor();
+	void MarkWidget();
 
 	// Multiplayer Function
 	UFUNCTION(Server, Reliable)

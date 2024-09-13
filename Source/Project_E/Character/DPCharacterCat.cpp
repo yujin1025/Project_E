@@ -13,15 +13,34 @@ ADPCharacterCat::ADPCharacterCat()
 
 void ADPCharacterCat::Attack()
 {
-	// Initial Input
-}
-
-void ADPCharacterCat::NetMulticast_Attack_Implementation()
-{
-	// Attack Logic
+	if(!bCanAttack) return;
+	
+	if(bCanAttack)
+	{
+		bCanAttack = false;
+		GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ThisClass::ResetAttack, AttackCooldown);
+		Server_Attack();
+	}
 }
 
 void ADPCharacterCat::Server_Attack_Implementation()
 {
+	// Server Attack Logic
+	NetMulticast_Attack();
+}
+
+void ADPCharacterCat::NetMulticast_Attack_Implementation()
+{
 	// Sound & Effect
+	UAnimInstance* CatAnimInstance = GetMesh()->GetAnimInstance();
+
+	if(BrandishMontage)
+	{
+		CatAnimInstance->Montage_Play(BrandishMontage);
+	}
+}
+
+void ADPCharacterCat::ResetAttack()
+{
+	bCanAttack = true;
 }
