@@ -7,12 +7,12 @@
 #include "PJEShokeWave.generated.h"
 
 UCLASS()
-class PROJECT_E_API APJEShokeWave : public AActor
+class PROJECT_E_API APJEShockwave : public AActor
 {
     GENERATED_BODY()
 
 public:
-    APJEShokeWave();
+    APJEShockwave();
 
 protected:
     virtual void BeginPlay() override;
@@ -24,18 +24,40 @@ private:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<class USphereComponent> CollisionSphere;
 
-    UPROPERTY(EditAnywhere, Category = "Damage")
-    float DamageAmount;
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<class USphereComponent> InnerCollisionSphere;
 
-    // 저장된 겹쳐진 액터
+    UPROPERTY(EditAnywhere, Category = "Damage")
+    float DamagePerSec;
+
+    float Radius;
+
+    float InnerRadius;
+
+    UPROPERTY(EditAnywhere, Category = "Collider")
+    float ExpandSpeed;
+
+    UPROPERTY(EditAnywhere, Category = "Duration")
+    float ShokeWaveDuration;
+
+    float TimeElapsed;
+
+    void DrawDebugSpheres();
+
     UPROPERTY()
-    TArray<TObjectPtr<AActor>> OverlappingActors;
+    TSet<TObjectPtr<class APJECharacterPlayer>> OverlappingActors;
+
+    UPROPERTY()
+    TSet<TObjectPtr<class APJECharacterPlayer>> InnerOverlappingActors;
 
     void ExpandShokeWave(float DeltaTime);
 
     UFUNCTION()
     void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
     UFUNCTION()
     void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+    UFUNCTION()
+    void OnInnerOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    UFUNCTION()
+    void OnInnerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
