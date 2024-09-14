@@ -60,5 +60,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class APJEShadowField> FieldActor;
 
+	UFUNCTION()
 	virtual void DestoryField(AActor* DestroyedActor) override;
 };
