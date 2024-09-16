@@ -112,22 +112,33 @@ void ADPCharacterBase::Interact(bool bBeginInteract)
 void ADPCharacterBase::Jump()
 {
 	Super::Jump();
-
+	
 	if(JumpCount < 2)
 	{
 		JumpCount++;
 		LaunchCharacter(FVector(0,0,JumpHeight), false, true);
 	}
+
+}
+
+void ADPCharacterBase::Falling()
+{
+	Super::Falling();
+
+	JumpStartHeight = GetActorLocation().Z;
 }
 
 void ADPCharacterBase::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
+	
 	JumpCount = 0;
 
 	FVector Velocity = GetVelocity();
-	// Landing speed determines death leap
-	if(Velocity.Z < -1400.f)
+	float JumpEndHeight = GetActorLocation().Z;
+	float DropHeight = JumpStartHeight - JumpEndHeight;
+	
+	if(Velocity.Z < -1400.f || DropHeight > 500.f)
 	{
 		// Death Leap Logic
 		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Death Leap")));

@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "DPCharacterBase.generated.h"
 
+class UBoxComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
@@ -28,7 +29,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+
+	virtual void Falling() override;
 	virtual void Landed(const FHitResult& Hit) override;
 	void FindClosestInteractiveActor();
 	void MarkWidget();
@@ -43,6 +45,8 @@ private:
 	USpringArmComponent* SpringArm;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Camera")
 	UCameraComponent* Camera;	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Trigger")
+	TObjectPtr<UBoxComponent> InteractionTrigger;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Player")
 	ECharacterType CharacterType;
@@ -51,6 +55,7 @@ private:
 	float Speed;
 	uint8 JumpCount = 0;
 	float JumpHeight = 500.f;
+	float JumpStartHeight;
 	UPROPERTY(Replicated)
 	bool bIsDash;
 	
