@@ -66,7 +66,8 @@ void AInGamePlayerController::InitPlayerInput()
 	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ThisClass::Dash, true);
 	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ThisClass::Dash, false);
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::Attack);
-	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::Interact);
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::InteractBegin);
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ThisClass::InteractEnd);
 }
 
 void AInGamePlayerController::InitHandleInput()
@@ -75,7 +76,7 @@ void AInGamePlayerController::InitHandleInput()
 
 	EnhancedInputComponent->ClearActionBindings();
 	
-	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Started, this, &ThisClass::Interact);
+	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Started, this, &ThisClass::Interrupt);
 }
 
 void AInGamePlayerController::InitCylinderInput()
@@ -84,7 +85,7 @@ void AInGamePlayerController::InitCylinderInput()
 
 	EnhancedInputComponent->ClearActionBindings();
 	
-	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Started, this, &ThisClass::Interact);
+	EnhancedInputComponent->BindAction(InterruptAction, ETriggerEvent::Started, this, &ThisClass::Interrupt);
 }
 
 void AInGamePlayerController::Move(const FInputActionValue& Value)
@@ -119,7 +120,6 @@ void AInGamePlayerController::Jump()
 		ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
 		if(DpCharacter)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Jump"));
 			DpCharacter->Jump();
 		}
 	}
@@ -138,25 +138,45 @@ void AInGamePlayerController::Dash(const bool bIsDash)
 
 void AInGamePlayerController::Drop()
 {
-}
-
-void AInGamePlayerController::Interact()
-{
-	ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
-	if(DpCharacter)
+	if(GetPawn())
 	{
-		if(InputType == EInputType::IT_Player)
+		ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
+		if(DpCharacter)
 		{
-			// Begin Interact
-			DpCharacter->Interact(true);
-		}
-		else
-		{
-			// End Intereact
-			DpCharacter->Interact(false);
+			DpCharacter->Drop();
 		}
 	}
 }
+
+void AInGamePlayerController::InteractBegin()
+{
+	if(GetPawn())
+	{
+		ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
+		if(DpCharacter)
+		{
+			DpCharacter->InteractBegin();
+		}
+	}
+}
+
+void AInGamePlayerController::InteractEnd()
+{
+	if(GetPawn())
+	{
+		ADPCharacterBase* DpCharacter = Cast<ADPCharacterBase>(GetPawn());
+		if(DpCharacter)
+		{
+			DpCharacter->InteractEnd();
+		}
+	}
+}
+
+void AInGamePlayerController::Interrupt()
+{
+	Client_SwitchInput(EInputType::IT_Player);
+}
+
 
 void AInGamePlayerController::Attack()
 {

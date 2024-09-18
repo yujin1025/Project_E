@@ -2,6 +2,7 @@
 
 #include "Gimmick/PJEInteractiveActor.h"
 
+#include "Character/DPCharacterBase.h"
 #include "Character/PJECharacterPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
@@ -87,7 +88,7 @@ void APJEInteractiveActor::NotifyOverlapBegin(UPrimitiveComponent* OverlappedCom
 {
 	if(!bIsInteractAble) return;
 	
-	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
+	ADPCharacterBase* CharacterPlayer = Cast<ADPCharacterBase>(OtherActor);
 	if(CharacterPlayer && CharacterPlayer->IsLocallyControlled())
 	{
 		NotifyInteractionWidget->SetVisibility(true);
@@ -99,7 +100,7 @@ void APJEInteractiveActor::NotifyOverlapEnd(UPrimitiveComponent* OverlappedComp,
 {
 	if(!bIsInteractAble) return;
 	
-	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
+	ADPCharacterBase* CharacterPlayer = Cast<ADPCharacterBase>(OtherActor);
 	if(CharacterPlayer && CharacterPlayer->IsLocallyControlled())
 	{
 		NotifyInteractionWidget->SetVisibility(false);
@@ -110,7 +111,7 @@ void APJEInteractiveActor::CheckIsPlayerNearby()
 {
 	TArray<AActor*> CharacterPlayers;
 	
-	InteractionTriggerBox->GetOverlappingActors(CharacterPlayers, APJECharacterPlayer::StaticClass());
+	InteractionTriggerBox->GetOverlappingActors(CharacterPlayers, ADPCharacterBase::StaticClass());
 	bIsPlayerNearby = CharacterPlayers.Num() > 0 ? true : false;
 }
 

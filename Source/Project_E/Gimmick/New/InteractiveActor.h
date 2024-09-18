@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Gimmick/PJEInteractiveActor.h"
 #include "InteractiveActor.generated.h"
 
+class UBoxComponent;
 class UWidgetComponent;
 enum class EInteractType : uint8;
 
@@ -16,7 +18,8 @@ class PROJECT_E_API AInteractiveActor : public AActor
 	
 public:	
 	AInteractiveActor();
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	// Interaction Function
 	virtual void InteractionKeyPressed();
 	virtual void InteractionKeyReleased();
@@ -32,6 +35,10 @@ protected:
 	
 private:
 	// Components
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Root")
+	TObjectPtr<USceneComponent> Root;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Widget")
+	UBoxComponent* InteractionBox;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Widget")
 	UWidgetComponent* NotifyWidget;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Widget")
@@ -39,13 +46,27 @@ private:
 
 	// Variables
 	EInteractType InteractType;
-	APawn* ControlPawn;
 
+	UPROPERTY(Replicated)
+	APawn* ControlPawn;
+	UPROPERTY(Replicated)
 	bool bIsInteractAble;
+	UPROPERTY(Replicated)
 	bool bIsInteracting;
+	UPROPERTY(Replicated)
 	bool bIsActivate;
 
 public:
 	// Getter & Setters
 	FORCEINLINE EInteractType GetInteractType() const { return InteractType; }
+	FORCEINLINE APawn* GetControlPawn() const { return ControlPawn; }
+	FORCEINLINE bool GetIsInteracting() const { return bIsInteracting; }
+	FORCEINLINE bool GetIsInteractAble() const { return bIsInteractAble; }
+	FORCEINLINE bool GetIsActivate() const { return bIsActivate; }
+
+	FORCEINLINE void SetInteractType(const EInteractType NewInteractType) { InteractType = NewInteractType; }
+	FORCEINLINE void SetControlPawn(APawn* NewControlPawn) { ControlPawn = NewControlPawn; }
+	FORCEINLINE void SetIsInteracting(const bool NewIsInteracting) { bIsInteracting = NewIsInteracting; }
+	FORCEINLINE void SetIsInteractAble(const bool NewIsInteractAble) { bIsInteractAble = NewIsInteractAble; }
+	FORCEINLINE void SetIsActivate(const bool NewIsActivate) { bIsActivate = NewIsActivate; }
 };

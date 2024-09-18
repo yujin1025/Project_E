@@ -2,7 +2,9 @@
 
 #include "Gimmick/New/InteractiveActor.h"
 
+#include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AInteractiveActor::AInteractiveActor()
 {
@@ -10,10 +12,40 @@ AInteractiveActor::AInteractiveActor()
 	bReplicates = true;
 	bAlwaysRelevant = true;
 
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Interactive Actor"));
+	RootComponent = Root;
+	
 	NotifyWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Notify Widget"));
 	NotifyWidget->SetupAttachment(RootComponent);
+	NotifyWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Interaction Widget"));
 	InteractionWidget->SetupAttachment(RootComponent);
+	InteractionWidget->SetWidgetSpace(EWidgetSpace::Screen);
+
+	InteractionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Box"));
+	InteractionBox->SetupAttachment(RootComponent);
+}
+
+void AInteractiveActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AInteractiveActor, ControlPawn);
+	DOREPLIFETIME(AInteractiveActor, bIsInteractAble);
+	DOREPLIFETIME(AInteractiveActor, bIsInteracting);
+	DOREPLIFETIME(AInteractiveActor, bIsActivate);
+}
+
+void AInteractiveActor::InteractionKeyPressed()
+{
+}
+
+void AInteractiveActor::InteractionKeyReleased()
+{
+}
+
+void AInteractiveActor::BreakInteracting()
+{
 }
 
 void AInteractiveActor::BeginPlay()
@@ -27,19 +59,6 @@ void AInteractiveActor::BeginPlay()
 	bIsInteractAble = true;
 	bIsInteracting = false;
 	bIsActivate = false;
-}
-
-void AInteractiveActor::InteractionKeyPressed()
-{
-}
-
-void AInteractiveActor::InteractionKeyReleased()
-{
-}
-
-void AInteractiveActor::BreakInteracting()
-{
-	bIsInteracting = false;
 }
 
 void AInteractiveActor::DisplayNotifyWidget(bool bDisplay)

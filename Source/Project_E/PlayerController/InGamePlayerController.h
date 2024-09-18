@@ -37,6 +37,7 @@ protected:
 	void InitPlayerInput();
 	void InitHandleInput();
 	void InitCylinderInput();
+	void Interrupt();
 	
 	// Player Function
 	void Move(const FInputActionValue& Value);
@@ -44,7 +45,8 @@ protected:
 	void Jump();
 	void Dash(const bool bIsDash);
 	void Drop();
-	void Interact();
+	void InteractBegin();
+	void InteractEnd();
 	void Attack();
 	void Aim();
 	

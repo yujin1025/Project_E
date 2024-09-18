@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "DPCharacterBase.generated.h"
 
+class AInteractiveActor;
+class USphereComponent;
 class UBoxComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -25,11 +27,12 @@ public:
 	
 	virtual void Jump() override;
 	virtual void Dash(bool bDash);
-	virtual void Interact(bool bBeginInteract);
+	virtual void Drop();
+	virtual void InteractBegin();
+	virtual void InteractEnd();
 
 protected:
 	virtual void BeginPlay() override;
-
 	virtual void Falling() override;
 	virtual void Landed(const FHitResult& Hit) override;
 	void FindClosestInteractiveActor();
@@ -38,6 +41,12 @@ protected:
 	// Multiplayer Function
 	UFUNCTION(Server, Reliable)
 	void Server_Dash(bool bDash);
+	UFUNCTION(Server, Reliable)
+	void Server_InteractBegin(AInteractiveActor* IActor);
+	UFUNCTION(Server,Reliable)
+	void Server_InteractEnd(AInteractiveActor* IActor);
+	UFUNCTION(Server, Reliable)
+	void Server_Interrupt(AInteractiveActor* IActor);
 
 private:
 	// Components
@@ -46,16 +55,17 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Camera")
 	UCameraComponent* Camera;	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Trigger")
-	TObjectPtr<UBoxComponent> InteractionTrigger;
+	USphereComponent* InteractionTrigger;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Player")
-	ECharacterType CharacterType;
-
 	// Variables
+	ECharacterType CharacterType;
 	float Speed;
 	uint8 JumpCount = 0;
 	float JumpHeight = 500.f;
 	float JumpStartHeight;
+	TArray<AActor*> InteractiveActors;
+	AInteractiveActor* ClosestActor;
+	
 	UPROPERTY(Replicated)
 	bool bIsDash;
 	
