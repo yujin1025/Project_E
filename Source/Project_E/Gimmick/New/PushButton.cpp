@@ -3,6 +3,8 @@
 
 #include "Gimmick/New/PushButton.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 APushButton::APushButton()
 {
 	ButtonBase = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Button Base"));
@@ -25,6 +27,7 @@ void APushButton::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	MoveButton(DeltaSeconds);
+	CheckActivate();
 }
 
 void APushButton::InteractionKeyPressed()
@@ -46,6 +49,22 @@ void APushButton::BreakInteracting()
 	Super::BreakInteracting();
 
 	SetIsInteracting(false);
+}
+
+void APushButton::CheckActivate()
+{
+	FVector TargetLocation = OriginButtonLocation + ButtonMovementOffset;
+	FVector CurrentLocation = ButtonMesh->GetComponentLocation();
+	float Dist = (TargetLocation - CurrentLocation).Size();
+	if(Dist < 1.f)
+	{
+		SetIsActivate(true);
+		if(GEngine) GEngine->AddOnScreenDebugMessage(10, 1.f, FColor::Magenta, TEXT("Button Activated"));
+	}
+	else
+	{
+		SetIsActivate(false);
+	}
 }
 
 void APushButton::MoveButton(float DeltaSeconds)

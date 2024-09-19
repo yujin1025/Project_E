@@ -23,7 +23,7 @@ protected:
 	
 	void MoveButton(float DeltaSeconds);
 	virtual void BreakInteracting() override;
-	
+	void CheckActivate();
 	
 private:
 	// Components
