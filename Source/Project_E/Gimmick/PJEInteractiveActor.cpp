@@ -88,7 +88,7 @@ void APJEInteractiveActor::NotifyOverlapBegin(UPrimitiveComponent* OverlappedCom
 {
 	if(!bIsInteractAble) return;
 	
-	ADPCharacterBase* CharacterPlayer = Cast<ADPCharacterBase>(OtherActor);
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
 	if(CharacterPlayer && CharacterPlayer->IsLocallyControlled())
 	{
 		NotifyInteractionWidget->SetVisibility(true);
@@ -100,7 +100,7 @@ void APJEInteractiveActor::NotifyOverlapEnd(UPrimitiveComponent* OverlappedComp,
 {
 	if(!bIsInteractAble) return;
 	
-	ADPCharacterBase* CharacterPlayer = Cast<ADPCharacterBase>(OtherActor);
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(OtherActor);
 	if(CharacterPlayer && CharacterPlayer->IsLocallyControlled())
 	{
 		NotifyInteractionWidget->SetVisibility(false);
@@ -111,7 +111,7 @@ void APJEInteractiveActor::CheckIsPlayerNearby()
 {
 	TArray<AActor*> CharacterPlayers;
 	
-	InteractionTriggerBox->GetOverlappingActors(CharacterPlayers, ADPCharacterBase::StaticClass());
+	InteractionTriggerBox->GetOverlappingActors(CharacterPlayers, APJECharacterPlayer::StaticClass());
 	bIsPlayerNearby = CharacterPlayers.Num() > 0 ? true : false;
 }
 

@@ -21,8 +21,8 @@ public:
 
 // Spawn Section
 public:
-	FORCEINLINE void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
-	FORCEINLINE float GetShadowSpawnRadius() const;
+	void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
+	float GetShadowSpawnRadius() const;
 
 	void SetRallyPoint(FVector NewPoint);
 	FVector GetRallyPoint();
