@@ -41,6 +41,7 @@ void APJEInGameMode::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(InitDelayHandle, this, &ThisClass::InitializePlayer, 3.0f, false);
 }
 
+
 void APJEInGameMode::SetPlayerControllerClass()
 {
 	PlayerControllerClass = APJEPlayerController::StaticClass();
@@ -102,3 +103,4 @@ void APJEInGameMode::PostSeamlessTravel()
 	Super::PostSeamlessTravel();
 	if(GEngine) GEngine->AddOnScreenDebugMessage(7, 10.f, FColor::Emerald, FString::Printf(TEXT("Seamless Travel Complete")));
 }
+

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -27,7 +25,7 @@ public:
 	FORCEINLINE int32 GetHandItemCode() const { return HandItemCode; }
 	// INLINE Function for test.. to be Deleted
 	FORCEINLINE void SetHandItemCode(int32 ItemCode) { HandItemCode = ItemCode; }
-	void InitInput(UEnhancedInputComponent* EnhancedInputComponent);
+	void InitInput(class UEnhancedInputComponent* EnhancedInputComponent);
 
 	virtual void InitWidget();
 
@@ -176,8 +174,6 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<AActor> InteractActor = NULL;
 
-//Projectile
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 };

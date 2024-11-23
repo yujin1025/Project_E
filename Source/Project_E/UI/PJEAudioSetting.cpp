@@ -5,6 +5,7 @@
 #include "Sound/SoundClass.h"
 #include "Kismet/GameplayStatics.h"
 #include "Project_E/PJEAudioSettingsSaveGame.h"
+#include "UI/Manager/PJEUIManager.h"
 
 void UPJEAudioSetting::NativeConstruct()
 {
@@ -134,7 +135,7 @@ void UPJEAudioSetting::OnResetButtonClicked()
 void UPJEAudioSetting::OnBackButtonClicked()
 {
     // Return to previous menu
-    this->RemoveFromParent();
+    UPJEUIManager::GetInstance()->RemovePopupWidget(GetWorld(), this);
 }
 
 void UPJEAudioSetting::SetVolume(USoundClass* SoundClass, float Value)

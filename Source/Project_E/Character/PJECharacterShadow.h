@@ -21,8 +21,13 @@ public:
 
 // Spawn Section
 public:
-	FORCEINLINE void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
-	FORCEINLINE float GetShadowSpawnRadius() const;
+	void SetShadowGeneratorsCount(int32 NewShadowGeneratorsCount);
+	float GetShadowSpawnRadius() const;
+
+	void SetRallyPoint(FVector NewPoint);
+	FVector GetRallyPoint();
+
+	virtual void InitBB();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shadow Generator")
@@ -30,4 +35,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	float ShadowSpawnRadius;
+
+	FVector RallyPoint;
 };

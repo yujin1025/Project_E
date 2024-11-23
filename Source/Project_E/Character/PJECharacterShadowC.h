@@ -25,6 +25,12 @@ protected:
 	float SingleBlinkDuration;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float TeleportRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float FieldRadius = 160.0f; // 1.6m
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float FieldDuration = 2.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float DamagePerSecond = 0.1f;
 
 public:
 	APJECharacterShadowC();
@@ -32,6 +38,9 @@ public:
 	virtual float GetBlinkDuration() override;
 	virtual float GetSingleBlinkDuration() override;
 	virtual float GetTeleportRange() override;
+	virtual float GetFieldRadius() override;
+	virtual float GetFieldDuration() override;
+	virtual float GetDamagePerSecond() override;
 	
 	void BeginPlay();
 
@@ -48,4 +57,14 @@ public:
 // Battle Section
 protected:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+public:
+	virtual void SetFieldActor(class APJEShadowField* NewFieldActor) override;
+	virtual class APJEShadowField* GetFieldActor() override;
+
+protected:
+	UPROPERTY()
+	TObjectPtr<class APJEShadowField> FieldActor;
+
+	virtual void DestoryField(AActor* DestroyedActor) override;
 };

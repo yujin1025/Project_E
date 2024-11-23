@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "AI/Enemies/BTTask/BTTask_RunAwayFromPlayer.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
@@ -12,6 +10,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "Project_E/Character/PJECharacterShadowA.h"
 #include "Project_E/AI/PJEAIController.h"
+#include "Components/CapsuleComponent.h"
 
 UBTTask_RunAwayFromPlayer::UBTTask_RunAwayFromPlayer()
 {
@@ -56,8 +55,8 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
         return;
     }
 
-    ACharacter* ControlledPawn = Cast<ACharacter>(AICon->GetPawn());
-    if (!ControlledPawn)
+    ACharacter* Character = Cast<ACharacter>(AICon->GetPawn());
+    if (!Character)
     {
         UE_LOG(LogTemp, Error, TEXT("Controlled Pawn not found"));
         FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
@@ -70,9 +69,8 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 
     if (CurrentTime - KeepMovingTime >= MaxKeepMovingTime)
     {
-        UE_LOG(LogTemp, Warning, TEXT("MaxKeepMovingTime reached: Stopping movement"));
         AICon->StopMovement();
-        ControlledPawn->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
+        Character->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         return;
     }
@@ -86,20 +84,27 @@ void UBTTask_RunAwayFromPlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint
     }
 
     FVector PlayerPos = PlayerActor->GetActorLocation();
-    FVector AIPos = ControlledPawn->GetActorLocation();
+    FVector AIPos = Character->GetActorLocation();
     FVector DirectionToPlayer = PlayerPos - AIPos;
     FVector DirectionAwayFromPlayer = -DirectionToPlayer.GetSafeNormal();
 
-    
     FRotator RandomRotation = FRotator(0, TaskMemory->RandomDegree, 0);
     FVector RandomDirectionAwayFromPlayer = RandomRotation.RotateVector(DirectionAwayFromPlayer);
+    RandomDirectionAwayFromPlayer.Normalize();
 
-    FVector NewLocation = AIPos + RandomDirectionAwayFromPlayer * ControlledPawn->GetCharacterMovement()->MaxWalkSpeed * DeltaSeconds * 100.0f;
+    FVector NewLocation = Character->GetActorLocation() + RandomDirectionAwayFromPlayer * 100.0f;
+    if (!IsFrontEmpty(Character, RandomDirectionAwayFromPlayer) || !IsLocationInNavMesh(Character, NewLocation) || IsCliff(Character, RandomDirectionAwayFromPlayer))
+    {  
+        AICon->StopMovement();
+        Character->GetCharacterMovement()->MaxWalkSpeed = TaskMemory->LastMaxMoveSpeed;
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+        return;
+    }
 
     AICon->MoveToLocation(NewLocation, 0.0001f, true, false, false, false, nullptr, true);
 }
 
 uint16 UBTTask_RunAwayFromPlayer::GetInstanceMemorySize() const
 {
-    return sizeof(FRunAwayFromPlayerTaskMemory);;
+    return sizeof(FRunAwayFromPlayerTaskMemory);
 }

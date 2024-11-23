@@ -28,7 +28,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     {
         UWorld* World = OwnerActor->GetWorld();
         TArray<AActor*> OverlappedActors;
-        FVector OwnerLocation = OwnerActor->GetActorLocation(); // 조종하는 액터의 위치
+        FVector OwnerLocation = OwnerActor->GetActorLocation();
         IPJEPlayerDectectable* PlayerDetectable = Cast<IPJEPlayerDectectable>(OwnerActor);
 
         float DetectionRadius = PlayerDetectable->GetPlayerDetectRange();
@@ -68,5 +68,6 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, PlayerActor);
         }
+        OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_SHOULDMOVETOPOINT, false);
     }
 }

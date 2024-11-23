@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AI/Enemies/BTTask/BTTask_Teleport.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
@@ -10,6 +7,9 @@
 #include "Project_E/Character/PJECharacterShadowA.h"
 #include "Project_E/AI/PJEAIController.h"
 #include "Project_E/AI/Enemies/Interface/PJETeleportable.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Components/CapsuleComponent.h"
+#include "NavigationPath.h"
 
 UBTTask_Teleport::UBTTask_Teleport()
 {
@@ -21,43 +21,36 @@ EBTNodeResult::Type UBTTask_Teleport::ExecuteTask(UBehaviorTreeComponent& OwnerC
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     APJEAIController* OwnerController = Cast<APJEAIController>(OwnerComp.GetOwner());
+    if (!OwnerController)
+    {
+        return EBTNodeResult::Failed;
+    }
 
-    AActor* OwnerActor = Cast<AActor>(OwnerController->GetPawn());
-    FVector CurrentLocation = OwnerActor->GetActorLocation();
-    FNavLocation RandomNavLocation;
+    ACharacter* Character = Cast<ACharacter>(OwnerController->GetPawn());
+    if (!Character)
+    {
+        return EBTNodeResult::Failed;
+    }
 
-    IPJETeleportable* Teleportable = Cast<IPJETeleportable>(OwnerActor);
-    float Radius = Teleportable->GetTeleportRange();
+    FVector CurrentLocation = Character->GetActorLocation();
 
-    UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+    IPJETeleportable* Teleportable = Cast<IPJETeleportable>(Character);
+    float Radius = Teleportable ? Teleportable->GetTeleportRange() : 1000.0f;
+
+    UNavigationSystemV1* NavSys = UNavigationSystemV1::GetNavigationSystem(Character->GetWorld());
     if (!NavSys)
     {
         return EBTNodeResult::Failed;
     }
 
-    const int32 MaxAttempts = 10;  // 시도 횟수 제한
-    int32 Attempts = 0;
-    bool bLocationFound = false;
+    FNavLocation RandomNavLocation;
 
-    while (Attempts < MaxAttempts)
-    {
-        if (NavSys->GetRandomPointInNavigableRadius(CurrentLocation, Radius, RandomNavLocation))
-        {
-            bLocationFound = true;
-            break;
-        }
+    NavSys->GetRandomReachablePointInRadius(CurrentLocation, Radius, RandomNavLocation);
 
-        Attempts++;
-    }
-
-    if (!bLocationFound)
-    {
-        return EBTNodeResult::Failed;
-    }
-
-    OwnerActor->SetActorLocation(RandomNavLocation.Location);
+    FVector NewLocation = RandomNavLocation.Location;
+    NewLocation.Z += Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+    Character->SetActorLocation(NewLocation);
     OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISPLAYERNEARBY, false);
     OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PLAYERACTOR, nullptr);
     return EBTNodeResult::Succeeded;
 }
-

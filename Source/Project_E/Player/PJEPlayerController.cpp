@@ -11,7 +11,9 @@
 #include "Gimmick/IgnitionHandle.h"
 #include "../UI/BaseWidget.h"
 #include "Game/PJEPlayerState.h"
+#include "Game/PJEGameState.h"
 #include "Gimmick/PJEPushableCylinder.h"
+#include "UI/Manager/PJEUIManager.h"
 
 
 APJEPlayerController::APJEPlayerController()
@@ -27,7 +29,11 @@ void APJEPlayerController::BeginPlay()
 	PlayerPawn = GetPawn();
 	
 	InitInputPawn();
-	OpenWidget();
+
+	if (HasAuthority())
+	{
+		OpenWidget();
+	}
 }
 
 void APJEPlayerController::Tick(float DeltaSeconds)
@@ -79,6 +85,35 @@ void APJEPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(ToggleSettingsMenuAction, ETriggerEvent::Triggered, this, &APJEPlayerController::ToggleSettingsMenu);
+	}
+}
+
+void APJEPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (PlayerState)
+	{
+		if (GetPawn())
+		{
+			Client_Init();
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &APJEPlayerController::TryClientInit);
+		}
+	}
+}
+
+void APJEPlayerController::TryClientInit()
+{
+	if (GetPawn())
+	{
+		Client_Init();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &APJEPlayerController::TryClientInit);
 	}
 }
 
@@ -167,14 +202,26 @@ void APJEPlayerController::GameOver()
 {
 }
 
+
+APJEPlayerState* APJEPlayerController::GetState()
+{
+	return Cast<APJEPlayerState>(PlayerState);
+}
+
 void APJEPlayerController::Client_Init_Implementation()
 {
 	InitInputPawn();
 
 	PlayerPawn = GetPawn();
+	if (!PlayerPawn)
+		return;
 
-	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(GetPawn());
-	CharacterPlayer->InitWidget();
+	APJECharacterPlayer* CharacterPlayer = Cast<APJECharacterPlayer>(PlayerPawn);
+	if (CharacterPlayer)
+	{
+		CharacterPlayer->InitWidget();
+		OpenWidget();
+	}
 }
 
 
@@ -185,36 +232,19 @@ void APJEPlayerController::OpenWidget()
 	{
 		InGameWindowWidget->AddToViewport(1);
 	}
-
-	if (SettingsMenuClass)
-	{
-		SettingsMenu = CreateWidget<UUserWidget>(this, SettingsMenuClass);
-		if (SettingsMenu)
-		{
-			SettingsMenu->AddToViewport();
-			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
 }
 
 void APJEPlayerController::ToggleSettingsMenu(const FInputActionValue& Value)
 {
-	if (SettingsMenu)
+	if (SettingsMenuClass)
 	{
-		if (SettingsMenu->IsVisible())
+		if (!SettingsMenu.IsValid() || SettingsMenu->IsPendingKill())
 		{
-			SettingsMenu->SetVisibility(ESlateVisibility::Hidden);
-			//FInputModeGameOnly InputMode;
-			//SetInputMode(InputMode);
-			//bShowMouseCursor = false;
-		}
-		else
-		{
-			SettingsMenu->SetVisibility(ESlateVisibility::Visible);
-			//FInputModeUIOnly InputMode;
-			//InputMode.SetWidgetToFocus(SettingsMenu->TakeWidget());
-			//SetInputMode(InputMode);
-			//bShowMouseCursor = true;
+			if (UPJEUIManager::GetInstance()->GetTopmostPopupWidget() == nullptr)
+			{
+				SettingsMenu = UPJEUIManager::GetInstance()->ShowPopupUI(GetWorld(), SettingsMenuClass);
+			}
+			
 		}
 	}
 }

@@ -49,5 +49,15 @@ protected:
     void StartSpawnTimer();
     void SpawnShadowAWithTimer();
 
+    void SpawnShadowBWithTimer();
+
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+    int32 MaxCount;
+
+    int32 CurrentCount;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+    FVector RallyPoint;
 };

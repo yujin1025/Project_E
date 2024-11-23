@@ -85,33 +85,14 @@ void APJECharacterShadowA::BeginPlay()
 	SetCurrentHP(MaxHp);
 }
 
-float APJECharacterShadowA::GetAIPatrolRadius()
+APJEShadowArea* APJECharacterShadowA::GetShadowArea()
 {
-	return 0.0f;
+	return ShadowArea;
 }
 
-float APJECharacterShadowA::GetAIDetectRange()
+void APJECharacterShadowA::SetShadowArea(APJEShadowArea* NewShadowArea)
 {
-	return 0.0f;
-}
-
-float APJECharacterShadowA::GetAIAttackRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterShadowA::GetAITurnSpeed()
-{
-	return 0.0f;
-}
-
-void APJECharacterShadowA::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
-{
-}
-
-void APJECharacterShadowA::AttackByAI()
-{
-	return;
+	ShadowArea = NewShadowArea;
 }
 
 void APJECharacterShadowA::PlaySound()

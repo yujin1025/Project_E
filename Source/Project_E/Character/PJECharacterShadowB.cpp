@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/PJEAIController.h"
 #include "AI/PJEAI.h"
+#include "AI/Enemies/PJEShadowField.h"
 
 APJECharacterShadowB::APJECharacterShadowB()
 {
@@ -26,26 +27,8 @@ void APJECharacterShadowB::BeginPlay()
 	SetCurrentHP(MaxHp);
 
 	PlayerDetectionRange = 4.0f;
-}
 
-float APJECharacterShadowB::GetAIPatrolRadius()
-{
-	return 0.0f;
-}
-
-float APJECharacterShadowB::GetAIDetectRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterShadowB::GetAIAttackRange()
-{
-	return 0.0f;
-}
-
-float APJECharacterShadowB::GetAITurnSpeed()
-{
-	return 0.0f;
+	OnDestroyed.AddDynamic(this, &APJECharacterShadowB::DestoryField);
 }
 
 float APJECharacterShadowB::GetChaseSpeed()
@@ -68,9 +51,29 @@ float APJECharacterShadowB::GetDetectMinYDifference()
 	return MinYDifference;
 }
 
-void APJECharacterShadowB::AttackByAI()
+float APJECharacterShadowB::GetFieldRadius()
 {
-	//TODO :Implement this function
+	return FieldRadius;
+}
+
+float APJECharacterShadowB::GetFieldDuration()
+{
+	return FieldDuration;
+}
+
+float APJECharacterShadowB::GetDamagePerSecond()
+{
+	return DamagePerSecond;
+}
+
+void APJECharacterShadowB::SetFieldActor(APJEShadowField* NewFieldActor)
+{
+	FieldActor = NewFieldActor;
+}
+
+APJEShadowField* APJECharacterShadowB::GetFieldActor()
+{
+	return FieldActor;
 }
 
 float APJECharacterShadowB::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -89,4 +92,13 @@ float APJECharacterShadowB::TakeDamage(float DamageAmount, FDamageEvent const& D
 		}
 	}
 	return 0.0f;
+}
+
+void APJECharacterShadowB::DestoryField(AActor* DestroyedActor)
+{
+	if (FieldActor)
+	{
+		FieldActor->Destroy();
+		FieldActor = nullptr;
+	}
 }

@@ -2,8 +2,8 @@
 
 #define BBKEY_DESTPOS TEXT("DestPos")
 #define BBKEY_SUBDESTPOS TEXT("SubDestPos")
-#define BBKEY_ORIPOS TEXT("OriPos")
 #define BBKEY_ISPLAYERNEARBY TEXT("bIsPlayerNearby")
 #define BBKEY_PROGRESS TEXT("Progress")
 #define BBKEY_ISFIRSTATTACKED TEXT("bIsFirstAttacked")
 #define BBKEY_PLAYERACTOR TEXT("PlayerActor")
+#define BBKEY_SHOULDMOVETOPOINT TEXT("bShouldMoveToPoint")

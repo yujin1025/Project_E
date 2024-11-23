@@ -13,6 +13,8 @@
 // Sets default values
 APJECharacterBase::APJECharacterBase()
 {
+	SetReplicates(true);
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -83,20 +85,6 @@ void APJECharacterBase::SetDead()
 	//HpBar->SetHiddenInGame(true);
 }
 
-// Called every frame
-void APJECharacterBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void APJECharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
 void APJECharacterBase::Move(const FVector2D Value)
 {
 	if (Controller != nullptr)
@@ -141,10 +129,19 @@ bool APJECharacterBase::IsPlayer()
 {
 	if(Controller)
 	{
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Emerald, FString::Printf(TEXT("Player has Controller")));
+		//if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Emerald, FString::Printf(TEXT("Player has Controller")));
 		return Controller->IsPlayerController();
 	}
 	return false;
+}
+
+float APJECharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float SuperReturn = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	HealthComponent->ChangeHealth(-DamageAmount);
+
+	return SuperReturn;
 }
 
 FVector APJECharacterBase::GetTargetPosition(ECollisionChannel Channel, float RayCastDistance, OUT bool& IsFoundTarget)

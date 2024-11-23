@@ -35,9 +35,6 @@ public:
     EItemType Type;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-    float Weight;
-    
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
     float CatDamage;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
@@ -47,7 +44,13 @@ public:
     UTexture2D* ItemImage;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-    TSubclassOf<class ACatWeapon> WeaponClass;
+    TSubclassOf<class ACatWeapon> CatWeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADuckProjectile> DuckWeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADropItem> DropItmeClass;
 
     FString GetItemName() const { return Name; }
 
@@ -69,9 +72,6 @@ struct FItemData : public FTableRowBase
     EItemType Type;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-    float Weight;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     float CatDamage;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
@@ -81,5 +81,11 @@ struct FItemData : public FTableRowBase
     UTexture2D* ItemImage;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-    TSubclassOf<class ACatWeapon> WeaponClass;
+    TSubclassOf<class ACatWeapon> CatWeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADuckProjectile> DuckWeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+    TSubclassOf<class ADropItem> DropItmeClass;
 };

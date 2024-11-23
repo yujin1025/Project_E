@@ -39,6 +39,7 @@ public:
 	void Swallow();
 
 protected:
+	void ResetSwallow();
 	void DropItem() override;
 	void Fire();
 	void ResetFire();
@@ -47,20 +48,49 @@ protected:
 	void ResetRapidFire();
 	void ApplySpeedReduction();
 	void Dash();
-	void LogInventory();
 	void UpdateInventoryWidget(EItemType ItemType);
 
 	void EnterAimingMode();
 	void ExitAimingMode();
 	void CalculateProjectilePath();
+	FVector2D GetCrosshairScreenPosition();
+
+	// Multiplay Section
+	UFUNCTION(Server, Reliable)
+	void Server_Swallow();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SwallowInventory(int32 ItemID);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropItem(int32 ItemID);
+
+	UFUNCTION(Server, Reliable)
+	void Server_Fire(FVector ClientMuzzleLocation, FRotator ClientMuzzleRotation);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Fire(FVector Location, FRotator Rotation);
+
+	UFUNCTION(Server, Reliable)
+	void Server_RapidFire(FVector InMuzzleLocation, FRotator InMuzzleRotation);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateSpeed(float NewSpeed, bool bNewIsSwallowed);
+
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	UInventory* Inventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(BlueprintReadWrite, Category = "Data")
 	class UDataTable* ItemDatabase;
 
+	bool bCanSwallow = true;
+
+	FTimerHandle SwallowCooldownTimer;
 	FTimerHandle ShootDelayTimer;
 	FTimerHandle RapidFireDelayTimer;
 	bool bCanShoot;
@@ -75,13 +105,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float SwallowedMultiplier = 0.7f;
 
-	
+	FVector OriginalCameraLocation;
+	FRotator OriginalCameraRotation;
 	FVector MuzzleLocation;
 	FRotator MuzzleRotation;
-
-	// 카메라 위치로부터의 총구 오프셋
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector MuzzleOffset;
 
 	int32 MagicBallCount;
 	FTimerHandle RapidFireTimerHandle;
@@ -92,9 +119,6 @@ protected:
 	bool bIsInitialized = false;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TSubclassOf<class ADuckProjectile> ProjectileClass;
-
 	UPROPERTY()
 	UDuckInventoryWidget* WeaponInventoryWidget;
 
@@ -107,7 +131,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UDuckInventoryWidget> NonWeaponInventoryClass;
 
-	UItem* SwallowedItem = nullptr;
+	TArray<UItem*> SwallowedItems;
+
+	UPROPERTY()
+	ADuckProjectile* PredictedProjectile;
 
 	/**
 	* Animation montages
@@ -117,4 +144,5 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* RapidFireMontage;
+
 };

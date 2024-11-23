@@ -19,6 +19,6 @@ private:
 	UPROPERTY()
 	UTextBlock* HPText;
 
-protected:
+public:
 	virtual void NativeConstruct() override;
 };

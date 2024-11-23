@@ -13,29 +13,10 @@ UCLASS()
 class PROJECT_E_API APJEShadowAIController : public APJEAIController
 {
 	GENERATED_BODY()
-	
-protected:
-
-	UPROPERTY(ReplicatedUsing = OnRep_NextPatrolPos)
-	FVector NextPatrolPos;
-
-    UPROPERTY(ReplicatedUsing = OnRep_SubPatrolPos)
-    FVector SubPatrolPos;
-
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-    UFUNCTION()
-    virtual void OnRep_NextPatrolPos();
-
-    UFUNCTION()
-    virtual void OnRep_SubPatrolPos();
 
 public:
     APJEShadowAIController();
 
-    UFUNCTION(Server, Reliable, WithValidation)
-    void Server_SetRandomDestPos(const FVector& DestPos);
-
-    virtual void Server_SetRandomDestPos_Implementation(const FVector& DestPos);
-    virtual bool Server_SetRandomDestPos_Validate(const FVector& DestPos);
+protected:
+	virtual void InitBB() override;
 };

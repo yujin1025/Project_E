@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "UI/PopUpWidget.h"
 #include "PJEPlayerController.generated.h"
 
 class UBaseWidget;
+class APJEPlayerState;
 
 UENUM(BlueprintType)
 enum class EControllerOperation : uint8
@@ -43,10 +45,15 @@ public:
 	void Client_Init();
 
 	FORCEINLINE APawn* GetPlayerPawn() {return PlayerPawn;}
+
+	APJEPlayerState* GetState();
 	
 protected:
 	TObjectPtr<APawn> PlayerPawn = NULL;
 	TObjectPtr<AActor> OperatingActor = NULL;
+
+	virtual void OnRep_PlayerState() override;
+	void TryClientInit();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
@@ -74,7 +81,8 @@ private:
 	UPROPERTY()
 	UBaseWidget* InGameWindowWidget;
 
-	TObjectPtr<UUserWidget> SettingsMenu;
+	UPROPERTY()
+	TWeakObjectPtr<class UPopUpWidget> SettingsMenu;
 
 	UFUNCTION()
 	void ToggleSettingsMenu(const FInputActionValue& Value);
@@ -87,5 +95,5 @@ public:
 	class UInputAction* ToggleSettingsMenuAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<class UUserWidget> SettingsMenuClass;
+	TSubclassOf<class UPopUpWidget> SettingsMenuClass;
 };

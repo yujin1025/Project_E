@@ -29,7 +29,13 @@ public:
 
 	FORCEINLINE void SetItemCode(int32 NewItemCode) { ItemCode = NewItemCode; }
 
-private:
+	void SetDamage(float Damage);
+
+protected:
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_GetBall();
+
+public:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* CollisionComponent;
 
@@ -39,12 +45,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	float Speed = 3200.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	float GravityScale = 4.0f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "DP_Settings")
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "item")
 	int32 ItemCode;
+
+	float DamageAmount = 0.0f;
+
+private:
+	void CalculateGravityScale(float DesiredRange, float InitialSpeed);
 };

@@ -6,6 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "PJEGameState.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedDelegate, int, float)
 /**
  * 
  */
@@ -16,7 +17,9 @@ class PROJECT_E_API APJEGameState : public AGameStateBase
 
 public:
 	APJEGameState();
+
+	FOnHealthChangedDelegate OnNonPlayerHPChanged;
 	
 public:
-	void OnChangedHealth(int ObjectID, float Amount);
+	void OnChangedHealth(int ObjectID, float NewCurrentHealth);
 };

@@ -6,6 +6,7 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_SetRandomDestPos.generated.h"
 
+class UBlackboardComponent;
 /**
  * 
  */
@@ -18,4 +19,5 @@ public:
 	UBTTask_SetRandomDestPos();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	
 };

@@ -10,6 +10,7 @@
 
 class APJEGameState;
 class APJEPlayerState;
+class APJEPlayerController;
 
 /**
  * 
@@ -61,7 +62,10 @@ public:
 	UPROPERTY()
 	APJEPlayerState* MyPlayerState;
 
-private:
+protected:
+	virtual void PostInitializeComponents() override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	void OnPostLogin(APJEPlayerController* NewPlayer);
 
 private:
 	UPROPERTY(EditAnywhere, Category = Data)

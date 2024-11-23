@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/PopUpWidget.h"
 #include "PJECatControlGuideWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_E_API UPJECatControlGuideWidget : public UUserWidget
+class PROJECT_E_API UPJECatControlGuideWidget : public UPopUpWidget
 {
 	GENERATED_BODY()
 	

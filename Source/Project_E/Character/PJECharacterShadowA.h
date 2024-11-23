@@ -53,21 +53,7 @@ public:
 	virtual float GetDetectMaxYDifference() override;
 	virtual float GetDetectMinYDifference() override;
 
-// AI Section
-protected:
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
-
-	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
-	virtual void AttackByAI() override;
-
 // Sound Section
-public:
-	UPROPERTY()
-	TObjectPtr<class APJEShadowArea> ShadowArea;
-
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TObjectPtr<USoundCue> LaughSound;
@@ -78,7 +64,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<class UAudioComponent> LaughAudioComponent;
 
+	UPROPERTY()
+	TObjectPtr<class APJEShadowArea> ShadowArea;
+
 public:
+	class APJEShadowArea* GetShadowArea();
+	void SetShadowArea(class APJEShadowArea* NewShadowArea);
+
 	void PlaySound();
 	void StopSound();
 

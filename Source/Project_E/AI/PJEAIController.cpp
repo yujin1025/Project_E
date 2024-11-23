@@ -10,7 +10,6 @@
 
 APJEAIController::APJEAIController()
 {
-    bReplicates = true;
 }
 
 void APJEAIController::RunAI()
@@ -31,26 +30,6 @@ void APJEAIController::StopAI()
 
 void APJEAIController::Server_RunAI_Implementation()
 {
-    Multicast_RunAI();
-}
-
-bool APJEAIController::Server_RunAI_Validate()
-{
-    return true;
-}
-
-void APJEAIController::Server_StopAI_Implementation()
-{
-    Multicast_StopAI();
-}
-
-bool APJEAIController::Server_StopAI_Validate()
-{
-    return true;
-}
-
-void APJEAIController::Multicast_RunAI_Implementation()
-{
     UBlackboardComponent* BlackboardPtr = Blackboard.Get();
     if (UseBlackboard(BBAsset, BlackboardPtr))
     {
@@ -60,13 +39,23 @@ void APJEAIController::Multicast_RunAI_Implementation()
     }
 }
 
-void APJEAIController::Multicast_StopAI_Implementation()
+bool APJEAIController::Server_RunAI_Validate()
+{
+    return true;
+}
+
+void APJEAIController::Server_StopAI_Implementation()
 {
     UBehaviorTreeComponent* BTComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
     if (BTComponent)
     {
         BTComponent->StopTree();
     }
+}
+
+bool APJEAIController::Server_StopAI_Validate()
+{
+    return true;
 }
 
 void APJEAIController::OnPossess(APawn* InPawn)
@@ -77,33 +66,15 @@ void APJEAIController::OnPossess(APawn* InPawn)
 
 void APJEAIController::InitBB()
 {
-    Blackboard->SetValueAsVector(BBKEY_ORIPOS, GetPawn()->GetActorLocation());
+    
 }
 
-TObjectPtr<class UBlackboardData> APJEAIController::GetBB()
+UBlackboardData* APJEAIController::GetBB()
 {
     return BBAsset;
 }
 
-TObjectPtr<class UBehaviorTree> APJEAIController::GetBT()
+UBehaviorTree* APJEAIController::GetBT()
 {
     return BTAsset;
-}
-
-void APJEAIController::OnRep_BBAsset()
-{
-    ;
-}
-
-void APJEAIController::OnRep_BTAsset()
-{
-    ;
-}
-
-void APJEAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-    DOREPLIFETIME(APJEAIController, BBAsset);
-    DOREPLIFETIME(APJEAIController, BTAsset);
 }

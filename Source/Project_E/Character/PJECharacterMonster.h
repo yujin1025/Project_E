@@ -23,10 +23,21 @@ class PROJECT_E_API APJECharacterMonster : public APJECharacterNonPlayer
 {
 	GENERATED_BODY()
 	
+public:
+	APJECharacterMonster();
+
+	virtual void BeginPlay() override;
+
+// Component Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UPJEHpBarWidgetComponent> HealthBarComponent;
+
 // Destory Section
 public:
 	void OnDeath();
 
+	/**/
 protected:
 	void DelayedDestroy();
 	FTimerHandle DestructionTimer;
@@ -48,4 +59,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MoveSpeed;
 
+// Physics Section
+protected:
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Push")
+	float PushStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Push")
+	float MinimumPlayerSpeed;
+
+// HP Section
+protected:
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TObjectPtr<class UNiagaraSystem> HitEffect;
+
+	void PlayHitEffect(AActor* DamageCauser);
 };

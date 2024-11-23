@@ -10,10 +10,12 @@
 #include "../Items/Inventory.h"
 #include "Projectile/DuckProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/SphereComponent.h"
 #include "../UI/DuckInventoryWidget.h"
 #include "../Items/Item.h"
+#include "../Items/DropItem.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "GameFramework/PlayerController.h"
 
 
 APJECharacterDuck::APJECharacterDuck()
@@ -43,9 +45,6 @@ void APJECharacterDuck::InitWidget()
 {
     Super::InitWidget();
     
-    Inventory = NewObject<UInventory>(this);
-    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
-
     WeaponInventoryWidget = CreateWidget<UDuckInventoryWidget>(GetWorld(), WeaponInventoryClass);
     if (WeaponInventoryWidget)
     {
@@ -62,6 +61,13 @@ void APJECharacterDuck::InitWidget()
 void APJECharacterDuck::BeginPlay()
 {
     Super::BeginPlay();
+
+    SetOwner(GetController());
+
+    Inventory = NewObject<UInventory>(this);
+    ItemDatabase = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DuckItem.DuckItem"));
+    OriginalCameraLocation = FollowCamera->GetRelativeLocation();
+    OriginalCameraRotation = FollowCamera->GetRelativeRotation();
 }
 
 void APJECharacterDuck::Tick(float DeltaTime)
@@ -82,31 +88,69 @@ void APJECharacterDuck::Tick(float DeltaTime)
 
 void APJECharacterDuck::Swallow()
 {
+    if (!bCanSwallow)
+        return;
+
+    Server_Swallow();
+}
+
+void APJECharacterDuck::Server_Swallow_Implementation()
+{
     if (Inventory)
     {
-        SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
+        UItem* SwallowedItem = UItem::SetItem(ItemDatabase, GetHandItemCode());
         if (SwallowedItem)
         {
             Inventory->AddItem(SwallowedItem, true);
-            
+            SwallowedItems.Add(SwallowedItem);
+
             if (SwallowedItem->ItemCode == 1)
                 MagicBallCount++;
-            
+
             ApplySpeedReduction();
-            LogInventory();
-            UpdateInventoryWidget(SwallowedItem->Type);
+            Multicast_SwallowInventory(SwallowedItem->ItemCode);
+
+            bCanSwallow = false;
+            GetWorld()->GetTimerManager().SetTimer(SwallowCooldownTimer, this, &APJECharacterDuck::ResetSwallow, 0.2f, false);
         }
     }
+}
+
+void APJECharacterDuck::Multicast_SwallowInventory_Implementation(int32 ItemID)
+{
+    UItem* NewItem = UItem::SetItem(ItemDatabase, ItemID);
+    if (NewItem)
+    {
+        if (!HasAuthority())
+        {
+            Inventory->AddItem(NewItem, true);
+        }
+        UpdateInventoryWidget(NewItem->Type);
+    }
+}
+
+
+void APJECharacterDuck::ResetSwallow()
+{
+    bCanSwallow = true;
 }
 
 void APJECharacterDuck::DropItem()
 {
     Super::DropItem();
 
+    Server_DropItem();
+}
+
+void APJECharacterDuck::Server_DropItem_Implementation()
+{
     if (Inventory)
     {
-        if (SwallowedItem)
+        if (SwallowedItems.Num() > 0)
         {
+            UItem* SwallowedItem = SwallowedItems.Last();
+            SwallowedItems.Remove(SwallowedItem);
+
             Inventory->RemoveItem(SwallowedItem, true);
 
             if (SwallowedItem->ItemCode == 1)
@@ -115,12 +159,39 @@ void APJECharacterDuck::DropItem()
                 if (MagicBallCount < 0)
                     MagicBallCount = 0;
             }
-            ApplySpeedReduction();
-            LogInventory();
-            UpdateInventoryWidget(SwallowedItem->Type);
 
+            FVector StartLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+            FVector EndLocation = StartLocation - FVector(0.0f, 0.0f, 500.0f);
+
+            FHitResult HitResult;
+            FCollisionQueryParams CollisionParams;
+            CollisionParams.AddIgnoredActor(this);
+
+            bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, CollisionParams);
+
+            FVector DropLocation = bHit ? HitResult.ImpactPoint : StartLocation;
+            FRotator DropRotation = GetActorRotation();
+
+            ADropItem* DroppedItem = GetWorld()->SpawnActor<ADropItem>(SwallowedItem->DropItmeClass, DropLocation, DropRotation);
+
+            ApplySpeedReduction();
+            Multicast_DropItem(SwallowedItem->ItemCode);
             SwallowedItem = nullptr;
         }
+    }
+}
+
+
+void APJECharacterDuck::Multicast_DropItem_Implementation(int32 ItemID)
+{
+    UItem* NewItem = UItem::SetItem(ItemDatabase, ItemID);
+    if (NewItem)
+    {
+        if (!HasAuthority())
+        {
+            Inventory->RemoveItem(NewItem, true);
+        }
+        UpdateInventoryWidget(NewItem->Type);
     }
 }
 
@@ -130,19 +201,30 @@ void APJECharacterDuck::Fire()
     if (!bIsAiming)
         return;
 
+    //일단 임의로 클라에서 발사 먼저 하고 서버에서 발사하면 destroy(나중에 수정하기)
+    if (!HasAuthority())
+    {
+        if (bCanShoot && Inventory->GetWeaponCount() > 0)
+        {
+            UItem* RemovedItem = Inventory->RemoveLastItem(true);
+            if (RemovedItem)
+            {
+                PredictedProjectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
+            }
+        }
+    }
+
+    Server_Fire(MuzzleLocation, MuzzleRotation);
+}
+
+void APJECharacterDuck::Server_Fire_Implementation(FVector ClientMuzzleLocation, FRotator ClientMuzzleRotation)
+{
     if (bCanShoot && Inventory->GetWeaponCount() > 0)
     {
-        if (FireMontage)
-        {
-            PlayAnimMontage(FireMontage);
-        }
-
-        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
-
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+            ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, ClientMuzzleLocation, ClientMuzzleRotation);
 
             if (RemovedItem->ItemCode == 1)
             {
@@ -151,28 +233,57 @@ void APJECharacterDuck::Fire()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
-            LogInventory();
-            UpdateInventoryWidget(RemovedItem->Type);
+            Projectile->SetDamage(RemovedItem->DuckDamage);
+
+            Multicast_Fire(ClientMuzzleLocation, ClientMuzzleRotation);
+            Multicast_DropItem(RemovedItem->ItemCode);
         }
 
         bCanShoot = false;
         GetWorld()->GetTimerManager().SetTimer(ShootDelayTimer, this, &APJECharacterDuck::ResetFire, 0.2f, false);
     }
-
 }
+
+void APJECharacterDuck::Multicast_Fire_Implementation(FVector Location, FRotator Rotation)
+{
+    if (FireMontage)
+    {
+        PlayAnimMontage(FireMontage);
+    }
+
+    if (!HasAuthority())
+    {
+        if (PredictedProjectile)
+        {
+            PredictedProjectile->Destroy();
+            PredictedProjectile = nullptr;  
+        }
+    }
+}
+
+
 
 void APJECharacterDuck::ResetFire()
 {
     bCanShoot = true;
 }
 
+
 void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
 {
     if (!bIsAiming)
         return;
 
+    Server_RapidFire(MuzzleLocation, MuzzleRotation);
+}
+
+void APJECharacterDuck::Server_RapidFire_Implementation(FVector InMuzzleLocation, FRotator InMuzzleRotation)
+{
     if (bCanRapidFire && Inventory->GetWeaponCount() > 2)
     {
+        MuzzleLocation = InMuzzleLocation;
+        MuzzleRotation = InMuzzleRotation;
+
         float FireInterval = 0.3f;
         RapidFireCount = 0;
 
@@ -185,6 +296,7 @@ void APJECharacterDuck::RapidFire(const FInputActionValue& Value)
     }
 }
 
+
 void APJECharacterDuck::SpawnRapidFireProjectile()
 {
     if (RapidFireCount < 3 && Inventory->GetWeaponCount() > 0)
@@ -194,12 +306,12 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
             PlayAnimMontage(RapidFireMontage);
         }
 
-        ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation);
-
         UItem* RemovedItem = Inventory->RemoveLastItem(true);
         if (RemovedItem)
         {
             UE_LOG(LogTemp, Warning, TEXT("Shot item: %s"), *RemovedItem->Name);
+
+            ADuckProjectile* Projectile = GetWorld()->SpawnActor<ADuckProjectile>(RemovedItem->DuckWeaponClass, MuzzleLocation, MuzzleRotation);
 
             if (RemovedItem->ItemCode == 1)
             {
@@ -208,7 +320,7 @@ void APJECharacterDuck::SpawnRapidFireProjectile()
                     MagicBallCount = 0;
             }
             ApplySpeedReduction();
-            LogInventory();
+            Projectile->SetDamage(RemovedItem->DuckDamage);
             UpdateInventoryWidget(RemovedItem->Type);
         }
 
@@ -229,23 +341,37 @@ void APJECharacterDuck::ResetRapidFire()
 
 void APJECharacterDuck::ApplySpeedReduction()
 {
+    float NewSpeed;
+    bool bNewIsSwallowed;
+
     if (MagicBallCount > 0 && Inventory->GetInventoryCount() > 3)
     {
-        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * SwallowedMultiplier;
-        bIsSwallowed = true;
+        NewSpeed = DefaultWalkSpeed * SwallowedMultiplier;
+        bNewIsSwallowed = true;
     }
     else if (Inventory->GetInventoryCount() > 5)
     {
-        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed * SwallowedMultiplier;
-        bIsSwallowed = true;
+        NewSpeed = DefaultWalkSpeed * SwallowedMultiplier;
+        bNewIsSwallowed = true;
     }
     else
     {
-        GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
-        bIsSwallowed = false;
+        NewSpeed = DefaultWalkSpeed;
+        bNewIsSwallowed = false;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Current Speed: %f"), GetCharacterMovement()->MaxWalkSpeed);
+    GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+    bIsSwallowed = bNewIsSwallowed;
+
+    Multicast_UpdateSpeed(NewSpeed, bNewIsSwallowed);
+}
+
+void APJECharacterDuck::Multicast_UpdateSpeed_Implementation(float NewSpeed, bool bNewIsSwallowed)
+{
+    GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+    bIsSwallowed = bNewIsSwallowed;
+
+    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 17.f, FColor::Blue, FString::Printf(TEXT("Updated Speed on Client: %f"), GetCharacterMovement()->MaxWalkSpeed));
 }
 
 
@@ -269,31 +395,6 @@ void APJECharacterDuck::Dash()
     }
 }
 
-//나중에 다 확인하고 지우기
-void APJECharacterDuck::LogInventory()
-{
-    if (Inventory)
-    {
-        if (Inventory->DuckWeaponInventory.Num() > 0)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Current Duck Weapon Inventory:"));
-            for (UItem* Item : Inventory->DuckWeaponInventory)
-            {
-                UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
-            }
-        }
-
-        if (Inventory->DuckNonWeaponInventory.Num() > 0)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Current Duck Non-Weapon Inventory:"));
-            for (UItem* Item : Inventory->DuckNonWeaponInventory)
-            {
-                UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
-            }
-        }
-    }
-}
-
 void APJECharacterDuck::UpdateInventoryWidget(EItemType ItemType)
 {
     if (ItemType == EItemType::Weapon && WeaponInventoryWidget)
@@ -311,12 +412,26 @@ void APJECharacterDuck::EnterAimingMode()
     bIsAiming = true;
     GetCharacterMovement()->bOrientRotationToMovement = false;
     GetCharacterMovement()->RotationRate = FRotator(0.f, 360.f, 0.f);
+
+    if (FollowCamera)
+    {
+        // 카메라를 오른쪽으로 이동
+        FVector CameraOffset = FVector(0.0f, 50.0f, 0.0f);
+        FollowCamera->SetRelativeLocation(OriginalCameraLocation + CameraOffset);
+    }
 }
 
 void APJECharacterDuck::ExitAimingMode()
 {
     bIsAiming = false;
     GetCharacterMovement()->bOrientRotationToMovement = true;
+
+    if (FollowCamera)
+    {
+        FollowCamera->SetRelativeLocation(OriginalCameraLocation);
+        FollowCamera->SetRelativeRotation(OriginalCameraRotation);
+    }
+
 }
 
 void APJECharacterDuck::CalculateProjectilePath()
@@ -325,26 +440,74 @@ void APJECharacterDuck::CalculateProjectilePath()
     FRotator CameraRotation;
     GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-    // 발사 위치 계산
-    MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
-    MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
-    MuzzleRotation = CameraRotation;
-    MuzzleRotation.Pitch += 23.0f;
+    //발사체의 발사 위치
+    MuzzleLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 
-    // 예측 궤도 계산
-    FPredictProjectilePathParams PredictParams(1.0f, MuzzleLocation, MuzzleRotation.Vector() * 1000.f, 10.f, ECC_Visibility, this);
-    FPredictProjectilePathResult PredictResult;
+    // 목표 지점 계산
+    FVector2D CrosshairScreenPosition = GetCrosshairScreenPosition();
+    FVector CrosshairWorldPosition;
+    FVector WorldDirection;
+    UGameplayStatics::DeprojectScreenToWorld(GetWorld()->GetFirstPlayerController(), CrosshairScreenPosition, CrosshairWorldPosition, WorldDirection);
+    
+    float DesiredDistance = 1000.0f;
+    FVector TargetPoint = CrosshairWorldPosition + WorldDirection * DesiredDistance;
+    
+    // 발사체 방향과 속도 설정
+    FVector MuzzleToTarget = (TargetPoint - MuzzleLocation).GetSafeNormal();
+    MuzzleRotation = MuzzleToTarget.Rotation();
+    MuzzleRotation.Pitch += 5.0f;
 
-    bool bHit = UGameplayStatics::PredictProjectilePath(this, PredictParams, PredictResult);
+    float ProjectileSpeed = 3200.0f;
+    FVector Velocity = MuzzleRotation.Vector() * ProjectileSpeed;
+    float GravityScale = 4.175f;
 
-    FlushPersistentDebugLines(GetWorld());
+    //궤적 계산
+    TArray<FVector> TrajectoryPoints;
+    FVector CurrentPosition = MuzzleLocation;
+    FVector CurrentVelocity = Velocity;
+    float TimeStep = 0.05f; 
+    float MaxTime = 10.0f; 
 
-    if (bHit && PredictResult.PathData.Num() > 0)
+    for (float Time = 0.0f; Time <= MaxTime; Time += TimeStep)
     {
-        for (FPredictProjectilePathPointData PointData : PredictResult.PathData)
-        {
-            DrawDebugSphere(GetWorld(), PointData.Location, 5.f, 8, FColor::Green, false, 0.0f);
-        }
+        FVector NewPosition = CurrentPosition + CurrentVelocity * TimeStep;
+        FVector NewVelocity = CurrentVelocity;
+        NewVelocity.Z -= GravityScale * 980.0f * TimeStep;
+
+        TrajectoryPoints.Add(NewPosition);
+
+        CurrentPosition = NewPosition;
+        CurrentVelocity = NewVelocity;
+    }
+
+    //궤적 시각화
+    for (const FVector& Point : TrajectoryPoints)
+    {
+        DrawDebugSphere(GetWorld(), Point, 5.f, 8, FColor::Green, false, 0.0f);
     }
 }
 
+FVector2D APJECharacterDuck::GetCrosshairScreenPosition()
+{
+    UWorld* World = GetWorld();
+    if (!World)
+        return FVector2D::ZeroVector;
+
+    APlayerController* PlayerController = UGameplayStatics::GetPlayerController(World, 0);
+    if (!PlayerController)
+        return FVector2D::ZeroVector;
+
+    FVector2D ViewportSize;
+    if (GEngine && GEngine->GameViewport)
+    {
+        GEngine->GameViewport->GetViewportSize(ViewportSize);
+    }
+    else
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    FVector2D CrosshairScreenPosition = FVector2D(ViewportSize.X * 0.5f, ViewportSize.Y * 0.5f);
+
+    return CrosshairScreenPosition;
+}

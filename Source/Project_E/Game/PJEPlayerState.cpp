@@ -7,12 +7,15 @@
 
 APJEPlayerState::APJEPlayerState()
 {
-	PlayerRole = EPlayerRole::Duck;
+	PlayerRole = EPlayerRole::Cat;
 }
 
-void APJEPlayerState::OnChangePlayerHealth(int objectId, float Amount)
+void APJEPlayerState::OnChangePlayerHealth(int objectId, float NewCurrentHealth)
 {
-
+	if (OnPlayerHPChanged.IsBound())
+	{
+		OnPlayerHPChanged.Broadcast(objectId, NewCurrentHealth);
+	}
 }
 
 void APJEPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

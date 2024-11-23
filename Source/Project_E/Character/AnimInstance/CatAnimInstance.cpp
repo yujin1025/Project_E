@@ -21,6 +21,27 @@ void UCatAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		CatCharacter = Cast<APJECharacterPlayer>(TryGetPawnOwner());
 	}
+
+	if (CatCharacter)
+	{
+		FVector Start = CatCharacter->GetActorLocation() + FVector(0, 0, -88);
+		FVector End = Start - FVector(0, 0, 500);
+
+		FHitResult HitResult;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(CatCharacter);
+
+		bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+		if (bHit)
+		{
+			DistanceToGround = (HitResult.Location - Start).Size();
+		}
+		else
+		{
+			DistanceToGround = 500.0f; 
+		}
+	}
 }
 
 void UCatAnimInstance::AnimNotify_L_DashTrail()

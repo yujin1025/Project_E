@@ -2,6 +2,7 @@
 
 #include "Gimmick/PJEInteractiveActor.h"
 
+#include "Character/DPCharacterBase.h"
 #include "Character/PJECharacterPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"

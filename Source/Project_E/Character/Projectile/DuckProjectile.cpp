@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "DuckProjectile.h"
@@ -25,12 +25,13 @@ ADuckProjectile::ADuckProjectile()
 	ProjectileMesh->SetupAttachment(CollisionComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
-	ProjectileMovementComponent->InitialSpeed = Speed;
-	ProjectileMovementComponent->MaxSpeed = Speed;
-	ProjectileMovementComponent->ProjectileGravityScale = GravityScale;
+
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Bounciness = 0.3f; 
-	ProjectileMovementComponent->BounceVelocityStopSimulatingThreshold = 500.0f;
+	CalculateGravityScale(25.0f, 32.0f);
+
+	SetReplicates(true);
+	SetReplicateMovement(true);
 }
 
 void ADuckProjectile::BeginPlay()
@@ -49,9 +50,15 @@ void ADuckProjectile::Tick(float DeltaTime)
 	InteractionTriggerBox->SetWorldLocation(CurrentLocation);
 }
 
+
+void ADuckProjectile::SetDamage(float Damage)
+{
+	DamageAmount = Damage;
+}
+
 void ADuckProjectile::OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor != this && OtherComp->IsSimulatingPhysics())
+	if (OtherActor != this)
 	{
 		APJECharacterBase* DamagedCharacter = Cast<APJECharacterBase>(OtherActor);
 		if (DamagedCharacter)
@@ -61,28 +68,56 @@ void ADuckProjectile::OnAttack(UPrimitiveComponent* HitComp, AActor* OtherActor,
 				return;
 
 			UE_LOG(LogTemp, Warning, TEXT("Projectile OnAttack"));
-			DamagedHealthComponent->ChangeHealth(-10);
+			DamagedHealthComponent->ChangeHealth(-DamageAmount);
 		}
 	}
-
 }
 
 void ADuckProjectile::InteractionKeyPressed(APJECharacterPlayer* Character)
 {
 	Super::InteractionKeyPressed(Character);
 
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Emerald, FString::Printf(TEXT("Get Projectile")));
+
 	if (Character)
 	{
-		Character->SetHandItemCode(ItemCode);
-
 		if (APJECharacterDuck* DuckCharacter = Cast<APJECharacterDuck>(Character))
 		{
-			DuckCharacter->Swallow();
+			if (ItemCode != 3)
+			{
+				Character->SetHandItemCode(ItemCode);
+				DuckCharacter->Swallow();
+				NetMulticast_GetBall();
+			}
 		}
 		else if (APJECharacterCat* CatCharacter = Cast<APJECharacterCat>(Character))
 		{
-			CatCharacter->Grab();
+			if (ItemCode != 1)
+			{
+				Character->SetHandItemCode(ItemCode);
+				if (CatCharacter->Grab())
+				{
+					NetMulticast_GetBall();
+				}
+			}
 		}
 	}
+}
+
+void ADuckProjectile::CalculateGravityScale(float DesiredRange, float InitialSpeed)
+{
+	float AngleInRadians = FMath::DegreesToRadians(45.0f);
+	float Gravity = (InitialSpeed * InitialSpeed * FMath::Sin(2 * AngleInRadians)) / DesiredRange;
+
+	float ProjectileSpeed = InitialSpeed * 100.0f;
+	float GravityScale = Gravity / 9.81f;
+	ProjectileMovementComponent->InitialSpeed = ProjectileSpeed;
+	ProjectileMovementComponent->MaxSpeed = ProjectileSpeed;
+	ProjectileMovementComponent->ProjectileGravityScale = GravityScale;
+}
+
+
+void ADuckProjectile::NetMulticast_GetBall_Implementation()
+{
 	Destroy();
 }
